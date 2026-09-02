@@ -1,26 +1,147 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
+  --background: #fafafa;
   --foreground: #171717;
+  --accent: #7c3aed;
+  --accent-light: #ede9fe;
+  --accent-dark: #5b21b6;
+  --surface: #ffffff;
+  --surface-raised: #ffffff;
+  --border: #e4e4e7;
+  --border-hover: #d4d4d8;
+  --muted: #71717a;
+  --radius: 0.875rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #09090b;
+    --foreground: #fafafa;
+    --accent: #a78bfa;
+    --accent-light: #1e1b4b;
+    --accent-dark: #c4b5fd;
+    --surface: #18181b;
+    --surface-raised: #1f1f23;
+    --border: #27272a;
+    --border-hover: #3f3f46;
+    --muted: #a1a1aa;
+  }
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-accent: var(--accent);
+  --color-accent-light: var(--accent-light);
+  --color-accent-dark: var(--accent-dark);
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
+  --color-border: var(--border);
+  --color-border-hover: var(--border-hover);
+  --color-muted: var(--muted);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
+}
+
+/* Buttons always show pointer cursor */
+button,
+[role="button"] {
+  cursor: pointer;
+}
+
+/* Smooth transitions on interactive elements */
+a,
+button,
+input,
+textarea,
+select {
+  transition: border-color 0.15s ease, background-color 0.15s ease,
+    box-shadow 0.15s ease, color 0.15s ease, opacity 0.15s ease;
+}
+
+/* Consistent focus ring */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 15%, transparent);
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--border-hover);
+}
+
+/* Selection color */
+::selection {
+  background: color-mix(in srgb, var(--accent) 25%, transparent);
+}
+
+/*
+ * Nav link pending hint. Paired with the `useLinkStatus` hook in
+ * app/components/nav-link-pending.tsx, this shows a subtle pulsing dot
+ * in the clicked tab while the next route is still being fetched. Hidden by
+ * default (reserves space via `visibility: hidden`), only visible if the
+ * navigation takes longer than ~100ms so fast transitions never flash.
+ * Recipe from Next.js docs: 01-app/03-api-reference/04-functions/use-link-status.md
+ */
+.link-hint {
+  display: inline-block;
+  width: 0.4em;
+  height: 0.4em;
+  margin-left: 0.15rem;
+  border-radius: 9999px;
+  background: currentColor;
+  opacity: 0;
+  visibility: hidden;
+  flex-shrink: 0;
+}
+
+.link-hint.is-pending {
+  visibility: visible;
+  animation-name: link-hint-fade-in, link-hint-pulse;
+  animation-duration: 200ms, 1s;
+  animation-delay: 100ms, 100ms;
+  animation-timing-function: ease, ease-in-out;
+  animation-iteration-count: 1, infinite;
+  animation-fill-mode: forwards, none;
+}
+
+@keyframes link-hint-fade-in {
+  to {
+    opacity: 0.7;
+  }
+}
+
+@keyframes link-hint-pulse {
+  50% {
+    opacity: 0.25;
+  }
 }

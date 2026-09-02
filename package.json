@@ -6,20 +6,35 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "db:link": "dotenv -e .env.local -- supabase link --project-ref kkrdvqecmhfcoyajjkjl",
+    "db:push": "dotenv -e .env.local -- supabase db push",
+    "db:pull": "dotenv -e .env.local -- supabase db pull --schema public",
+    "db:new": "dotenv -e .env.local -- supabase migration new",
+    "db:status": "dotenv -e .env.local -- supabase migration list",
+    "db:diff": "dotenv -e .env.local -- supabase db diff --schema public",
+    "db:reset": "dotenv -e .env.local -- supabase db reset"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
+    "@supabase/ssr": "^0.10.2",
+    "@supabase/supabase-js": "^2.103.0",
+    "lucide-react": "^1.8.0",
     "next": "16.2.2",
+    "node-latex-compiler": "^1.0.5",
     "react": "19.2.4",
-    "react-dom": "19.2.4"
+    "react-dom": "19.2.4",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "dotenv-cli": "^11.0.0",
     "eslint": "^9",
     "eslint-config-next": "16.2.2",
+    "supabase": "^2.106.0",
     "tailwindcss": "^4",
     "typescript": "^5"
   }
