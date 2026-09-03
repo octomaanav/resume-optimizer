@@ -159,8 +159,9 @@ export const CoverLetterOptimizationSchema = z.object({
 export type CoverLetterOptimization = z.infer<typeof CoverLetterOptimizationSchema>;
 
 export const SettingsSchema = z.object({
-  aiProvider: z.enum(["gemini", "ollama"]).default("gemini"),
+  aiProvider: z.enum(["gemini", "groq", "ollama"]).default("gemini"),
   geminiApiKey: z.string().trim().optional().default(""),
+  groqApiKey: z.string().trim().optional().default(""),
   ollamaBaseUrl: z.string().trim().optional().default("http://127.0.0.1:11434"),
   ollamaModel: z.string().trim().optional().default("llama3.2"),
   skillsMd: z.string().default(""),

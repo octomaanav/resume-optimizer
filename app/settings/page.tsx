@@ -92,6 +92,18 @@ export default function SettingsPage() {
             <input
               type="radio"
               name="provider"
+              checked={settings.aiProvider === "groq"}
+              onChange={() =>
+                setSettings((s) => ({ ...s, aiProvider: "groq" }))
+              }
+              className="accent-accent"
+            />
+            Groq (API key)
+          </label>
+          <label className="flex cursor-pointer items-center gap-2.5 text-sm">
+            <input
+              type="radio"
+              name="provider"
               checked={settings.aiProvider === "ollama"}
               onChange={() =>
                 setSettings((s) => ({ ...s, aiProvider: "ollama" }))
@@ -117,6 +129,23 @@ export default function SettingsPage() {
               />
               <span className="text-xs text-muted">
                 Or set <code className="font-mono">GEMINI_API_KEY</code> on the
+                server.
+              </span>
+            </label>
+          ) : settings.aiProvider === "groq" ? (
+            <label className="flex flex-col gap-1.5">
+              <span className="text-sm font-medium">Groq API key</span>
+              <input
+                value={settings.groqApiKey ?? ""}
+                onChange={(e) =>
+                  setSettings((s) => ({ ...s, groqApiKey: e.target.value }))
+                }
+                className="rounded-xl border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-accent"
+                placeholder="gsk_..."
+                autoComplete="off"
+              />
+              <span className="text-xs text-muted">
+                Or set <code className="font-mono">GROQ_API_KEY</code> on the
                 server.
               </span>
             </label>

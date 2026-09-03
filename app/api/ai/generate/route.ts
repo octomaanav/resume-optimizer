@@ -110,6 +110,69 @@ function getApiKey(req: Request) {
   return "";
 }
 
+function getGroqApiKey(req: Request) {
+  const headerKey = req.headers.get("x-groq-api-key")?.trim();
+  if (headerKey) return headerKey;
+  const envKey = process.env.GROQ_API_KEY?.trim();
+  if (envKey) return envKey;
+  return "";
+}
+
+const GROQ_MODEL_CANDIDATES = [
+  "openai/gpt-oss-120b",
+  "openai/gpt-oss-20b",
+  // Older Llama/Qwen names Groq has since retired for some accounts — kept as
+  // harmless fallbacks in case a given key still has access to them.
+  "llama-3.3-70b-versatile",
+  "llama-3.1-8b-instant",
+  "qwen/qwen3-32b",
+];
+
+/** Groq's API is OpenAI-compatible; try a few current models since exact names shift over time. */
+async function groqCompleteJson(prompt: string, apiKey: string): Promise<string> {
+  const errors: string[] = [];
+  for (const model of GROQ_MODEL_CANDIDATES) {
+    let res: Response;
+    try {
+      res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          authorization: `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify({
+          model,
+          messages: [{ role: "user", content: prompt }],
+          temperature: 0.2,
+          response_format: { type: "json_object" },
+        }),
+        signal: AbortSignal.timeout(120_000),
+      });
+    } catch (e) {
+      errors.push(`${model}: ${e instanceof Error ? e.message : String(e)}`);
+      continue;
+    }
+    const raw = await res.text();
+    if (!res.ok) {
+      errors.push(`${model} (${res.status}): ${raw.slice(0, 300)}`);
+      continue;
+    }
+    try {
+      const data = JSON.parse(raw) as {
+        choices?: Array<{ message?: { content?: string } }>;
+      };
+      const text = data.choices?.[0]?.message?.content?.trim() ?? "";
+      if (text) return text;
+      errors.push(`${model}: empty response`);
+    } catch {
+      errors.push(`${model}: unparsable response`);
+    }
+  }
+  throw new Error(
+    ["Groq request failed for all configured models.", "", "Tried:", ...errors.map((e) => `- ${e}`)].join("\n"),
+  );
+}
+
 /** Qwen / reasoning models often emit a think block before JSON. */
 function stripThinkingAndNoise(raw: string): string {
   let s = raw.trim();
@@ -664,8 +727,9 @@ export async function POST(req: Request) {
     }
   }
 
+  const providerHeader = req.headers.get("x-ai-provider")?.trim();
   const provider =
-    req.headers.get("x-ai-provider")?.trim() === "ollama" ? "ollama" : "gemini";
+    providerHeader === "ollama" ? "ollama" : providerHeader === "groq" ? "groq" : "gemini";
 
   const prompt = buildPrompt(input);
 
@@ -674,6 +738,20 @@ export async function POST(req: Request) {
     try {
       const { baseUrl, model } = getOllamaConfig(req);
       text = await ollamaCompleteJson(prompt, baseUrl, model);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      return new Response(msg, { status: 502 });
+    }
+  } else if (provider === "groq") {
+    const apiKey = getGroqApiKey(req);
+    if (!apiKey) {
+      return new Response(
+        "Missing Groq API key. Set it in Settings (sent as x-groq-api-key) or server env GROQ_API_KEY.",
+        { status: 401 },
+      );
+    }
+    try {
+      text = await groqCompleteJson(prompt, apiKey);
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
       return new Response(msg, { status: 502 });
@@ -691,10 +769,14 @@ export async function POST(req: Request) {
     const preferredModel = (process.env.GEMINI_MODEL?.trim() || "").trim();
     const modelCandidates = [
       preferredModel,
+      // Google retired 2.5-series models for newer API keys in favor of 3.6 —
+      // try the current model first, keep the older ones as fallback for keys
+      // that still have 2.5 access.
+      "gemini-3.6-flash",
+      "gemini-flash-latest",
       "gemini-2.5-flash",
       "gemini-2.5-flash-lite",
       "gemini-2.5-pro",
-      "gemini-flash-latest",
       "gemini-pro-latest",
       "gemini-3-flash-preview",
       "gemini-3.1-pro-preview",

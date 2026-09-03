@@ -9,9 +9,12 @@ import {
   MessageSquareText,
   Sparkles,
   Settings,
+  Send,
 } from "lucide-react";
 import { AuthHeader } from "./components/auth-header";
 import { NavLinkPending } from "./components/nav-link-pending";
+import { WebMcpPdfBanner } from "./components/webmcp-pdf-banner";
+import { WebMcpProvider } from "./components/webmcp-provider";
 import { WorkspaceProvider } from "./lib/workspace-context";
 
 const dockItems: Array<{
@@ -24,16 +27,22 @@ const dockItems: Array<{
   { href: "/documents", label: "Documents", icon: FolderOpen },
   { href: "/application-questions", label: "Q&A", icon: MessageSquareText },
   { href: "/optimize", label: "Optimize", icon: Sparkles },
+  { href: "/apply", label: "Apply Demo", icon: Send },
   { href: "/settings", label: "Settings", icon: Settings },
 ];
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const isApplyDemo = pathname === "/apply" || pathname.startsWith("/apply/");
 
   return (
     <WorkspaceProvider>
-      <div className="min-h-full bg-background text-foreground">
-        <div className="mx-auto min-h-full w-full max-w-6xl px-3 pb-28 pt-4 sm:px-6">
+      <WebMcpProvider />
+      <div
+        className={`min-h-full bg-background text-foreground ${isApplyDemo ? "theme-apply" : ""}`}
+      >
+        <WebMcpPdfBanner />
+        <div className="relative z-10 mx-auto min-h-full w-full max-w-6xl px-3 pb-28 pt-4 sm:px-6">
           <header className="mb-6 flex items-center justify-between gap-3">
             <Link
               href="/"
@@ -73,7 +82,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                   "relative inline-flex flex-col items-center justify-center gap-0.5 rounded-xl px-3 py-2 text-[10px] font-medium transition-all sm:flex-row sm:gap-1.5 sm:px-3.5 sm:text-xs",
                   active
                     ? "bg-accent text-white shadow-sm"
-                    : "text-muted hover:bg-zinc-100 hover:text-foreground dark:hover:bg-zinc-800",
+                    : "text-muted hover:bg-surface-raised hover:text-foreground",
                 ].join(" ")}
               >
                 <Icon size={16} className="shrink-0" />
