@@ -1,0 +1,689 @@
+{
+  "profile": {
+    "name": "Manav Sharma",
+    "email": "maanav.vashist@gmail.com",
+    "phone": "+1 (716) 547-1887",
+    "location": "Buffalo",
+    "links": [
+      {
+        "label": "LinkedIn",
+        "url": "https://www.linkedin.com/in/manav-sharma0"
+      },
+      {
+        "id": "link_c6abae22-1a70-49dc-a834-9e70217ea1e1",
+        "label": "Github",
+        "url": "https://github.com/octomaanav"
+      },
+      {
+        "id": "link_0a63a30a-db0e-4fc6-996e-f2bdcb01c646",
+        "label": "Portfolio",
+        "url": "https://manav-dev.web.app/"
+      },
+      {
+        "id": "link_db4b02c0-72cf-47ea-acaf-a69d1cb58dd7",
+        "label": "Devpost",
+        "url": "https://devpost.com/maanav-vashist"
+      }
+    ],
+    "summary": "",
+    "skills": [],
+    "skillCategories": [
+      {
+        "id": "skillcat_00b7fe0e-6150-442d-9368-db0c09b5f6c8",
+        "label": "Language",
+        "items": [
+          "Java",
+          "Python",
+          "C",
+          "OCaml",
+          "TypeScript",
+          "HTML/CSS",
+          "SQL",
+          "NoSQL",
+          "MIPS Assembly"
+        ]
+      },
+      {
+        "id": "skillcat_b8ae6214-7912-490c-ad63-d56d5468f9ed",
+        "label": "Frameworks/Tools",
+        "items": [
+          "React",
+          "Next.js",
+          "Node.js",
+          "Express.js",
+          "Spring Boot",
+          "Docker",
+          "Firebase",
+          "Supabase",
+          "AWS",
+          "Azure",
+          "MongoDB",
+          "Redis",
+          "Git",
+          "Figma"
+        ]
+      },
+      {
+        "id": "skillcat_014b7c2f-20d3-4dd9-8cbd-62687010434e",
+        "label": "Concepts",
+        "items": [
+          "Mathematics",
+          "Database",
+          "Web Development",
+          "Agile Methodology",
+          "DevOps",
+          "Web Services"
+        ]
+      }
+    ],
+    "experience": [
+      {
+        "id": "exp_c0176390-bf15-4fe7-8af1-725174a792ae",
+        "company": "UB Hacking",
+        "title": "Web Lead",
+        "location": "Buffalo, NY, USA",
+        "start": "Jan 2025",
+        "end": "Present",
+        "type": "Part-Time",
+        "bullets": [
+          "Built a fully featured CMS platform using TypeScript, React, PostgreSQL, and Drizzle ORM to manage UB Hacking\u2019s website for 700+ hackers, saving 100+ developer hours annually by eliminating yearly rebuilds.",
+          "Developed integrated tools, including a QR-code food scanner and automated check-in system, cutting operational costs by $1,000+ and removing 100+ hours of manual check-ins.",
+          "Implemented an automated email campaign system with end-to-end Playwright tests, enabling scheduled announcements and reducing communication overhead by 70%."
+        ]
+      },
+      {
+        "id": "exp_8441a55a-30ec-458f-bab9-ecacec475fa0",
+        "company": "University at Buffalo - SUNY",
+        "title": "Undergraduate Teaching Assistant",
+        "location": "Buffalo, NY, USA",
+        "start": "Aug 2024",
+        "end": "Present",
+        "type": "Part-Time",
+        "bullets": [
+          "Mentored 50+ students weekly in Java, Python, data structures, and algorithms, improving average assignment scores.",
+          "Designed and hosted weekly algorithmic coding challenges focused on data structures, algorithms, and problem-solving, increasing lab attendance by 30%, improving student engagement and confidence in tackling complex programming tasks.",
+          "Provided end-to-end testing assistance to resolve complex logical bugs using JUnit 5 (fixtures, parameterized tests) and the IntelliJ debugger, reducing project completion time for students by 20%."
+        ]
+      },
+      {
+        "id": "exp_5faa00fb-6af4-4bfc-b8fd-e516a53c25c6",
+        "company": "University at Buffalo - SUNY",
+        "title": "Tech Squad IT Consultant",
+        "location": "Buffalo, NY, USA",
+        "start": "Aug 2024",
+        "end": "Present",
+        "type": "Part-Time",
+        "bullets": [
+          "Enhanced security posture for 200+ devices by removing malware, patching OS vulnerabilities, and enforcing secure configurations across Windows, macOS, and Linux.",
+          "Diagnosed and mitigated 50+ network threats including rogue access points, VPN hijacks, and Wi-Fi spoofing, improving system uptime for 300+ students.",
+          "Performed OS-level debugging and authentication for 150+ incidents, strengthening knowledge of Kerberos, PAM, file permissions, and system logs."
+        ]
+      },
+      {
+        "id": "exp_f83c7d2f-23de-42bd-bebb-f480d7405a8a",
+        "company": "Mimeo",
+        "title": "Software Engineer Intern",
+        "location": "Remote",
+        "start": "May 2025",
+        "end": "Aug 2025",
+        "type": "Internship",
+        "bullets": [
+          "Improved file transfer e\ufb03ciency by 40% in a client\u2013designer collaboration web app by designing and deploying REST APIs with Spring Boot and MongoDB, integrating Redis caching and optimizing AWS S3 access patterns.",
+          "Reduced AWS S3 storage costs by 60% through restructuring bucket paths with metadata indexing, enabling seamless uploads/downloads for 100+ active client projects.",
+          "Accelerated deployment speed by 70% by implementing a CI/CD pipeline using GitHub Actions, automating build, test, and deployment workflows."
+        ]
+      },
+      {
+        "id": "exp_6889c641-d0a2-467a-9ed6-c987ab35a6c0",
+        "company": "Vinsak",
+        "title": "Mobile Development Intern",
+        "location": "Dubai, UAE",
+        "start": "Jun 2024",
+        "end": "Aug 2024",
+        "type": "Internship",
+        "bullets": [
+          "Increased cross-platform usability by 25% by collaborating in Figma and translating designs into responsive React Native UI/UX components with Expo, improving load times and user interface.",
+          "Decreased authentication latency by 40% via Firebase + Google OAuth 2.0 integration, enabling secure, fast sign-ins for 1,000+ users.",
+          "Improved scalability by integrating real-time analytics and optimizing state management, enabling the system to handle 2x peak tra\ufb03c with 30% lower latency."
+        ]
+      }
+    ],
+    "projects": [
+      {
+        "id": "proj_6cc8345d-b743-4ba7-a885-6f06b70135fb",
+        "role": "Backend Developer",
+        "name": "Carbonproxy",
+        "link": "https://devpost.com/software/carbonproxy",
+        "location": "Buffalo, NY",
+        "start": "April 2026",
+        "end": "",
+        "tech": [
+          "Python",
+          "React.js",
+          "Vector Search",
+          "FastAPI",
+          "Gemini API"
+        ],
+        "bullets": [
+          "Reduced LLM API token usage by ~86% by building a vector-based memory system that replaces full conversation history with relevance-scored context retrieval per request, resulting in 1st Place (Virtual Track) at HackDuke 2025",
+          "Decreased prompt token length by 40\u201370% on average using a 6-stage semantic compression pipeline while preserving task intent and output quality",
+          "Improved request efficiency by routing queries to smaller models in ~65\u201380% of calls, reducing cost per request by ~30\u201355% depending on workload complexity"
+        ]
+      },
+      {
+        "id": "proj_8ca72792-ca2e-4ad7-9114-e54976c42444",
+        "role": "Full Stack Developer",
+        "name": "Symbiote",
+        "link": "https://devpost.com/software/symbiote",
+        "location": "Illinois, CHI",
+        "start": "Feb 2026",
+        "end": "",
+        "tech": [
+          "Gemini API",
+          "Computer Vision",
+          "Swift",
+          "FastAPI",
+          "GPU Inference"
+        ],
+        "bullets": [
+          "Reduced inspection-to-report time from ~10\u201315 minutes \u2192 <60 seconds (~85\u201390% reduction) using a voice-driven AI pipeline for field engineers, winning Best Use of AI + Honorable Mention (Caterpillar Track) at HackIllinois 2025",
+          "Improved defect classification reliability by routing vision-language inputs through component-aware context filtering, reducing misclassification errors by an estimated 25\u201340% in testing scenarios",
+          "Built end-to-end system handling real-time multimodal input (voice + image) with synchronized reporting across mobile, backend, and dashboard systems"
+        ]
+      },
+      {
+        "id": "proj_0e56e4c6-2148-4c7c-9e96-fd65b4dc4d11",
+        "role": "Backend Engineer",
+        "name": "ResQme",
+        "link": "https://devpost.com/software/resqme-jq52al",
+        "location": "Boston, MA",
+        "start": "Oct 2025",
+        "end": "",
+        "tech": [
+          "React Native",
+          "Embedded Systems",
+          "Next.js",
+          "Supabase",
+          "Python",
+          "ESP32 Microcontrollers"
+        ],
+        "bullets": [
+          "Engineered an o\ufb04ine-capable emergency response system using a self-healing ESP32 mesh network supporting SOS broadcasting, GPS sharing, and dual-mode WiFi/AP communication, earning 2nd Place at Hack Harvard.",
+          "Built a cross-platform React Native app for SOS alerts and GPS sharing over mesh connectivity, along with a Next.js responder dashboard for real-time mapping, alerts, and communication using Supabase subscriptions.",
+          "Developed embedded C++ firmware with OLED feedback and a Python serial bridge to sync mesh activity to Supabase for live cloud monitoring and location tracking."
+        ]
+      },
+      {
+        "id": "proj_e34d4025-d968-45ed-a4c6-65448805b643",
+        "role": "Full Stack Developer",
+        "name": "LearnHub",
+        "link": "https://devpost.com/software/learnhub-fmaxl5",
+        "location": "Buffalo, NY",
+        "start": "Mar 2026",
+        "end": "Apr 2026",
+        "tech": [
+          "Google Cloud Platform (GCP)",
+          "PostgreSQL",
+          "WebSocket",
+          "Express.js",
+          "Gemini API"
+        ],
+        "bullets": [
+          "Built a voice-first learning system supporting <100ms median interaction latency, enabling real-time conversational tutoring without traditional UI navigation",
+          "Enabled accessibility for visually impaired users by converting 100% of generated STEM content (LaTeX \u2192 Nemeth Braille) for refreshable Braille display compatibility",
+          "Orchestrated 4+ AI models (speech, LLM, TTS, image generation) into a unified pipeline generating multi-format learning content in under 2 seconds per lesson module"
+        ]
+      },
+      {
+        "id": "proj_312da73f-49c0-447a-89a0-02066e00af53",
+        "role": "Lead Software Engineer",
+        "name": "Next Up",
+        "link": "",
+        "location": "Buffalo, NY",
+        "start": "Dec 2024",
+        "end": "March 2025",
+        "tech": [
+          "Typescript",
+          "Next.js",
+          "Node.js",
+          "PostgreSQL",
+          "Docker",
+          "Redux",
+          "OAuth 2.0"
+        ],
+        "bullets": [
+          "Built an o\ufb03ce hours management platform that automated student queue tracking using magnetic card reader integration and Autolab OAuth 2.0 authentication, reducing administrative overhead and wait times by 50% for 200+ students weekly.",
+          "Optimized backend performance by 60% through caching high-frequency queries with PostgreSQL and Redis, improving real-time responsiveness.",
+          "Implemented container orchestration and automated deployment pipelines using Docker and CI/CD tools, reducing release cycle time by 30% and ensuring high system availability under peak loads."
+        ]
+      }
+    ],
+    "education": [
+      {
+        "id": "edu_1d9d4191-9939-4ab7-a000-2c840b6bad55",
+        "school": "University at Buffalo - SUNY",
+        "degree": "Bachelor of Science in Computer Science",
+        "location": "",
+        "start": "Aug 2023",
+        "end": "May 2027",
+        "details": [
+          "GPA: 3.98",
+          "Honors and Awards: Grace W. Capen Academic Award, Dean\u2019s List (4 semesters)",
+          "Relevant Coursework: Object-oriented programming, Data Structures & Algorithms, Systems Programming"
+        ]
+      }
+    ]
+  },
+  "workspace": {
+    "settings": {
+      "aiProvider": "ollama",
+      "geminiApiKey": "AIzaSyABXka-pNIKmNhsTB7lFKMjhBwGtfT5FOk",
+      "ollamaBaseUrl": "http://127.0.0.1:11434",
+      "ollamaModel": "llama3.2:3b",
+      "skillsMd": "",
+      "personalContext": "# Personal Context\n\n## Who I Am\n\nI'm a Computer Science student at the University at Buffalo. Most of my time is spent building software, but what keeps me interested isn't the technology itself. It's the process of taking a messy problem that frustrates people and turning it into something that actually works.\n\nI didn't get into programming because I was fascinated by algorithms or computer architecture. I got into it because I liked solving problems. Over time I realized that software is one of the few fields where a small group of people can build something that thousands of others use every day.\n\nA lot of students build projects because they're good resume material. I usually start with a problem that annoys me or someone around me. The project becomes an excuse to solve it.\n\n## What I Care About\n\nI'm interested in systems that remove friction from people's lives. The problems that excite me most are the ones that seem small on the surface but waste thousands of hours when nobody fixes them.\n\nI care about tools, infrastructure, developer productivity, automation, and increasingly AI systems that can take action instead of simply generating text. I think there is a huge opportunity to build software that helps people accomplish real-world tasks rather than just answer questions.\n\nOne thing I find interesting is that many of the best engineering problems are invisible. Nobody notices when a system is reliable, when a deployment goes smoothly, or when a workflow saves five minutes. But those improvements compound across hundreds or thousands of users.\n\nIf money and constraints didn't matter, I would probably spend my time building autonomous systems that solve practical problems in education, accessibility, and infrastructure. I'm more interested in useful technology than flashy technology.\n\n## My Values & How I Work\n\nI optimize for usefulness.\n\nA lot of projects are technically impressive but don't solve a meaningful problem. I'd rather build something simple that people actually use than something complicated that nobody needs.\n\nWhen making engineering decisions, I usually favor reliability and maintainability over cleverness. The best solution is often not the most technically sophisticated one. It's the one that other people can understand, operate, and improve.\n\nI also care a lot about ownership. If I take responsibility for a problem, I become obsessed with solving it. I don't enjoy leaving things half-finished or \"good enough\" when I know there's a fix.\n\nOne thing that separates me from many people I've worked with is that I have a hard time walking away from unsolved problems. When something breaks, I want to understand why. When a design doesn't feel right, I keep iterating until it does. Sometimes that's frustrating, but it's also the reason I've been able to solve problems that initially seemed impossible.\n\n## Project Stories\n\n### Next Up\n\nNext Up started because I saw how inefficient office hours could be. Students would wait without knowing where they were in line, teaching assistants would manually manage queues, and everyone involved lost time.\n\nThe technical challenges weren't the hardest part. The difficult part was designing a system that people would actually trust enough to replace an existing process. If students didn't trust the queue or if teaching assistants found it inconvenient, the project would fail regardless of the implementation.\n\nThe biggest lesson I learned was that software adoption is often harder than software development. Building features is relatively straightforward. Building something that changes behavior is much harder.\n\n### UB Hacking CMS\n\nThis is probably the project I'm most proud of.\n\nEvery year, student developers rebuilt large parts of UB Hacking's infrastructure from scratch. That meant institutional knowledge disappeared, engineering time was wasted, and new teams repeatedly solved the same problems.\n\nThe goal wasn't just to build a website. The goal was to build a platform that future teams could inherit.\n\nOne of the hardest decisions was choosing between maximizing flexibility and keeping the system maintainable. It's tempting to add endless customization options, but that usually creates complexity that future developers have to manage. I spent a lot of time thinking about what not to build.\n\nThe project taught me that good engineering isn't always about creating new features. Sometimes it's about removing future work.\n\n### ResQme\n\nResQme came from a simple question: what happens when communication infrastructure disappears?\n\nMost modern applications assume internet connectivity. During emergencies, that's often the first thing that becomes unreliable.\n\nThe challenge wasn't building a messaging application. The challenge was designing a system that could continue functioning when many of the assumptions modern software depends on were gone.\n\nWorking on ResQme made me think differently about reliability. It's easy to build systems that work under ideal conditions. It's much harder to build systems that work when everything starts failing.\n\n## Goals & What I Want From Opportunities\n\nI apply to internships, hackathons, and programs because they expose me to problems I wouldn't encounter on my own.\n\nA successful internship isn't one where I spend a summer implementing tickets. It's one where I leave understanding how strong engineering teams operate, how large systems are built, and how experienced engineers make decisions.\n\nA successful hackathon isn't necessarily one where I win. It's one where I build something I couldn't have built by myself and learn from people who think differently than I do.\n\nLong term, I want to become the kind of engineer who can take ownership of ambiguous problems and drive them from idea to production.\n\n## Strengths & Working Style\n\nMy biggest strength is persistence.\n\nWhen I encounter a difficult bug, a system failure, or an unfamiliar problem, I rarely give up quickly. I become fixated on understanding what's happening and finding a solution.\n\nIn teams, I naturally gravitate toward ownership roles. If there's a problem that nobody is handling, I tend to pick it up. If a project lacks structure, I usually help create it.\n\nI work well under ambiguity because I'm comfortable learning as I go. Most interesting problems don't come with clear instructions.\n\nI also value feedback. Some of my biggest improvements as an engineer have come from having my assumptions challenged by teammates, mentors, and open-source maintainers.\n\n## Beyond Tech\n\nOutside of coding, I spend a lot of time organizing events, mentoring students, and helping build communities through UB Hacking.\n\nI enjoy environments where people are building ambitious things and sharing ideas. A lot of my favorite conversations are with people who approach problems completely differently than I do.\n\nMy communication style is direct and practical. I prefer clear explanations over polished buzzwords. I'd rather talk about what actually happened than what sounds impressive.\n\nAt the end of the day, I'm motivated by building useful things, solving difficult problems, and continuously improving. The technology changes. That part stays the same.\n"
+    },
+    "resumes": [
+      {
+        "id": "res_d5e8586e-9c19-4190-819d-391d07d2a0f7",
+        "title": "manav_swe_resume",
+        "createdAt": 1776011597068,
+        "updatedAt": 1776011597068,
+        "template": "jake",
+        "subsetEnabled": false,
+        "latexMode": "generated",
+        "customLatex": "",
+        "defaults": {
+          "experienceIds": [],
+          "projectIds": []
+        }
+      }
+    ],
+    "coverLetters": [],
+    "applicationAnswerDocs": [
+      {
+        "id": "aa_a693d1bf-64c7-4506-a43c-97cc9fce61a9",
+        "title": "First Name",
+        "createdAt": 1781202152416,
+        "updatedAt": 1781951091376,
+        "question": "First Name",
+        "templateAnswer": "Manav",
+        "source": "greenhouse"
+      },
+      {
+        "id": "aa_5dc941a6-495d-4302-9b2a-69af7c1937a1",
+        "title": "Last Name",
+        "createdAt": 1781202152416,
+        "updatedAt": 1781951110663,
+        "question": "Last Name",
+        "templateAnswer": "Sharma",
+        "source": "greenhouse"
+      },
+      {
+        "id": "aa_107edbab-40e9-4bca-b88a-a6289f39c200",
+        "title": "Email",
+        "createdAt": 1781202152416,
+        "updatedAt": 1781951120044,
+        "question": "Email",
+        "templateAnswer": "maanav.vashist@gmail.com",
+        "source": "greenhouse"
+      },
+      {
+        "id": "aa_3b51799a-fbb1-4caf-8e9a-3cd66208c8e3",
+        "title": "Country*",
+        "createdAt": 1781202152416,
+        "updatedAt": 1781951143211,
+        "question": "Country*",
+        "templateAnswer": "United States +1",
+        "source": "greenhouse"
+      },
+      {
+        "id": "aa_44c47bde-901a-4fe4-9962-b1bcc34746c3",
+        "title": "Phone",
+        "createdAt": 1781202152416,
+        "updatedAt": 1781951158761,
+        "question": "Phone",
+        "templateAnswer": "7165471887",
+        "source": "greenhouse"
+      },
+      {
+        "id": "aa_82106f24-817a-462d-b066-30d800d62773",
+        "title": "LinkedIn Profile",
+        "createdAt": 1781202312680,
+        "updatedAt": 1781202312680,
+        "question": "LinkedIn Profile",
+        "templateAnswer": "https://www.linkedin.com/in/manav-sharma0",
+        "source": ""
+      },
+      {
+        "id": "aa_00f4753c-8628-488b-ad7b-1b8b76df4667",
+        "title": "Website",
+        "createdAt": 1781202312680,
+        "updatedAt": 1781202312680,
+        "question": "Website",
+        "templateAnswer": "https://manav-dev.web.app/",
+        "source": ""
+      },
+      {
+        "id": "aa_9f7d17c6-843e-4121-ba64-2acbdfe8bb7a",
+        "title": "Current Company",
+        "createdAt": 1781202312680,
+        "updatedAt": 1781202312680,
+        "question": "Current Company",
+        "templateAnswer": "University at Buffalo",
+        "source": ""
+      },
+      {
+        "id": "aa_634dbda4-9878-42cc-8781-04c7299c697a",
+        "title": "Years of Work Experience",
+        "createdAt": 1781202312680,
+        "updatedAt": 1781202312680,
+        "question": "Years of Work Experience",
+        "templateAnswer": "3",
+        "source": ""
+      },
+      {
+        "id": "aa_dd7327df-0bfe-4228-9cff-4cdcfec3ecf9",
+        "title": "Current Title",
+        "createdAt": 1781202312680,
+        "updatedAt": 1781202312680,
+        "question": "Current Title",
+        "templateAnswer": "Web Lead @ UBHacking",
+        "source": ""
+      },
+      {
+        "id": "aa_4c88c9fe-458a-4f1f-a442-0a5f61dfa329",
+        "title": "Have you previously applied to work at Point72?*",
+        "createdAt": 1781202312680,
+        "updatedAt": 1781202312680,
+        "question": "Have you previously applied to work at Point72?*",
+        "templateAnswer": "Yes",
+        "source": ""
+      },
+      {
+        "id": "aa_cbff9d37-1dd9-4551-821c-a0bb6693b19e",
+        "title": "Are you legally authorized to work in the United States?*",
+        "createdAt": 1781202312680,
+        "updatedAt": 1781202312680,
+        "question": "Are you legally authorized to work in the United States?*",
+        "templateAnswer": "Yes",
+        "source": ""
+      },
+      {
+        "id": "aa_41be5836-0a4e-4e1f-acfe-bc025285483c",
+        "title": "Will you now or in the future require sponsorship for employment visa status (e.",
+        "createdAt": 1781202312680,
+        "updatedAt": 1781202312680,
+        "question": "Will you now or in the future require sponsorship for employment visa status (e.g. H1B visa status)?*",
+        "templateAnswer": "Yes",
+        "source": ""
+      },
+      {
+        "id": "aa_d9def319-3e02-41e9-b9a4-e52e6af58f66",
+        "title": "Privacy *",
+        "createdAt": 1781202312680,
+        "updatedAt": 1781202312680,
+        "question": "Privacy *",
+        "templateAnswer": "Yes",
+        "source": ""
+      },
+      {
+        "id": "aa_ebc9dd1f-7e77-4db2-9209-69b7467cb2b8",
+        "title": "I identify as",
+        "createdAt": 1781202312680,
+        "updatedAt": 1781202312680,
+        "question": "I identify as",
+        "templateAnswer": "Male",
+        "source": ""
+      },
+      {
+        "id": "aa_45e4e135-3628-4989-8b99-384e65b0164d",
+        "title": "Are you Hispanic/Latinx?",
+        "createdAt": 1781202312680,
+        "updatedAt": 1781951216092,
+        "question": "Are you Hispanic/Latinx?",
+        "templateAnswer": "No",
+        "source": "greenhouse"
+      },
+      {
+        "id": "aa_64979d9b-98e1-4e4d-afe9-bee3ab899d5c",
+        "title": "Please identify your race",
+        "createdAt": 1781202312680,
+        "updatedAt": 1781951872450,
+        "question": "Please identify your race",
+        "templateAnswer": "Asian",
+        "source": "greenhouse"
+      },
+      {
+        "id": "aa_a69e4660-a29c-4aae-84a2-3b8596c7675f",
+        "title": "What is your preferred work location?*",
+        "createdAt": 1781250651558,
+        "updatedAt": 1781253550514,
+        "question": "What is your preferred work location?*",
+        "templateAnswer": "New York",
+        "source": ""
+      },
+      {
+        "id": "aa_1cd197ab-2bb4-4608-994a-9a4037d4c701",
+        "title": "School",
+        "createdAt": 1781250651558,
+        "updatedAt": 1781250651558,
+        "question": "School",
+        "templateAnswer": "University at Buffalo",
+        "source": ""
+      },
+      {
+        "id": "aa_05d9905c-dc31-404e-8b3e-c11660e22d3c",
+        "title": "Degree",
+        "createdAt": 1781250651558,
+        "updatedAt": 1781250651558,
+        "question": "Degree",
+        "templateAnswer": "Bachelor's",
+        "source": ""
+      },
+      {
+        "id": "aa_ce5d2725-5151-4873-9ed0-b698a04d4de8",
+        "title": "Discipline",
+        "createdAt": 1781250651558,
+        "updatedAt": 1781250651558,
+        "question": "Discipline",
+        "templateAnswer": "Computer Science",
+        "source": ""
+      },
+      {
+        "id": "aa_cbb9bfe2-ead5-408a-87b5-df90f5b19945",
+        "title": "How did you hear about this job?",
+        "createdAt": 1781337787651,
+        "updatedAt": 1781337787651,
+        "question": "How did you hear about this job?",
+        "templateAnswer": "Linkedin",
+        "source": ""
+      },
+      {
+        "id": "aa_d2637dfd-bd2e-464e-9188-8d44a88f2783",
+        "title": "Are you currently enrolled in a university or program and will return to the pro",
+        "createdAt": 1781337787651,
+        "updatedAt": 1781337787651,
+        "question": "Are you currently enrolled in a university or program and will return to the program upon completion of internship?*",
+        "templateAnswer": "Yes",
+        "source": ""
+      },
+      {
+        "id": "aa_65139eda-2b08-41fc-b70f-766fb2d747bf",
+        "title": "Gender",
+        "createdAt": 1781337787651,
+        "updatedAt": 1781951195779,
+        "question": "Gender",
+        "templateAnswer": "Male",
+        "source": "greenhouse"
+      },
+      {
+        "id": "aa_cc1d84d1-0c96-4ef5-b887-54ecfc76e2d8",
+        "title": "Are you Hispanic/Latino?",
+        "createdAt": 1781337787651,
+        "updatedAt": 1781337787651,
+        "question": "Are you Hispanic/Latino?",
+        "templateAnswer": "No",
+        "source": ""
+      },
+      {
+        "id": "aa_73ec4cca-3914-471c-a612-8e71163fb881",
+        "title": "Location (City)*",
+        "createdAt": 1781373824389,
+        "updatedAt": 1781373824389,
+        "question": "Location (City)*",
+        "templateAnswer": "Buffalo, New York, United States",
+        "source": ""
+      },
+      {
+        "id": "aa_0df60a32-9edb-4b5c-9f1b-0a8955f97643",
+        "title": "Legal Name (if different than above)",
+        "createdAt": 1781373824389,
+        "updatedAt": 1781373824389,
+        "question": "Legal Name (if different than above)",
+        "templateAnswer": "Manav Sharma",
+        "source": ""
+      },
+      {
+        "id": "aa_259312da-c267-4a55-96ec-42f1567ff327",
+        "title": "Do you now or will you in the future require immigration sponsorship to work at",
+        "createdAt": 1781373824389,
+        "updatedAt": 1781373824389,
+        "question": "Do you now or will you in the future require immigration sponsorship to work at Cloudflare?*",
+        "templateAnswer": "Yes",
+        "source": ""
+      },
+      {
+        "id": "aa_3db0a49e-89d2-4fa0-b827-5d22e5aef8a3",
+        "title": "If you are enrolled in university, what degree are you currently pursuing? *",
+        "createdAt": 1781373824389,
+        "updatedAt": 1781373824389,
+        "question": "If you are enrolled in university, what degree are you currently pursuing? *",
+        "templateAnswer": "Bachelor's",
+        "source": ""
+      },
+      {
+        "id": "aa_b211c872-2ea3-47f8-b54c-02dfcadd0f83",
+        "title": "Veteran Status",
+        "createdAt": 1781373824389,
+        "updatedAt": 1781951228711,
+        "question": "Veteran Status",
+        "templateAnswer": "I am not a protected veteran",
+        "source": "greenhouse"
+      },
+      {
+        "id": "aa_808e9cc2-a857-43c4-9573-4f1693e5e2d4",
+        "title": "Disability Status",
+        "createdAt": 1781373824389,
+        "updatedAt": 1781951277411,
+        "question": "Disability Status",
+        "templateAnswer": "No, I do not have a disability and have not had one in the past",
+        "source": "greenhouse"
+      },
+      {
+        "id": "aa_8534cdf2-7297-4438-9597-6530f4d49968",
+        "title": "Are you legally eligible to work in the country to which you are applying?*",
+        "createdAt": 1781438284364,
+        "updatedAt": 1781438284364,
+        "question": "Are you legally eligible to work in the country to which you are applying?*",
+        "templateAnswer": "Yes",
+        "source": ""
+      },
+      {
+        "id": "aa_91cfa336-c0fb-4c49-8b6b-afc6972d0b50",
+        "title": "Pronouns",
+        "createdAt": 1781970341234,
+        "updatedAt": 1781970341234,
+        "question": "Pronouns",
+        "templateAnswer": "He/Him",
+        "source": "generic"
+      },
+      {
+        "id": "aa_45b5669b-fab4-4f9b-aaf9-1e83667645d2",
+        "title": "US candidates only: Are you a veteran/have you served in the military?",
+        "createdAt": 1786385526274,
+        "updatedAt": 1786385526274,
+        "question": "US candidates only: Are you a veteran/have you served in the military?",
+        "templateAnswer": "No",
+        "source": "ashby"
+      },
+      {
+        "id": "aa_aa2d54de-d0f6-4994-95e1-8acdcacf41a1",
+        "title": "US candidates only: Do you live with a disability (as outlined in the Americans",
+        "createdAt": 1786385543253,
+        "updatedAt": 1786385543253,
+        "question": "US candidates only: Do you live with a disability (as outlined in the Americans with Disabilities Act)?",
+        "templateAnswer": "No",
+        "source": "ashby"
+      },
+      {
+        "id": "aa_f7dd89ee-44db-48a7-8c11-2e4983d84213",
+        "title": "What race and/or ethnic identities do you identify with? (please select all that",
+        "createdAt": 1786385615146,
+        "updatedAt": 1786385615146,
+        "question": "What race and/or ethnic identities do you identify with? (please select all that apply)",
+        "templateAnswer": "South Asian",
+        "source": "ashby"
+      },
+      {
+        "id": "aa_98186729-d89f-4953-8580-41bc1ead686b",
+        "title": "How would you describe your gender identity?",
+        "createdAt": 1786463400858,
+        "updatedAt": 1786463400858,
+        "question": "How would you describe your gender identity?",
+        "templateAnswer": "Male",
+        "source": "ashby"
+      }
+    ],
+    "resumeOptimizations": {
+      "res_d5e8586e-9c19-4190-819d-391d07d2a0f7": {
+        "baseResumeId": "res_d5e8586e-9c19-4190-819d-391d07d2a0f7",
+        "jd": "Who are we?\n\nOur mission is to scale intelligence to serve humanity. We\u2019re training and deploying frontier models for developers and enterprises who are building AI systems to power magical experiences like content generation, semantic search, RAG, and agents. We believe that our work is instrumental to the widespread adoption of AI.\n\nWe obsess over what we build. Each one of us is responsible for contributing to increasing the capabilities of our models and the value they drive for our customers. We like to work hard and move fast to do what\u2019s best for our customers.\n\nCohere is a team of researchers, engineers, designers, and more, who are passionate about their craft. Each person is one of the best in the world at what they do. We believe that a diverse range of perspectives is a requirement for building great products.\n\nJoin us on our mission and shape the future!\n\nWhy this role?\n\nThis role is for students who are excited about building the next generation of machine learning models and NLP products. Our SWE roles can cover creating datasets for machine learning, scaling the pods to serve our API, or even building out new security features on our platform. We don't distinguish much between interns and full-time employees, and you\u2019ll have plenty of opportunities to push code to production. You'll have full autonomy and ownership over high-impact work, and will be backed by the support of an incredible team or leaders & mentors.\n\nJoin us at a pivotal moment, shape what we build, and wear multiple hats!\nWe're currently hiring for multiple teams and roles, including Frontend, Backend, Full-stack, and Infrastructure roles. We'll take your interests & experience into account throughout the application process.\nOur recruitment process will begin in the upcoming weeks, and we will be carefully reviewing applications and assessing potential candidates for our internships. Should we find a suitable match with your qualifications and our requirements, we will be in touch to discuss the opportunity further and to advance your application to the next stage.\n\nPlease Note: To be eligible for this position, you should be currently enrolled in a post-secondary program and available for a full-time 3-6 month internship, co-op, or research work term.\n\nAs a Software Engineering Intern, you will:\n\nShip delightful experiences for our user-facing products, meticulously crafting code for browsers or server code.\n\nBuild features for the API platform that directly impact users.\n\nDesign and implement robust data pipelines (crawlers, storage, filters).\n\nDesign and implement scalable services or infrastructure for machine learning development.\n\nBuild internal tooling (CI/CD, dev utilities) to move faster together.\n\nBuild tech writing skills through maintaining and contributing to technical documentation, both internal and external facing.\n\nKeep up with the cutting edge and adopt new technologies to improve performance and reliability across Cohere.\n\nIf some of the above doesn\u2019t line up perfectly with your experience, we still encourage you to apply!",
+        "createdAt": 1776108245316,
+        "selectedExperienceIds": [
+          "exp_c0176390-bf15-4fe7-8af1-725174a792ae",
+          "exp_8441a55a-30ec-458f-bab9-ecacec475fa0",
+          "exp_5faa00fb-6af4-4bfc-b8fd-e516a53c25c6"
+        ],
+        "selectedProjectIds": [
+          "proj_6cc8345d-b743-4ba7-a885-6f06b70135fb",
+          "proj_312da73f-49c0-447a-89a0-02066e00af53"
+        ],
+        "outputMarkdown": "### Manav Sharma\nBuffalo, NY | 716-547-1887 | maanav.vashist@gmail.com | [LinkedIn](https://www.linkedin.com/in/manav-sharma0) | [GitHub](https://github.com/octomaanav) | [Portfolio](https://manav-dev.web.app/) | [Devpost](https://devpost.com/maanav-vashist)\n\n### Skills\n**Programming:** Python, TypeScript, JavaScript, Java, C++\n**Frameworks/Libraries:** React, Next.js, Node.js, Express.js, FastAPI, Redux\n**Databases:** PostgreSQL, Redis, Supabase, Drizzle ORM\n**Cloud/DevOps:** Docker, Google Cloud Platform (GCP), Git, GitHub, CI/CD, Nginx\n**AI/ML:** LLMs (Gemini API), Vector Search, Computer Vision, NLP, Semantic Compression\n**Tools/Other:** Playwright, JUnit, IntelliJ, REST APIs, WebSockets, OAuth 2.0, Embedded Systems (ESP32), Data Structures & Algorithms, Linux, macOS, Windows\n\n### Education\n**University at Buffalo - SUNY** | Bachelor of Science in Computer Science | Buffalo, NY\nAugust 2023 - May 2027 | GPA: 3.98\n* Relevant Coursework: Object-oriented programming, Data Structures & Algorithms, Systems Programming\n* Honors and Awards: Grace W. Capen Academic Award, Dean\u2019s List (4 semesters)\n\n### Experience\n**UB Hacking** | Web Lead | Buffalo, NY, USA\nJan 2025 \u2013 Present\n* Optimized website management for 700+ hackers, achieving 100+ developer hours in annual savings by architecting a robust CMS platform using **TypeScript, React, PostgreSQL, and Drizzle ORM**.\n* Developed integrated tools, including a QR-code food scanner and automated check-in system, cutting operational costs by $1,000+ and removing 100+ hours of manual check-ins.\n* Implemented an automated email campaign system with end-to-end **Playwright** tests, enabling scheduled announcements and reducing communication overhead by 70%.\n\n**University at Buffalo - SUNY** | Undergraduate Teaching Assistant | Buffalo, NY, USA\nAug 2024 \u2013 Present\n* Mentored 50+ students weekly in **Java, Python, data structures, and algorithms**, improving average assignment scores and increasing lab attendance by 30%.\n* Provided end-to-end testing assistance to resolve complex logical bugs using **JUnit 5** and the **IntelliJ** debugger, reducing project completion time for students by 20%.\n\n**University at Buffalo - SUNY** | Tech Squad IT Consultant | Buffalo, NY, USA\nAug 2024 \u2013 Present\n* Enhanced security posture for 200+ devices by removing malware, patching OS vulnerabilities, and enforcing secure configurations across **Windows, macOS, and Linux**.\n* Diagnosed and mitigated 50+ network threats including rogue access points, VPN hijacks, and Wi-Fi spoofing, improving system uptime for 300+ students.\n* Performed OS-level debugging and authentication for 150+ incidents, strengthening knowledge of **Kerberos, PAM**, file permissions, and system logs.\n\n### Projects\n**Carbonproxy** | HackDuke 2025 - 1st Place (Virtual Track)\n**Python, React.js, Vector Search, FastAPI, Gemini API**\n* Reduced LLM API token usage by ~86% by building a vector-based memory system that replaces full conversation history with relevance-scored context retrieval per request.\n* Decreased prompt token length by 40\u201370% on average using a 6-stage semantic compression pipeline while preserving task intent and output quality.\n* Improved request efficiency by routing queries to smaller models in ~65\u201380% of calls, reducing cost per request by ~30\u201355% depending on workload complexity.\n\n**Next Up**\n**Typescript, Next.js, Node.js, PostgreSQL, Docker, Redis, OAuth 2.0**\n* Built an o\ufb03ce hours management platform that automated student queue tracking using magnetic card reader integration and Autolab **OAuth 2.0** authentication, reducing administrative overhead and wait times by 50% for 200+ students weekly.\n* Optimized backend performance by 60% through caching high-frequency queries with **PostgreSQL** and **Redis**, improving real-time responsiveness.\n* Implemented container orchestration and automated deployment pipelines using **Docker** and **CI/CD** tools, reducing release cycle time by 30% and ensuring high system availability under peak loads.",
+        "outputLatex": "%-------------------------\n% Resume in Latex\n% Author : Jake Gutierrez\n% Based off of: https://github.com/sb2nov/resume\n% License : MIT\n%------------------------\n\n\\documentclass[letterpaper,10pt]{article}\n\n\\usepackage{latexsym}\n\\usepackage[empty]{fullpage}\n\\usepackage{titlesec}\n\\usepackage{marvosym}\n\\usepackage[usenames,dvipsnames]{color}\n\\usepackage{verbatim}\n\\usepackage{enumitem}\n\\usepackage[hidelinks]{hyperref}\n\\usepackage{fancyhdr}\n\\usepackage[english]{babel}\n\\usepackage{tabularx}\n\\ifdefined\\pdfglyphtounicode\n  \\input{glyphtounicode}\n\\fi\n\n\\pagestyle{fancy}\n\\fancyhf{}\n\\fancyfoot{}\n\\renewcommand{\\headrulewidth}{0pt}\n\\renewcommand{\\footrulewidth}{0pt}\n\n% Adjust margins\n\\addtolength{\\oddsidemargin}{-0.6in}\n\\addtolength{\\evensidemargin}{-0.5in}\n\\addtolength{\\textwidth}{1.19in}\n\\addtolength{\\topmargin}{-.7in}\n\\addtolength{\\textheight}{1.4in}\n\n\\urlstyle{same}\n\n\\raggedbottom\n\\raggedright\n\\setlength{\\tabcolsep}{0in}\n\n% Sections formatting\n\\titleformat{\\section}{\\vspace{-7pt}\\scshape\\raggedright\\large}{}{0em}{}[\\color{black}\\titlerule \\vspace{-5pt}]\n\n% Ensure that generate pdf is machine readable/ATS parsable (pdfTeX only)\n\\ifdefined\\pdfgentounicode\n  \\pdfgentounicode=1\n\\fi\n\n%-------------------------\n% Custom commands\n\\newcommand{\\mainheadingsize}{\\fontsize{14}{10}\\selectfont}\n\n\\newcommand{\\resumeItem}[1]{\n  \\item\\small{#1}\n}\n\n\\newcommand{\\resumeSubheading}[4]{\n  \\vspace{-2pt}\\item\n    \\begin{tabular*}{0.97\\textwidth}[t]{l@{\\extracolsep{\\fill}}r}\n      \\textbf{#1} & #2 \\\\\n      \\textit{\\small#3} & \\textit{\\small #4} \\\\\n    \\end{tabular*}\\vspace{-7pt}\n}\n\n\\newcommand{\\resumeProjectHeading}[2]{\n    \\item\n    \\begin{tabular*}{0.97\\textwidth}{l@{\\extracolsep{\\fill}}r}\n      \\small#1 & \\textit{\\small #2} \\\\\n    \\end{tabular*}\\vspace{-6pt}\n}\n\n\\newcommand{\\resumeSubItem}[1]{\\resumeItem{#1}\\vspace{-4pt}}\n\n\\renewcommand\\labelitemii{$\\vcenter{\\hbox{\\tiny$\\bullet$}}$}\n\n\\newcommand{\\resumeSubHeadingListStart}{\\begin{itemize}[leftmargin=0.15in, label={}]}\n\\newcommand{\\resumeSubHeadingListEnd}{\\end{itemize} \\vspace{-10pt}}\n\\newcommand{\\resumeItemListStart}{\\begin{itemize}}\n\\newcommand{\\resumeItemListEnd}{\\end{itemize}\\vspace{-5pt}}\n\n\\begin{document}\n\n\\begin{center}\n    {\\fontsize{15}{20} \\selectfont \\textbf{\\scshape Manav Sharma}} \\\\ \\vspace{1pt}\n    {\\small 7165471887 $|$ \\href{mailto:maanav.vashist@gmail.com}{\\underline{maanav.vashist@gmail.com}} $|$ \\href{https://www.linkedin.com/in/manav-sharma0}{\\underline{LinkedIn URL}} $|$ \\href{https://github.com/octomaanav}{\\underline{Github}} $|$ \\href{https://manav-dev.web.app/}{\\underline{Portfolio}}}\n\\end{center}\n\n\\section{Education}\n  \\resumeSubHeadingListStart\n    \\resumeSubheading\n      {University at Buffalo - SUNY}{}\n      {Bachelor of Science in Computer Science}{Aug 2023 \u2022 May 2027}\n      \\resumeItemListStart\n        \\resumeItem{GPA: 3.98}\n        \\resumeItem{Honors and Awards: Grace W. Capen Academic Award, Dean\u2019s List (4 semesters)}\n        \\resumeItem{Relevant Coursework: Object-oriented programming, Data Structures \\& Algorithms, Systems Programming}\n      \\resumeItemListEnd\n  \\resumeSubHeadingListEnd\n\n\\section{Experience}\n  \\resumeSubHeadingListStart\n    \\resumeSubheading\n      {UB Hacking}{Buffalo, NY, USA}\n      {Web Lead}{Jan 2025 \u2022 Present}\n      \\resumeItemListStart\n        \\resumeItem{Optimized website management for 700+ hackers, achieving 100+ developer hours in annual savings by eliminating yearly rebuilds, through architecting a robust CMS platform using TypeScript, React, PostgreSQL, and Drizzle ORM.}\n        \\resumeItem{Developed integrated tools, including a QR-code food scanner and automated check-in system, cutting operational costs by \\$1,000+ and removing 100+ hours of manual check-ins.}\n        \\resumeItem{Implemented an automated email campaign system with end-to-end Playwright tests, enabling scheduled announcements and reducing communication overhead by 70\\%.}\n      \\resumeItemListEnd\n\n    \\resumeSubheading\n      {University at Buffalo - SUNY}{Buffalo, NY, USA}\n      {Undergraduate Teaching Assistant}{Aug 2024 \u2022 Present}\n      \\resumeItemListStart\n        \\resumeItem{Mentored 50+ students weekly in Java, Python, data structures, and algorithms, improving average assignment scores.}\n        \\resumeItem{Designed and hosted weekly algorithmic coding challenges focused on data structures, algorithms, and problem-solving, increasing lab attendance by 30\\%, improving student engagement and confidence in tackling complex programming tasks.}\n        \\resumeItem{Provided end-to-end testing assistance to resolve complex logical bugs using JUnit 5 (fixtures, parameterized tests) and the IntelliJ debugger, reducing project completion time for students by 20\\%.}\n      \\resumeItemListEnd\n\n    \\resumeSubheading\n      {University at Buffalo - SUNY}{Buffalo, NY, USA}\n      {Tech Squad IT Consultant}{Aug 2024 \u2022 Present}\n      \\resumeItemListStart\n        \\resumeItem{Enhanced security posture for 200+ devices by removing malware, patching OS vulnerabilities, and enforcing secure configurations across Windows, macOS, and Linux.}\n        \\resumeItem{Diagnosed and mitigated 50+ network threats including rogue access points, VPN hijacks, and Wi-Fi spoofing, improving system uptime for 300+ students.}\n        \\resumeItem{Performed OS-level debugging and authentication for 150+ incidents, strengthening knowledge of Kerberos, PAM, file permissions, and system logs.}\n      \\resumeItemListEnd\n\n  \\resumeSubHeadingListEnd\n\n\\section{Projects}\n    \\resumeSubHeadingListStart\n      \\resumeProjectHeading\n          {\\textbf{Carbonproxy} $|$ \\emph{Python, React.js, Vector Search, FastAPI, Gemini API}}{April 2026}\n          \\resumeItemListStart\n            \\resumeItem{Reduced LLM API token usage by \\textasciitilde{}86\\% by building a vector-based memory system that replaces full conversation history with relevance-scored context retrieval per request, resulting in 1st Place (Virtual Track) at HackDuke 2025}\n            \\resumeItem{Decreased prompt token length by 40\u201370\\% on average using a 6-stage semantic compression pipeline while preserving task intent and output quality}\n            \\resumeItem{Improved request efficiency by routing queries to smaller models in \\textasciitilde{}65\u201380\\% of calls, reducing cost per request by \\textasciitilde{}30\u201355\\% depending on workload complexity}\n          \\resumeItemListEnd\n\n      \\resumeProjectHeading\n          {\\textbf{Next Up} $|$ \\emph{Typescript, Next.js, Node.js, PostgreSQL, Docker, Redux, OAuth 2.0}}{Dec 2024 \u2022 March 2025}\n          \\resumeItemListStart\n            \\resumeItem{Built an o\ufb03ce hours management platform that automated student queue tracking using magnetic card reader integration and Autolab OAuth 2.0 authentication, reducing administrative overhead and wait times by 50\\% for 200+ students weekly.}\n            \\resumeItem{Optimized backend performance by 60\\% through caching high-frequency queries with PostgreSQL and Redis, improving real-time responsiveness.}\n            \\resumeItem{Implemented container orchestration and automated deployment pipelines using Docker and CI/CD tools, reducing release cycle time by 30\\% and ensuring high system availability under peak loads.}\n          \\resumeItemListEnd\n\n    \\resumeSubHeadingListEnd\n\n\\end{document}\n",
+        "experienceBulletsById": {
+          "exp_5faa00fb-6af4-4bfc-b8fd-e516a53c25c6": [
+            "Enhanced security posture for 200+ devices by patching OS vulnerabilities and enforcing secure configurations across Windows, macOS, and Linux systems.",
+            "Diagnosed and mitigated 50+ network threats, including rogue access points and VPN hijacks, improving system uptime for 300+ students.",
+            "Performed OS-level debugging and authentication for 150+ incidents, leveraging Kerberos, PAM, file permissions, and system logs for resolution."
+          ],
+          "exp_8441a55a-30ec-458f-bab9-ecacec475fa0": [
+            "Mentored 50+ students weekly in Java, Python, data structures, and algorithms, contributing to improved average assignment scores.",
+            "Designed and hosted weekly algorithmic coding challenges focused on data structures and algorithms, increasing lab attendance by 30% and enhancing problem-solving skills.",
+            "Provided end-to-end testing and debugging assistance with JUnit 5, resolving complex logical bugs and reducing student project completion time by 20%."
+          ],
+          "exp_c0176390-bf15-4fe7-8af1-725174a792ae": [
+            "Architected a scalable CMS platform with TypeScript, React, PostgreSQL, and Drizzle ORM, eliminating yearly rebuilds and saving 100+ developer hours for 700+ hackers.",
+            "Developed integrated tools, including a QR-code food scanner and automated check-in system, cutting operational costs by $1,000+ and removing 100+ hours of manual processing.",
+            "Implemented an automated email campaign system with end-to-end Playwright tests, reducing communication overhead by 70% and ensuring reliable scheduled announcements."
+          ]
+        },
+        "projectBulletsById": {
+          "proj_312da73f-49c0-447a-89a0-02066e00af53": [
+            "Built an office hours management platform automating student queue tracking with magnetic card reader integration and OAuth 2.0, reducing administrative overhead and wait times by 50% for 200+ students.",
+            "Optimized backend performance by 60% through caching high-frequency queries with PostgreSQL and Redis, significantly improving real-time responsiveness.",
+            "Implemented container orchestration and automated deployment pipelines using Docker and CI/CD tools, reducing release cycle time by 30% and ensuring high system availability."
+          ],
+          "proj_6cc8345d-b743-4ba7-a885-6f06b70135fb": [
+            "Reduced LLM API token usage by ~86% via a vector-based memory system for relevance-scored context retrieval, earning 1st Place at HackDuke 2025 (Python, Vector Search, FastAPI, Gemini API).",
+            "Decreased prompt token length by 40\u201370% using a 6-stage semantic compression pipeline, preserving task intent and quality for LLM interactions.",
+            "Improved LLM request efficiency by routing ~65\u201380% of queries to smaller models, reducing cost per request by ~30\u201355% based on workload complexity."
+          ]
+        }
+      }
+    },
+    "coverLetterOptimizations": {},
+    "applicationAnswerOptimizations": {}
+  },
+  "updatedAt": 1788386547566
+}
