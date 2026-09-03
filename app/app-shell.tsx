@@ -33,14 +33,11 @@ const dockItems: Array<{
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const isApplyDemo = pathname === "/apply" || pathname.startsWith("/apply/");
 
   return (
     <WorkspaceProvider>
       <WebMcpProvider />
-      <div
-        className={`min-h-full bg-background text-foreground ${isApplyDemo ? "theme-apply" : ""}`}
-      >
+      <div className="theme-apply min-h-full bg-background text-foreground">
         <WebMcpPdfBanner />
         <div className="relative z-10 mx-auto min-h-full w-full max-w-6xl px-3 pb-28 pt-4 sm:px-6">
           <header className="mb-6 flex items-center justify-between gap-3">

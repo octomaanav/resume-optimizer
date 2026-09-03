@@ -1,42 +1,22 @@
 @import "tailwindcss";
 
-:root {
-  --background: #fafafa;
-  --foreground: #171717;
-  --accent: #7c3aed;
-  --accent-light: #ede9fe;
-  --accent-dark: #5b21b6;
-  --surface: #ffffff;
-  --surface-raised: #ffffff;
-  --border: #e4e4e7;
-  --border-hover: #d4d4d8;
-  --muted: #71717a;
-  --radius: 0.875rem;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #09090b;
-    --foreground: #fafafa;
-    --accent: #a78bfa;
-    --accent-light: #1e1b4b;
-    --accent-dark: #c4b5fd;
-    --surface: #18181b;
-    --surface-raised: #1f1f23;
-    --border: #27272a;
-    --border-hover: #3f3f46;
-    --muted: #a1a1aa;
-  }
-}
+/*
+ * The app previously had a separate purple light/dark theme (still visible
+ * scattered through individual pages as literal dark:* utility classes).
+ * Rather than hand-edit every one of those, point Tailwind's dark variant at
+ * a class that's never applied — every dark:* utility in the codebase
+ * becomes inert, so each page falls back to its light-mode classes, which
+ * together with the warm palette below gives one consistent look everywhere.
+ */
+@custom-variant dark (&:where(.force-dark, .force-dark *));
 
 /*
- * Scoped theme for /apply — warm paper + ink + a single terracotta accent,
- * editorial rather than dark/terminal. Independent of light/dark OS
- * preference. Reuses the same token names as the rest of the app, so every
- * existing bg-surface / text-muted / border-border / bg-accent class just
- * picks up these values inside .theme-apply without any component changes.
+ * One fixed palette everywhere — warm paper + ink + a single terracotta
+ * accent — not OS-dependent light/dark. This is the true root now, so
+ * body's own background and every unscoped token usage resolve correctly
+ * without depending on the .theme-apply wrapper below.
  */
-.theme-apply {
+:root {
   --background: #f1eee4;
   --foreground: #211d16;
   --accent: #bd5b2c;
@@ -48,6 +28,15 @@
   --border-hover: #c7bca3;
   --muted: #8c8371;
   --radius: 0.75rem;
+}
+
+/*
+ * .theme-apply is applied app-wide in app-shell.tsx — the tokens now live on
+ * :root itself (see above), so this just adds the subtle paper-grain texture
+ * plus a few /apply-specific decorative utilities (hud-corners, live-dot,
+ * term-cursor) that only make sense on that page's console-style UI.
+ */
+.theme-apply {
   background-image: repeating-radial-gradient(
     circle at 0 0,
     rgba(33, 29, 22, 0.05) 0,
@@ -59,6 +48,23 @@
 }
 
 @layer utilities {
+  /*
+   * Every page's main heading uses the same display serif as /apply's
+   * "Apply, agent-assisted." — one rule instead of editing all 22 h1s
+   * individually. Instrument Serif only ships a 400 weight, so bold/semibold
+   * utility classes already on these headings are reset here too, or the
+   * browser would synthesize a faux-bold that looks rough on a serif face.
+   */
+  h1 {
+    font-family: var(--font-display-serif), Georgia, "Times New Roman", serif;
+    /* Beats existing font-bold/font-semibold utility classes on these
+       headings (class specificity otherwise wins over a bare element
+       selector) — needed because Instrument Serif only ships weight 400;
+       anything heavier gets faux-bolded by the browser and looks rough. */
+    font-weight: 400 !important;
+    letter-spacing: -0.01em;
+  }
+
   /* Two-corner marks on a panel, instead of a flat full border. */
   .theme-apply .hud-corners {
     position: relative;

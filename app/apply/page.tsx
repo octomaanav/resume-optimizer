@@ -207,8 +207,11 @@ export default function ApplyPage() {
                 <div className="font-mono text-[11px] font-medium uppercase tracking-[0.2em] text-muted">
                   Nimbus Cloud Security
                 </div>
-                <h2 className="truncate text-xl font-semibold tracking-tight">
-                  Software Engineering Intern, Platform Security
+                <h2
+                  className="truncate text-2xl leading-tight tracking-tight"
+                  style={{ fontFamily: "var(--font-display-serif)" }}
+                >
+                  Software Engineering Intern, <span className="italic">Platform Security</span>
                 </h2>
                 <div className="mt-0.5 text-xs text-muted">Buffalo, NY (Hybrid) · Internship</div>
               </div>
@@ -219,7 +222,12 @@ export default function ApplyPage() {
             {state.submitted ? (
               <div className="flex flex-col items-center gap-4 py-10 text-center">
                 <CheckCircle2 size={40} className="text-accent" />
-                <h3 className="text-lg font-semibold">Application submitted</h3>
+                <h3
+                  className="text-3xl tracking-tight"
+                  style={{ fontFamily: "var(--font-display-serif)" }}
+                >
+                  Application <span className="italic">submitted</span>.
+                </h3>
                 <p className="text-sm text-muted">
                   {applicantName || "The applicant"} applied to Nimbus Cloud Security —
                   this is a demo form, nothing left the browser.
