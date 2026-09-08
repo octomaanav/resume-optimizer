@@ -726,8 +726,92 @@ const CLEARANCE_CRED = [
 
 const WEB_NET_LEGACY = ["html", "css", "sass", "scss", "less", "php", "wordpress", "drupal"];
 
+
+const CRYPTO_WEB3 = [
+  "smart contracts",
+  "smart contract",
+  "solidity",
+  "blockchain",
+  "ethereum",
+  "evm",
+  "defi",
+  "decentralized finance",
+  "dex",
+  "decentralized exchange",
+  "amm",
+  "automated market maker",
+  "layer 2",
+  "layer 1",
+  "rollup",
+  "optimistic rollup",
+  "zk-rollup",
+  "zero-knowledge",
+  "web3",
+  "on-chain",
+  "off-chain",
+  "liquidity",
+  "staking",
+  "tokenomics",
+  "erc-20",
+  "erc-721",
+  "nft",
+  "wallet",
+  "hardhat",
+  "foundry",
+  "ethers.js",
+  "web3.js",
+  "viem",
+  "wagmi",
+  "the graph",
+  "subgraph",
+  "ipfs",
+  "consensus",
+  "mempool",
+  "gas optimization",
+  "mev",
+  "cryptography",
+  "crypto",
+];
+
+const CORE_ENGINEERING = [
+  "api",
+  "apis",
+  "backend",
+  "back-end",
+  "frontend",
+  "front-end",
+  "production code",
+  "code review",
+  "open source",
+  "open-source",
+  "testing",
+  "unit testing",
+  "integration testing",
+  "test coverage",
+  "debugging",
+  "competitive programming",
+  "data structures",
+  "computer science",
+  "cs fundamentals",
+  "ctf",
+  "capture the flag",
+  "technical writing",
+  "pair programming",
+  "infrastructure",
+  "web development",
+  "distributed systems",
+  "scalability",
+  "production",
+  "hackathon",
+  "side projects",
+  "system design",
+  "performance optimization",
+];
+
 const ALL = [
   ...LANGUAGES,
+  ...CRYPTO_WEB3,
+  ...CORE_ENGINEERING,
   ...WEB_PLATFORM,
   ...BACKEND_APIS,
   ...DATA_ML,
@@ -761,4 +845,24 @@ function dedupeNormalized(terms: string[]): string[] {
 /** Longer phrases first — used for deterministic matching order. */
 export const JD_KEYWORD_ALLOWLIST: readonly string[] = dedupeNormalized(ALL).sort(
   (a, b) => b.length - a.length
+);
+
+/**
+ * Generic / soft terms. They stay matchable — a JD that stresses ownership or
+ * mentorship is telling you something — but they rank below concrete technical
+ * terms so they never crowd the top of the list.
+ */
+export const JD_KEYWORD_SOFT_TERMS: ReadonlySet<string> = new Set(
+  SOFT_CONCRETE.map((t) => t.toLowerCase()),
+);
+
+/**
+ * Short entries that are only meaningful as acronyms. Matched case-sensitively
+ * so prose like "we go fast" or "an R&D team" cannot produce a false hit for
+ * the Go language or the R language.
+ */
+export const JD_KEYWORD_CASE_SENSITIVE: ReadonlySet<string> = new Set(
+  JD_KEYWORD_ALLOWLIST.filter((t) => t.length <= 3 && !/[+#.]/.test(t)).map((t) =>
+    t.toLowerCase(),
+  ),
 );

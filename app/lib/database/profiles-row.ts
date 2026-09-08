@@ -1,28 +1,11 @@
-import type { SupabaseClient } from "@supabase/supabase-js";
 import {
   ProfileSchema,
   migrateLegacyProfileSkills,
   type Profile,
-  emptyProfile,
 } from "@/app/lib/profile-model";
+import type { ProfileRow } from "@/app/lib/db/schema";
 
-export type ProfilesTableRow = {
-  id: string;
-  name: string;
-  email: string;
-  phone: string;
-  location: string;
-  summary: string;
-  links: unknown;
-  skills: unknown;
-  skill_categories: unknown;
-  experience: unknown;
-  projects: unknown;
-  education: unknown;
-  created_at: string;
-  updated_at: string;
-};
-
+/** Profile → row values for insert/update. Keys match the Drizzle schema. */
 export function profileToRow(userId: string, p: Profile) {
   return {
     id: userId,
@@ -33,14 +16,15 @@ export function profileToRow(userId: string, p: Profile) {
     summary: p.summary ?? "",
     links: p.links,
     skills: p.skills,
-    skill_categories: p.skillCategories ?? [],
+    skillCategories: p.skillCategories ?? [],
     experience: p.experience,
     projects: p.projects,
     education: p.education,
   };
 }
 
-export function rowToProfile(row: ProfilesTableRow): Profile {
+/** Row → validated Profile, applying the legacy flat-skills migration. */
+export function rowToProfile(row: ProfileRow): Profile {
   return migrateLegacyProfileSkills(
     ProfileSchema.parse({
       name: row.name ?? "",
@@ -50,28 +34,10 @@ export function rowToProfile(row: ProfilesTableRow): Profile {
       summary: row.summary ?? "",
       links: row.links ?? [],
       skills: row.skills ?? [],
-      skillCategories: row.skill_categories ?? [],
+      skillCategories: row.skillCategories ?? [],
       experience: row.experience ?? [],
       projects: row.projects ?? [],
       education: row.education ?? [],
     }),
   );
-}
-
-/** Insert default profile row if missing (RLS: own id only). */
-export async function ensureDefaultProfileRow(
-  supabase: SupabaseClient,
-  userId: string,
-): Promise<{ error: Error | null }> {
-  const { data: existing } = await supabase
-    .from("profiles")
-    .select("id")
-    .eq("id", userId)
-    .maybeSingle();
-
-  if (existing) return { error: null };
-
-  const row = profileToRow(userId, emptyProfile());
-  const { error } = await supabase.from("profiles").insert(row);
-  return { error: error ? new Error(error.message) : null };
 }

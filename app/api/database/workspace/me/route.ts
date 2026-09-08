@@ -1,75 +1,62 @@
+import { eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
-import { WorkspacePatchSchema } from "@/app/lib/document-schemas";
-import { defaultWorkspacePayload } from "@/app/lib/document-schemas";
+
+import { currentUserId } from "@/auth";
+import { db } from "@/app/lib/db";
+import { userWorkspace } from "@/app/lib/db/schema";
 import {
   mergeWorkspacePatch,
   rowToWorkspacePayload,
   workspacePayloadToRow,
-  type UserWorkspaceRow,
 } from "@/app/lib/database/workspace-row";
-import { createClient } from "@/app/lib/supabase/server";
+import { WorkspacePatchSchema } from "@/app/lib/document-schemas";
 
-async function ensureWorkspaceRow(
-  supabase: Awaited<ReturnType<typeof createClient>>,
-  userId: string,
-) {
-  const { data: existing } = await supabase
-    .from("user_workspace")
-    .select("id")
-    .eq("id", userId)
-    .maybeSingle();
+export const runtime = "nodejs";
 
-  if (existing) return;
+/** Reads the user's workspace row, creating an empty one on first access. */
+async function loadOrCreateRow(userId: string) {
+  let row = await db.query.userWorkspace.findFirst({
+    where: eq(userWorkspace.id, userId),
+  });
 
-  await supabase
-    .from("user_workspace")
-    .insert(workspacePayloadToRow(userId, defaultWorkspacePayload()));
+  if (!row) {
+    [row] = await db
+      .insert(userWorkspace)
+      .values({ id: userId })
+      .onConflictDoNothing()
+      .returning();
+
+    row ??= await db.query.userWorkspace.findFirst({
+      where: eq(userWorkspace.id, userId),
+    });
+  }
+
+  return row ?? null;
 }
 
 /**
  * GET /api/database/workspace/me — settings, documents, optimizations JSON.
  */
 export async function GET() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-    error: authError,
-  } = await supabase.auth.getUser();
-
-  if (authError || !user) {
+  const userId = await currentUserId();
+  if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  await ensureWorkspaceRow(supabase, user.id);
-
-  const { data: row, error } = await supabase
-    .from("user_workspace")
-    .select("*")
-    .eq("id", user.id)
-    .single<UserWorkspaceRow>();
-
-  if (error || !row) {
-    return NextResponse.json(
-      { error: error?.message ?? "Workspace not found" },
-      { status: 500 },
-    );
+  const row = await loadOrCreateRow(userId);
+  if (!row) {
+    return NextResponse.json({ error: "Workspace not found" }, { status: 500 });
   }
 
-  const workspace = rowToWorkspacePayload(row);
-  return NextResponse.json({ workspace });
+  return NextResponse.json({ workspace: rowToWorkspacePayload(row) });
 }
 
 /**
  * PUT /api/database/workspace/me — partial patch; merged server-side.
  */
 export async function PUT(request: Request) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-    error: authError,
-  } = await supabase.auth.getUser();
-
-  if (authError || !user) {
+  const userId = await currentUserId();
+  if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -82,45 +69,31 @@ export async function PUT(request: Request) {
 
   const parsed = WorkspacePatchSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: parsed.error.flatten() },
-      { status: 400 },
-    );
+    return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
   }
 
   if (Object.keys(parsed.data).length === 0) {
-    return NextResponse.json(
-      { error: "Empty patch" },
-      { status: 400 },
-    );
+    return NextResponse.json({ error: "Empty patch" }, { status: 400 });
   }
 
-  await ensureWorkspaceRow(supabase, user.id);
-
-  const { data: row, error: readError } = await supabase
-    .from("user_workspace")
-    .select("*")
-    .eq("id", user.id)
-    .single<UserWorkspaceRow>();
-
-  if (readError || !row) {
+  const row = await loadOrCreateRow(userId);
+  if (!row) {
     return NextResponse.json(
-      { error: readError?.message ?? "Workspace read failed" },
+      { error: "Workspace read failed" },
       { status: 500 },
     );
   }
 
-  const current = rowToWorkspacePayload(row);
-  const merged = mergeWorkspacePatch(current, parsed.data);
-  const upsertRow = workspacePayloadToRow(user.id, merged);
+  const merged = mergeWorkspacePatch(rowToWorkspacePayload(row), parsed.data);
+  const next = workspacePayloadToRow(userId, merged);
 
-  const { error: upsertError } = await supabase
-    .from("user_workspace")
-    .upsert(upsertRow, { onConflict: "id" });
-
-  if (upsertError) {
-    return NextResponse.json({ error: upsertError.message }, { status: 500 });
-  }
+  await db
+    .insert(userWorkspace)
+    .values(next)
+    .onConflictDoUpdate({
+      target: userWorkspace.id,
+      set: { ...next, updatedAt: new Date() },
+    });
 
   return NextResponse.json({ workspace: merged });
 }

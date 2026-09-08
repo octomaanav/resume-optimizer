@@ -377,32 +377,43 @@ const TECHNICAL_KEYWORDS_DICT = [
   "Unit Testing", "Integration Testing", "End-to-End Testing", "Jest", "Cypress", "Playwright", "Test-Driven Development", "TDD", "Cybersecurity", "OAuth", "JWT", "Penetration Testing", "Compliance", "SOC2", "GDPR"
 ];
 
-function extractKeywordsFromText(jdText) {
+/**
+ * Local fallback only — used when the app server can't be reached.
+ *
+ * Deliberately dictionary-only. An earlier version also harvested every
+ * /\b[A-Z]{2,10}\b/ token as a "technical acronym", which meant a JD's
+ * location and legal boilerplate (NYC, NY, EEO, E-Verify) dominated the
+ * keyword list while real terms like "smart contracts" were missed entirely.
+ * The authoritative extractor is the curated allowlist in
+ * app/lib/jd-keyword-extract.ts, reached via EXTRACT_JD_KEYWORDS_DETERMINISTIC.
+ */
+function extractKeywordsFromTextLocal(jdText) {
   if (!jdText || typeof jdText !== "string" || !jdText.trim()) return [];
-  const text = jdText;
-  const found = new Set();
-
-  // 1. Match against curated technical & engineering keywords dictionary
+  const found = [];
   for (const kw of TECHNICAL_KEYWORDS_DICT) {
     const escKw = kw.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     const re = new RegExp(`(?:^|[^a-z0-9+#])${escKw}(?:$|[^a-z0-9+#])`, "i");
-    if (re.test(text)) {
-      found.add(kw);
-    }
+    if (re.test(jdText)) found.push(kw);
   }
+  // Longer, more specific phrases first — same ordering intent as the server.
+  return found.sort((a, b) => b.length - a.length).slice(0, 40);
+}
 
-  // 2. Match technical uppercase acronyms/terms (e.g., CUDA, gRPC, MLOps, LLM, SDK)
-  const acronyms = text.match(/\b[A-Z]{2,10}\b/g) || [];
-  const commonNonTechAcronyms = new Set(["THE", "AND", "FOR", "YOU", "OUT", "YES", "NOT", "USA", "FAQ", "EEOC"]);
-  for (const ac of acronyms) {
-    if (ac.length >= 2 && !commonNonTechAcronyms.has(ac) && found.size < 25) {
-      if (!Array.from(found).some((existing) => existing.toUpperCase() === ac)) {
-        found.add(ac);
-      }
+/** Server-backed extraction, falling back to the local dictionary offline. */
+async function extractKeywordsFromText(jdText) {
+  if (!jdText || typeof jdText !== "string" || !jdText.trim()) return [];
+  try {
+    const res = await sendToBackground({
+      type: "EXTRACT_JD_KEYWORDS_DETERMINISTIC",
+      payload: { jd: jdText, settings: state.settings },
+    });
+    if (Array.isArray(res?.keywords) && res.keywords.length) {
+      return res.keywords;
     }
+  } catch {
+    // fall through to the local dictionary
   }
-
-  return Array.from(found);
+  return extractKeywordsFromTextLocal(jdText);
 }
 
 async function computeMatchAsync(jd) {
@@ -410,7 +421,7 @@ async function computeMatchAsync(jd) {
   const profileText = profileToText(profile);
   const profileTextLower = profileText.toLowerCase();
 
-  const keywords = extractKeywordsFromText(jd);
+  const keywords = await extractKeywordsFromText(jd);
   if (!keywords.length) {
     return { score: 0, matched: [], missing: [], keywords: [] };
   }

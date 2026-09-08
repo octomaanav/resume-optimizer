@@ -1,33 +1,28 @@
-import { type NextRequest, NextResponse } from "next/server";
-import { updateSession } from "@/app/lib/supabase/middleware";
-import { isSupabaseConfigured } from "@/app/lib/supabase/public-env";
+import { NextResponse } from "next/server";
+
+import { auth } from "@/auth";
 
 function isPublicPath(pathname: string) {
   if (pathname === "/") return true;
   if (pathname.startsWith("/login")) return true;
-  if (pathname.startsWith("/auth/")) return true;
+  if (pathname.startsWith("/signup")) return true;
   if (pathname.startsWith("/api/")) return true;
   if (pathname.startsWith("/_next/")) return true;
   return false;
 }
 
-export async function middleware(request: NextRequest) {
-  if (!isSupabaseConfigured()) {
-    return NextResponse.next();
-  }
-
-  const { response, user } = await updateSession(request);
+export default auth((request) => {
   const { pathname } = request.nextUrl;
 
-  if (!isPublicPath(pathname) && !user) {
+  if (!isPublicPath(pathname) && !request.auth) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     url.searchParams.set("next", pathname);
     return NextResponse.redirect(url);
   }
 
-  return response;
-}
+  return NextResponse.next();
+});
 
 export const config = {
   matcher: [

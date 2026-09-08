@@ -3,43 +3,32 @@ import {
   type WorkspacePayload,
   type WorkspacePatch,
 } from "@/app/lib/document-schemas";
+import type { WorkspaceRow } from "@/app/lib/db/schema";
 
-export type UserWorkspaceRow = {
-  id: string;
-  settings: unknown;
-  resumes: unknown;
-  cover_letters: unknown;
-  application_answer_docs: unknown;
-  resume_optimizations: unknown;
-  cover_letter_optimizations: unknown;
-  application_answer_optimizations: unknown;
-};
-
-export function rowToWorkspacePayload(row: UserWorkspaceRow): WorkspacePayload {
+/** Row → validated WorkspacePayload. Keys match the Drizzle schema. */
+export function rowToWorkspacePayload(row: WorkspaceRow): WorkspacePayload {
   return WorkspacePayloadSchema.parse({
     settings: row.settings ?? {},
     resumes: row.resumes ?? [],
-    coverLetters: row.cover_letters ?? [],
-    applicationAnswerDocs: row.application_answer_docs ?? [],
-    resumeOptimizations: row.resume_optimizations ?? {},
-    coverLetterOptimizations: row.cover_letter_optimizations ?? {},
-    applicationAnswerOptimizations: row.application_answer_optimizations ?? {},
+    coverLetters: row.coverLetters ?? [],
+    applicationAnswerDocs: row.applicationAnswerDocs ?? [],
+    resumeOptimizations: row.resumeOptimizations ?? {},
+    coverLetterOptimizations: row.coverLetterOptimizations ?? {},
+    applicationAnswerOptimizations: row.applicationAnswerOptimizations ?? {},
   });
 }
 
-export function workspacePayloadToRow(
-  userId: string,
-  w: WorkspacePayload,
-): Omit<UserWorkspaceRow, "id"> & { id: string } {
+/** WorkspacePayload → row values for insert/update. */
+export function workspacePayloadToRow(userId: string, w: WorkspacePayload) {
   return {
     id: userId,
     settings: w.settings,
     resumes: w.resumes,
-    cover_letters: w.coverLetters,
-    application_answer_docs: w.applicationAnswerDocs,
-    resume_optimizations: w.resumeOptimizations,
-    cover_letter_optimizations: w.coverLetterOptimizations,
-    application_answer_optimizations: w.applicationAnswerOptimizations,
+    coverLetters: w.coverLetters,
+    applicationAnswerDocs: w.applicationAnswerDocs,
+    resumeOptimizations: w.resumeOptimizations,
+    coverLetterOptimizations: w.coverLetterOptimizations,
+    applicationAnswerOptimizations: w.applicationAnswerOptimizations,
   };
 }
 

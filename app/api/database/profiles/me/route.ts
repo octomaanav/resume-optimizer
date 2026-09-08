@@ -1,64 +1,57 @@
+import { eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
-import { createClient } from "@/app/lib/supabase/server";
-import {
-  ensureDefaultProfileRow,
-  profileToRow,
-  rowToProfile,
-  type ProfilesTableRow,
-} from "@/app/lib/database/profiles-row";
+
+import { currentUserId } from "@/auth";
+import { db } from "@/app/lib/db";
+import { profiles } from "@/app/lib/db/schema";
+import { profileToRow, rowToProfile } from "@/app/lib/database/profiles-row";
 import { ProfileSchema } from "@/app/lib/profile-model";
+
+export const runtime = "nodejs";
 
 /**
  * GET /api/database/profiles/me — full Profile JSON for the signed-in user.
  * Creates an empty profile row if none exists.
  */
 export async function GET() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-    error: authError,
-  } = await supabase.auth.getUser();
-
-  if (authError || !user) {
+  const userId = await currentUserId();
+  if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { error: ensureError } = await ensureDefaultProfileRow(
-    supabase,
-    user.id,
-  );
-  if (ensureError) {
-    return NextResponse.json({ error: ensureError.message }, { status: 500 });
+  let row = await db.query.profiles.findFirst({
+    where: eq(profiles.id, userId),
+  });
+
+  if (!row) {
+    [row] = await db
+      .insert(profiles)
+      .values({ id: userId })
+      .onConflictDoNothing()
+      .returning();
+
+    // A concurrent request may have inserted it first.
+    row ??= await db.query.profiles.findFirst({
+      where: eq(profiles.id, userId),
+    });
   }
 
-  const { data: row, error: selectError } = await supabase
-    .from("profiles")
-    .select("*")
-    .eq("id", user.id)
-    .single<ProfilesTableRow>();
-
-  if (selectError || !row) {
+  if (!row) {
     return NextResponse.json(
-      { error: selectError?.message ?? "Profile not found" },
+      { error: "Profile could not be created" },
       { status: 500 },
     );
   }
 
-  const profile = rowToProfile(row);
-  return NextResponse.json({ profile });
+  return NextResponse.json({ profile: rowToProfile(row) });
 }
 
 /**
  * PUT /api/database/profiles/me — replace profile with validated body.
  */
 export async function PUT(request: Request) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-    error: authError,
-  } = await supabase.auth.getUser();
-
-  if (authError || !user) {
+  const userId = await currentUserId();
+  if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -75,20 +68,18 @@ export async function PUT(request: Request) {
       : body,
   );
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: parsed.error.flatten() },
-      { status: 400 },
-    );
+    return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
   }
 
-  const row = profileToRow(user.id, parsed.data);
-  const { error: upsertError } = await supabase
-    .from("profiles")
-    .upsert(row, { onConflict: "id" });
+  const row = profileToRow(userId, parsed.data);
 
-  if (upsertError) {
-    return NextResponse.json({ error: upsertError.message }, { status: 500 });
-  }
+  await db
+    .insert(profiles)
+    .values(row)
+    .onConflictDoUpdate({
+      target: profiles.id,
+      set: { ...row, updatedAt: new Date() },
+    });
 
   return NextResponse.json({ profile: parsed.data });
 }

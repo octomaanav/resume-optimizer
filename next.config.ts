@@ -3,8 +3,8 @@ import path from "node:path";
 import type { NextConfig } from "next";
 
 /**
- * Next.js only auto-loads `.env*` from the project root. Many editors put
- * `app/.env` next to the app folder; merge it so Supabase (and other) vars work.
+ * Next.js only auto-loads `.env*` from the project root. Some editors put
+ * `app/.env` next to the app folder; merge it so those vars still work.
  */
 function parseDotEnvFile(filePath: string): Record<string, string> {
   if (!existsSync(filePath)) return {};
@@ -37,38 +37,10 @@ function applyEnvRecord(record: Record<string, string>) {
   }
 }
 
-const appEnvPath = path.join(process.cwd(), "app", ".env");
-const appEnv = parseDotEnvFile(appEnvPath);
-applyEnvRecord(appEnv);
-
-/** Dashboard / CLI often use unprefixed names; the browser needs NEXT_PUBLIC_*. */
-function ensureSupabasePublicEnv() {
-  const pick = (k: string) => process.env[k]?.trim() || appEnv[k]?.trim();
-  if (!pick("NEXT_PUBLIC_SUPABASE_URL")) {
-    const u = pick("SUPABASE_URL");
-    if (u) process.env.NEXT_PUBLIC_SUPABASE_URL = u;
-  }
-  if (!pick("NEXT_PUBLIC_SUPABASE_ANON_KEY")) {
-    const k = pick("SUPABASE_ANON_KEY") || pick("SUPABASE_KEY");
-    if (k) process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = k;
-  }
-}
-
-ensureSupabasePublicEnv();
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "";
+applyEnvRecord(parseDotEnvFile(path.join(process.cwd(), "app", ".env")));
 
 const nextConfig: NextConfig = {
-  serverExternalPackages: ["node-latex-compiler"],
-  /**
-   * Ensures Turbopack/webpack inline these into client bundles. Relying only on
-   * mutating `process.env` in this file is not always enough for the browser.
-   */
-  env: {
-    NEXT_PUBLIC_SUPABASE_URL: supabaseUrl,
-    NEXT_PUBLIC_SUPABASE_ANON_KEY: supabaseAnonKey,
-  },
+  serverExternalPackages: ["node-latex-compiler", "postgres", "bcryptjs"],
 };
 
 export default nextConfig;

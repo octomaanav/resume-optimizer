@@ -1,5 +1,4 @@
 import type { Profile } from "@/app/lib/profile-model";
-import { isSupabaseConfigured } from "@/app/lib/supabase/public-env";
 
 async function parseJsonError(res: Response): Promise<string> {
   try {
@@ -54,13 +53,12 @@ export type CloudProfileSyncResult =
   | { cloud: "error"; message: string };
 
 /**
- * Upsert profile to `public.profiles` when Supabase is configured and the user
- * has a session cookie. Guests / no env → skipped (no throw).
+ * Upsert the profile for the signed-in user. Guests (401) are skipped rather
+ * than treated as an error, so the app still works signed out.
  */
 export async function syncProfileToDatabaseIfSignedIn(
   profile: Profile,
 ): Promise<CloudProfileSyncResult> {
-  if (!isSupabaseConfigured()) return { cloud: "skipped" };
   try {
     await saveDatabaseProfile(profile);
     return { cloud: "ok" };

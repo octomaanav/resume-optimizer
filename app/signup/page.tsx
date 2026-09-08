@@ -2,8 +2,7 @@ import { Suspense } from "react";
 
 import { AuthForm } from "../components/auth-form";
 
-/** Providers are only rendered when their credentials are actually set. */
-export default function LoginPage() {
+export default function SignupPage() {
   const oauth = {
     google: Boolean(process.env.AUTH_GOOGLE_ID && process.env.AUTH_GOOGLE_SECRET),
     github: Boolean(process.env.AUTH_GITHUB_ID && process.env.AUTH_GITHUB_SECRET),
@@ -11,7 +10,7 @@ export default function LoginPage() {
 
   return (
     <Suspense fallback={null}>
-      <AuthForm mode="login" oauth={oauth} />
+      <AuthForm mode="signup" oauth={oauth} />
     </Suspense>
   );
 }

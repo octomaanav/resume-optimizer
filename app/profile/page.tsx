@@ -433,7 +433,7 @@ export default function ProfilePage() {
 
       {cloudSyncError ? (
         <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950 dark:border-amber-900/50 dark:bg-amber-950/30 dark:text-amber-100">
-          Could not sync profile to Supabase: {cloudSyncError}. Your edits
+          Could not save profile to the database: {cloudSyncError}. Your edits
           are still on this page. Check that the <code className="rounded bg-amber-100/80 px-1 dark:bg-amber-900/60">profiles</code> table exists (run the migration SQL) and you are signed in.
         </div>
       ) : null}
