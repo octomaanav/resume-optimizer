@@ -4,6 +4,7 @@ import { z } from "zod";
 
 import { renderJakeResumeTex } from "@/app/lib/jake-latex";
 import { ProfileSchema } from "@/app/lib/profile-model";
+import { fitResumeToPageLimit } from "@/app/lib/resume-pdf-fit";
 
 export const runtime = "nodejs";
 export const maxDuration = 120;
@@ -20,7 +21,15 @@ const BodySchema = z.object({
   title: z.string().optional(),
 });
 
-async function compileLatexToPdf(latex: string) {
+class LatexCompileError extends Error {
+  stderr: string;
+  constructor(message: string, stderr: string) {
+    super(message);
+    this.stderr = stderr;
+  }
+}
+
+async function compileLatexToPdf(latex: string): Promise<Uint8Array> {
   const { compile } = require("node-latex-compiler") as {
     compile: (c: {
       tex: string;
@@ -36,14 +45,13 @@ async function compileLatexToPdf(latex: string) {
   const result = await compile({ tex: latex, returnBuffer: true });
 
   if (result.status !== "success" || !result.pdfBuffer?.length) {
-    return {
-      ok: false as const,
-      error: result.error ?? "LaTeX compilation failed",
-      stderr: (result.stderr ?? "").slice(0, 12_000),
-    };
+    throw new LatexCompileError(
+      result.error ?? "LaTeX compilation failed",
+      (result.stderr ?? "").slice(0, 12_000),
+    );
   }
 
-  return { ok: true as const, pdfBuffer: result.pdfBuffer };
+  return new Uint8Array(result.pdfBuffer);
 }
 
 /** Build a Jake-style PDF from profile + optimized bullets (Chrome extension). */
@@ -73,7 +81,7 @@ export async function POST(req: Request) {
     title,
   } = parsed.data;
 
-  const latex = renderJakeResumeTex({
+  const preview = renderJakeResumeTex({
     profile,
     experienceIds: selectedExperienceIds,
     projectIds: selectedProjectIds,
@@ -84,27 +92,40 @@ export async function POST(req: Request) {
     highlightMetrics: true,
   });
 
-  if (!latex.trim()) {
+  if (!preview.trim()) {
     return NextResponse.json({ error: "Empty LaTeX output" }, { status: 400 });
   }
 
   try {
-    const compiled = await compileLatexToPdf(latex);
-    if (!compiled.ok) {
-      return NextResponse.json(
-        { error: compiled.error, stderr: compiled.stderr },
-        { status: 422 },
-      );
-    }
+    const fitted = await fitResumeToPageLimit({
+      profile,
+      experienceIds: selectedExperienceIds,
+      projectIds: selectedProjectIds,
+      subsetEnabled,
+      title,
+      experienceBulletsById,
+      projectBulletsById,
+      highlightMetrics: true,
+      compile: compileLatexToPdf,
+      maxPages: 1,
+    });
 
-    return new NextResponse(new Uint8Array(compiled.pdfBuffer), {
+    return new NextResponse(new Uint8Array(fitted.pdfBytes), {
       status: 200,
       headers: {
         "Content-Type": "application/pdf",
         "Content-Disposition": 'attachment; filename="resume-tailored.pdf"',
+        "X-Resume-Pages": String(fitted.pages),
+        "X-Resume-Bullets-Trimmed": String(fitted.bulletsDropped),
       },
     });
   } catch (e) {
+    if (e instanceof LatexCompileError) {
+      return NextResponse.json(
+        { error: e.message, stderr: e.stderr },
+        { status: 422 },
+      );
+    }
     const message = e instanceof Error ? e.message : "Compilation error";
     return NextResponse.json({ error: message }, { status: 500 });
   }

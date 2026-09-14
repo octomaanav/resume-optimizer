@@ -1,5 +1,6 @@
 import type { Profile } from "./profile-model";
 import { profileSkillDisplayRows } from "./profile-skills";
+import { tightenBulletOrphanLine } from "./resume-bullet-fit";
 import {
   resumeFilteredExperience,
   resumeFilteredProjects,
@@ -251,7 +252,10 @@ export function renderJakeResumeTex(args: {
       if (bullets.length > 0) {
         lines.push(String.raw`      \resumeItemListStart`);
         for (const b of bullets) {
-          const rendered = highlightMetrics ? latexBullet(b) : latexEscape(b);
+          const tightened = tightenBulletOrphanLine(b);
+          const rendered = highlightMetrics
+            ? latexBullet(tightened)
+            : latexEscape(tightened);
           lines.push(`        \\resumeItem{${rendered}}`);
         }
         lines.push(String.raw`      \resumeItemListEnd`);
@@ -280,7 +284,10 @@ export function renderJakeResumeTex(args: {
       if (bullets.length > 0) {
         lines.push(String.raw`          \resumeItemListStart`);
         for (const b of bullets) {
-          const rendered = highlightMetrics ? latexBullet(b) : latexEscape(b);
+          const tightened = tightenBulletOrphanLine(b);
+          const rendered = highlightMetrics
+            ? latexBullet(tightened)
+            : latexEscape(tightened);
           lines.push(`            \\resumeItem{${rendered}}`);
         }
         lines.push(String.raw`          \resumeItemListEnd`);
