@@ -31,3 +31,7 @@ if (process.env.NODE_ENV !== "production") {
 
 export const db = drizzle(sql, { schema });
 export { schema };
+
+export type Db = typeof db;
+/** The plain client, or a transaction handle passed into `db.transaction(...)`. */
+export type DbOrTx = Db | Parameters<Parameters<Db["transaction"]>[0]>[0];

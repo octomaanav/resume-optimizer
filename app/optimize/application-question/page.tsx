@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Suspense, useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { buildAiHeaders } from "../../lib/ai-client";
 import type { ApplicationAnswerDoc } from "../../lib/document-schemas";
@@ -69,13 +69,21 @@ function OptimizeApplicationQuestionInner() {
     after: string;
   } | null>(null);
 
+  // Hydrate once per baseId (keyed by createdAt, stable across a session) —
+  // not on every reference change of applicationAnswerOptimizations, which
+  // happens on unrelated workspace refreshes and would otherwise clobber an
+  // in-progress hand-edit to the tailored answer.
+  const lastHydrateKey = useRef<string>("");
   useEffect(() => {
     if (!ready || !baseId) return;
     const opt = applicationAnswerOptimizations[baseId];
-    if (opt) {
-      setJd(opt.jd);
-      setTailoredAnswer(opt.tailoredAnswer ?? "");
-    }
+    if (!opt) return;
+    const key = `${baseId}:${opt.createdAt}`;
+    if (lastHydrateKey.current === key) return;
+    lastHydrateKey.current = key;
+
+    setJd(opt.jd);
+    setTailoredAnswer(opt.tailoredAnswer ?? "");
   }, [ready, baseId, applicationAnswerOptimizations]);
 
   async function onOptimize() {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import type { CoverLetterDoc } from "../../lib/document-schemas";
@@ -38,12 +38,24 @@ export default function CoverLetterDetailPage() {
 
   const [title, setTitle] = useState("");
   const [template, setTemplate] = useState("");
+  const hydrateFromDoc = useCallback((d: CoverLetterDoc) => {
+    setTitle(d.title);
+    setTemplate(d.templateMarkdown ?? "");
+  }, []);
+
+  // Re-hydrate local edit state only when the doc actually changes underneath
+  // us (id swap, or a fresh save) — not on every reference change, which
+  // would otherwise clobber whatever the user is currently typing.
+  const lastHydrateKey = useRef<string>("");
   useEffect(() => {
-    if (doc) {
-      setTitle(doc.title);
-      setTemplate(doc.templateMarkdown ?? "");
-    }
-  }, [doc]);
+    if (!doc) return;
+    const key = `${doc.id}:${doc.updatedAt}`;
+    if (lastHydrateKey.current === key) return;
+    lastHydrateKey.current = key;
+    // Same guarded re-hydrate-on-identity-change pattern as resumes/[id]/page.tsx.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    hydrateFromDoc(doc);
+  }, [doc, hydrateFromDoc]);
 
   function persist(nextDoc: CoverLetterDoc) {
     const next = docs.map((d) => (d.id === nextDoc.id ? nextDoc : d));

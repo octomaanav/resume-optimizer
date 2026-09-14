@@ -32,22 +32,47 @@ export function workspacePayloadToRow(userId: string, w: WorkspacePayload) {
   };
 }
 
+/**
+ * Optimization records are keyed by base-document id and nothing ever
+ * deletes an entry (a stale one is just orphaned when its base document is
+ * removed), so it's safe — and necessary for correctness — to merge these
+ * key-by-key instead of replacing the whole map. Two concurrent saves that
+ * each touch a different base document's optimization (e.g. two tabs, or two
+ * optimize pages open at once) would otherwise have one silently discard the
+ * other's entry, since each PUT only knows about the optimization it just
+ * computed, not ones saved elsewhere in the meantime.
+ */
+function mergeOptimizationMap<T>(
+  base: Record<string, T>,
+  patch: Record<string, T> | undefined,
+): Record<string, T> {
+  if (!patch) return base;
+  return { ...base, ...patch };
+}
+
 export function mergeWorkspacePatch(
   base: WorkspacePayload,
   patch: WorkspacePatch,
 ): WorkspacePayload {
   return WorkspacePayloadSchema.parse({
     settings: patch.settings ?? base.settings,
+    // Document lists are always sent in full (deleting one means the client
+    // omits it), so these stay a full replace rather than a key-merge.
     resumes: patch.resumes ?? base.resumes,
     coverLetters: patch.coverLetters ?? base.coverLetters,
     applicationAnswerDocs:
       patch.applicationAnswerDocs ?? base.applicationAnswerDocs,
-    resumeOptimizations:
-      patch.resumeOptimizations ?? base.resumeOptimizations,
-    coverLetterOptimizations:
-      patch.coverLetterOptimizations ?? base.coverLetterOptimizations,
-    applicationAnswerOptimizations:
-      patch.applicationAnswerOptimizations ??
+    resumeOptimizations: mergeOptimizationMap(
+      base.resumeOptimizations,
+      patch.resumeOptimizations,
+    ),
+    coverLetterOptimizations: mergeOptimizationMap(
+      base.coverLetterOptimizations,
+      patch.coverLetterOptimizations,
+    ),
+    applicationAnswerOptimizations: mergeOptimizationMap(
       base.applicationAnswerOptimizations,
+      patch.applicationAnswerOptimizations,
+    ),
   });
 }

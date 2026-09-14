@@ -12,11 +12,6 @@ function escapeRegex(s: string): string {
   return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
-function findCanonicalAllowlistTerm(token: string): string | null {
-  const lower = token.toLowerCase();
-  return SORTED_ALLOWLIST.find((t) => t.toLowerCase() === lower) ?? null;
-}
-
 /** Counts non-overlapping matches without the trailing-delimiter loss of `match`. */
 function countMatches(haystack: string, term: string, caseSensitive: boolean) {
   const e = escapeRegex(term);
@@ -69,10 +64,18 @@ export function extractJdKeywordsDeterministic(jd: string): string[] {
 
     let hits: number;
     try {
-      hits = caseSensitive
-        ? countMatches(text, kw.toUpperCase(), true) +
-          countMatches(text, kw.charAt(0).toUpperCase() + kw.slice(1), true)
-        : countMatches(textLower, lower, false);
+      if (caseSensitive) {
+        // All-caps and title-case spellings — deduped, so a 1-char term
+        // (where both forms are identical, e.g. "r" -> "R") isn't counted twice.
+        const variants = new Set([
+          kw.toUpperCase(),
+          kw.charAt(0).toUpperCase() + kw.slice(1),
+        ]);
+        hits = 0;
+        for (const v of variants) hits += countMatches(text, v, true);
+      } else {
+        hits = countMatches(textLower, lower, false);
+      }
     } catch {
       continue; // malformed entry
     }
@@ -85,14 +88,6 @@ export function extractJdKeywordsDeterministic(jd: string): string[] {
     const softPenalty = JD_KEYWORD_SOFT_TERMS.has(lower) ? 14 : 0;
 
     bump(kw, 12 + specificity + frequency - softPenalty);
-  }
-
-  // C++/C#/F# need their own pass — the boundary class above excludes + and #.
-  const plusSharp = text.match(/\b[A-Za-z][A-Za-z0-9]*(?:\+\+|#)/g) ?? [];
-  const singleSharp = text.match(/\b[A-Za-z]#/g) ?? [];
-  for (const raw of [...plusSharp, ...singleSharp]) {
-    const canon = findCanonicalAllowlistTerm(raw);
-    if (canon) bump(canon, 30);
   }
 
   const ranked = [...scored.values()].sort(

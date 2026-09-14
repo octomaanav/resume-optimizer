@@ -2,9 +2,8 @@
 
 import {
   useCallback,
-  useEffect,
   useMemo,
-  useState,
+  useSyncExternalStore,
   type Dispatch,
   type SetStateAction,
 } from "react";
@@ -17,12 +16,15 @@ import type {
 } from "./document-schemas";
 import { useWorkspace } from "./workspace-context";
 
+const subscribeNever = () => () => {};
+
+/** True once on the client, false during SSR/the initial hydration pass. */
 export function useHasMounted(): boolean {
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-  return mounted;
+  return useSyncExternalStore(
+    subscribeNever,
+    () => true,
+    () => false,
+  );
 }
 
 export function useHydratedProfile(): [

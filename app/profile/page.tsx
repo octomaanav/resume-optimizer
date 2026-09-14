@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { WandSparkles } from 'lucide-react';
 import { buildAiHeaders } from "../lib/ai-client";
 import { formatSavedBannerTime } from "../lib/format-date";
@@ -91,14 +91,21 @@ function SkillsInput({
   const [raw, setRaw] = useState(items.join(", "));
   const lastCommittedRef = useRef(items.join(", "));
 
-  // Sync external changes (e.g. profile reload) without clobbering in-progress edits.
-  useEffect(() => {
-    const joined = items.join(", ");
+  const syncFromExternalItems = useCallback((next: string[]) => {
+    const joined = next.join(", ");
     if (joined !== lastCommittedRef.current) {
       setRaw(joined);
       lastCommittedRef.current = joined;
     }
-  }, [items]);
+  }, []);
+
+  // Sync external changes (e.g. profile reload) without clobbering
+  // in-progress edits: syncFromExternalItems only calls setRaw when `items`
+  // differs from what we last committed ourselves.
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    syncFromExternalItems(items);
+  }, [items, syncFromExternalItems]);
 
   function commit(value: string) {
     const next = chipSplit(value);

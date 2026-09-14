@@ -11,6 +11,7 @@ import {
   resumeFilteredProjects,
 } from "../../lib/resume-filter";
 import { renderJakeResumeTex } from "../../lib/jake-latex";
+import { fitResumeToPageLimit } from "../../lib/resume-pdf-fit";
 import {
   useHydratedProfile,
   useHydratedResumes,
@@ -146,29 +147,61 @@ export default function ResumeDetailPage() {
     setPdfObjectUrl(next);
   }
 
+  async function compileLatexViaApi(tex: string): Promise<Uint8Array> {
+    const res = await fetch("/api/latex/pdf", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ latex: tex }),
+    });
+    const ct = res.headers.get("content-type") ?? "";
+    if (!res.ok) {
+      let msg = `Compile failed (${res.status})`;
+      if (ct.includes("application/json")) {
+        const j = (await res.json()) as { error?: string; stderr?: string };
+        const parts = [j.error, j.stderr?.trim()].filter(Boolean);
+        msg = parts.join("\n\n").slice(0, 4000) || msg;
+      } else {
+        msg = (await res.text()).slice(0, 800) || msg;
+      }
+      throw new Error(msg);
+    }
+    return new Uint8Array(await res.arrayBuffer());
+  }
+
+  /**
+   * Compiles to a PDF, shrinking bullets to keep it to one page. Custom
+   * hand-edited LaTeX is compiled as-is — we can't safely trim raw text the
+   * user wrote themselves.
+   */
+  async function buildFittedPdf(): Promise<{
+    bytes: Uint8Array;
+    bulletsDropped: number;
+  }> {
+    if (latexMode === "custom" && customLatexDraft.trim()) {
+      const bytes = await compileLatexViaApi(customLatexDraft);
+      return { bytes, bulletsDropped: 0 };
+    }
+    const fitted = await fitResumeToPageLimit({
+      profile: displayProfile,
+      experienceIds: selExp,
+      projectIds: selProj,
+      subsetEnabled,
+      title: title.trim() || doc?.title,
+      compile: compileLatexViaApi,
+      maxPages: 1,
+    });
+    return { bytes: fitted.pdfBytes, bulletsDropped: fitted.bulletsDropped };
+  }
+
   async function compilePdfPreview() {
     if (!effectiveLatex.trim()) return;
     setPdfError(null);
     setPdfBusy(true);
     try {
-      const res = await fetch("/api/latex/pdf", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ latex: effectiveLatex }),
+      const { bytes } = await buildFittedPdf();
+      const blob = new Blob([new Uint8Array(bytes)], {
+        type: "application/pdf",
       });
-      const ct = res.headers.get("content-type") ?? "";
-      if (!res.ok) {
-        let msg = `Compile failed (${res.status})`;
-        if (ct.includes("application/json")) {
-          const j = (await res.json()) as { error?: string; stderr?: string };
-          const parts = [j.error, j.stderr?.trim()].filter(Boolean);
-          msg = parts.join("\n\n").slice(0, 4000) || msg;
-        } else {
-          msg = (await res.text()).slice(0, 800) || msg;
-        }
-        throw new Error(msg);
-      }
-      const blob = await res.blob();
       const url = URL.createObjectURL(blob);
       replacePdfUrl(url);
     } catch (e) {
@@ -184,24 +217,10 @@ export default function ResumeDetailPage() {
     setPdfError(null);
     setPdfBusy(true);
     try {
-      const res = await fetch("/api/latex/pdf", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ latex: effectiveLatex }),
+      const { bytes } = await buildFittedPdf();
+      const blob = new Blob([new Uint8Array(bytes)], {
+        type: "application/pdf",
       });
-      const ct = res.headers.get("content-type") ?? "";
-      if (!res.ok) {
-        let msg = `PDF compile failed (${res.status})`;
-        if (ct.includes("application/json")) {
-          const j = (await res.json()) as { error?: string; stderr?: string };
-          const parts = [j.error, j.stderr?.trim()].filter(Boolean);
-          msg = parts.join("\n\n").slice(0, 4000) || msg;
-        } else {
-          msg = (await res.text()).slice(0, 800) || msg;
-        }
-        throw new Error(msg);
-      }
-      const blob = await res.blob();
       const base = (title.trim() || doc?.title || "resume").replaceAll(
         "/",
         "-",

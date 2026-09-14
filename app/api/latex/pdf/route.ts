@@ -2,6 +2,8 @@ import { createRequire } from "module";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
+import { currentUserId } from "@/auth";
+
 export const runtime = "nodejs";
 export const maxDuration = 120;
 
@@ -11,7 +13,17 @@ const BodySchema = z.object({
   latex: z.string().max(1_500_000),
 });
 
+/**
+ * Only signed-in pages call this (resumes/[id], optimize/resume both compile
+ * client-side and POST the result here) — gating it stops an unauthenticated
+ * caller from spawning arbitrary LaTeX-compile processes at will.
+ */
 export async function POST(req: Request) {
+  const userId = await currentUserId();
+  if (!userId) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   let json: unknown;
   try {
     json = await req.json();

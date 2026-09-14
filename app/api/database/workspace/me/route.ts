@@ -2,7 +2,7 @@ import { eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
 import { currentUserId } from "@/auth";
-import { db } from "@/app/lib/db";
+import { db, type DbOrTx } from "@/app/lib/db";
 import { userWorkspace } from "@/app/lib/db/schema";
 import {
   mergeWorkspacePatch,
@@ -14,19 +14,19 @@ import { WorkspacePatchSchema } from "@/app/lib/document-schemas";
 export const runtime = "nodejs";
 
 /** Reads the user's workspace row, creating an empty one on first access. */
-async function loadOrCreateRow(userId: string) {
-  let row = await db.query.userWorkspace.findFirst({
+async function loadOrCreateRow(client: DbOrTx, userId: string) {
+  let row = await client.query.userWorkspace.findFirst({
     where: eq(userWorkspace.id, userId),
   });
 
   if (!row) {
-    [row] = await db
+    [row] = await client
       .insert(userWorkspace)
       .values({ id: userId })
       .onConflictDoNothing()
       .returning();
 
-    row ??= await db.query.userWorkspace.findFirst({
+    row ??= await client.query.userWorkspace.findFirst({
       where: eq(userWorkspace.id, userId),
     });
   }
@@ -43,7 +43,7 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const row = await loadOrCreateRow(userId);
+  const row = await loadOrCreateRow(db, userId);
   if (!row) {
     return NextResponse.json({ error: "Workspace not found" }, { status: 500 });
   }
@@ -76,24 +76,44 @@ export async function PUT(request: Request) {
     return NextResponse.json({ error: "Empty patch" }, { status: 400 });
   }
 
-  const row = await loadOrCreateRow(userId);
-  if (!row) {
+  // Read-modify-write must be one atomic unit: SELECT ... FOR UPDATE locks
+  // the row for the transaction's lifetime, so a second concurrent PUT
+  // blocks until this one commits, then merges on top of *our* result
+  // instead of the same stale snapshot (otherwise the later write silently
+  // discards the earlier one — each top-level key is a full replace).
+  let merged;
+  try {
+    merged = await db.transaction(async (tx) => {
+      await loadOrCreateRow(tx, userId);
+      const [locked] = await tx
+        .select()
+        .from(userWorkspace)
+        .where(eq(userWorkspace.id, userId))
+        .for("update");
+      if (!locked) throw new Error("Workspace read failed");
+
+      const mergedPayload = mergeWorkspacePatch(
+        rowToWorkspacePayload(locked),
+        parsed.data,
+      );
+      const next = workspacePayloadToRow(userId, mergedPayload);
+
+      await tx
+        .insert(userWorkspace)
+        .values(next)
+        .onConflictDoUpdate({
+          target: userWorkspace.id,
+          set: { ...next, updatedAt: new Date() },
+        });
+
+      return mergedPayload;
+    });
+  } catch {
     return NextResponse.json(
       { error: "Workspace read failed" },
       { status: 500 },
     );
   }
-
-  const merged = mergeWorkspacePatch(rowToWorkspacePayload(row), parsed.data);
-  const next = workspacePayloadToRow(userId, merged);
-
-  await db
-    .insert(userWorkspace)
-    .values(next)
-    .onConflictDoUpdate({
-      target: userWorkspace.id,
-      set: { ...next, updatedAt: new Date() },
-    });
 
   return NextResponse.json({ workspace: merged });
 }

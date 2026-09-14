@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Suspense, useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { buildAiHeaders } from "../../lib/ai-client";
 import {
@@ -60,14 +60,22 @@ function OptimizeCoverLetterInner() {
     after: string;
   } | null>(null);
 
+  // Hydrate once per baseId (keyed by createdAt, stable across a session) —
+  // not on every reference change of coverLetterOptimizations, which happens
+  // on unrelated workspace refreshes and would otherwise clobber in-progress
+  // hand-edits to the tailored letter.
+  const lastHydrateKey = useRef<string>("");
   useEffect(() => {
     if (!ready || !baseId) return;
     const opt = coverLetterOptimizations[baseId];
-    if (opt) {
-      setJd(opt.jd);
-      setOutputMarkdown(opt.outputMarkdown ?? "");
-      setCompanyName(opt.companyName ?? "");
-    }
+    if (!opt) return;
+    const key = `${baseId}:${opt.createdAt}`;
+    if (lastHydrateKey.current === key) return;
+    lastHydrateKey.current = key;
+
+    setJd(opt.jd);
+    setOutputMarkdown(opt.outputMarkdown ?? "");
+    setCompanyName(opt.companyName ?? "");
   }, [ready, baseId, coverLetterOptimizations]);
 
   async function onOptimize() {

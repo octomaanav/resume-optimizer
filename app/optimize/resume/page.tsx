@@ -1,13 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { Suspense, useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { buildAiHeaders } from "../../lib/ai-client";
 import type { ResumeDoc } from "../../lib/document-schemas";
 import type { Profile } from "../../lib/profile-model";
 import { mergeProfileForResume } from "../../lib/merge-profile-for-resume";
 import { renderJakeResumeTex } from "../../lib/jake-latex";
+import { fitResumeToPageLimit } from "../../lib/resume-pdf-fit";
 import { JakeResumePreview } from "../../resumes/[id]/jake-preview";
 import {
   useHydratedProfile,
@@ -415,10 +416,21 @@ function OptimizeResumeInner() {
     afterProj: Record<string, string[]>;
   } | null>(null);
 
+  // Hydrate the wizard from a previously saved optimization once per baseId
+  // (keyed by createdAt, which is stable across a session — see the `prev?.createdAt
+  // ?? Date.now()` saves below). `resumeOptimizations` gets a new object
+  // reference on every workspace refresh (e.g. tab visibility change), which
+  // would otherwise re-fire this on every such refresh and blow away
+  // whatever JD/bullets/step the user currently has in progress.
+  const lastHydrateKey = useRef<string>("");
   useEffect(() => {
     if (!storageReady || !baseId) return;
     const existingOpt = resumeOptimizations[baseId];
     if (!existingOpt) return;
+    const key = `${baseId}:${existingOpt.createdAt}`;
+    if (lastHydrateKey.current === key) return;
+    lastHydrateKey.current = key;
+
     setJd(existingOpt.jd);
     setSelectedExperienceIds(existingOpt.selectedExperienceIds ?? []);
     setSelectedProjectIds(existingOpt.selectedProjectIds ?? []);
@@ -711,29 +723,50 @@ function OptimizeResumeInner() {
     }
   }
 
+  async function compileLatexViaApi(tex: string): Promise<Uint8Array> {
+    const res = await fetch("/api/latex/pdf", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ latex: tex }),
+    });
+    const ct = res.headers.get("content-type") ?? "";
+    if (!res.ok) {
+      let msg = `PDF compile failed (${res.status})`;
+      if (ct.includes("application/json")) {
+        const j = (await res.json()) as { error?: string; stderr?: string };
+        const parts = [j.error, j.stderr?.trim()].filter(Boolean);
+        msg = parts.join("\n\n").slice(0, 4000) || msg;
+      } else {
+        const t = await res.text();
+        msg = t.slice(0, 800) || msg;
+      }
+      throw new Error(msg);
+    }
+    return new Uint8Array(await res.arrayBuffer());
+  }
+
   async function onDownloadPdf() {
     setError(null);
     setPdfBusy(true);
     try {
-      const res = await fetch("/api/latex/pdf", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ latex: outputLatex }),
+      const hasPick =
+        selectedExperienceIds.length > 0 || selectedProjectIds.length > 0;
+      const fitted = await fitResumeToPageLimit({
+        profile: resumeProfile,
+        experienceIds: selectedExperienceIds,
+        projectIds: selectedProjectIds,
+        subsetEnabled: hasPick,
+        title: baseDoc?.title ?? "resume",
+        experienceBulletsById,
+        projectBulletsById,
+        highlightMetrics: true,
+        compile: compileLatexViaApi,
+        maxPages: 1,
       });
-      const ct = res.headers.get("content-type") ?? "";
-      if (!res.ok) {
-        let msg = `PDF compile failed (${res.status})`;
-        if (ct.includes("application/json")) {
-          const j = (await res.json()) as { error?: string; stderr?: string };
-          const parts = [j.error, j.stderr?.trim()].filter(Boolean);
-          msg = parts.join("\n\n").slice(0, 4000) || msg;
-        } else {
-          const t = await res.text();
-          msg = t.slice(0, 800) || msg;
-        }
-        throw new Error(msg);
-      }
-      const blob = await res.blob();
+
+      const blob = new Blob([new Uint8Array(fitted.pdfBytes)], {
+        type: "application/pdf",
+      });
       const base = (baseDoc?.title || "resume").replaceAll("/", "-");
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
@@ -741,8 +774,12 @@ function OptimizeResumeInner() {
       a.download = `${base}.pdf`;
       a.click();
       URL.revokeObjectURL(url);
-      setToast("PDF downloaded.");
-      setTimeout(() => setToast(null), 1600);
+      setToast(
+        fitted.bulletsDropped > 0
+          ? `PDF downloaded (trimmed ${fitted.bulletsDropped} bullet${fitted.bulletsDropped === 1 ? "" : "s"} to fit one page).`
+          : "PDF downloaded.",
+      );
+      setTimeout(() => setToast(null), 2400);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Could not build PDF.");
     } finally {
