@@ -55,7 +55,7 @@ export function mergeWorkspacePatch(
   patch: WorkspacePatch,
 ): WorkspacePayload {
   return WorkspacePayloadSchema.parse({
-    settings: patch.settings ?? base.settings,
+    settings: { ...base.settings, ...patch.settings },
     // Document lists are always sent in full (deleting one means the client
     // omits it), so these stay a full replace rather than a key-merge.
     resumes: patch.resumes ?? base.resumes,

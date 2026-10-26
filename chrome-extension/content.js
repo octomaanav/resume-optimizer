@@ -63,25 +63,6 @@
     if (event.data?.type === "RO_CLOSE") setOverlayVisible(false);
   });
 
-  // Automatic silent sync from web app localStorage when browsing the app
-  try {
-    const rawWorkspace = localStorage.getItem("resume-optimizer-workspace-v1");
-    if (rawWorkspace) {
-      const data = JSON.parse(rawWorkspace);
-      if (data?.profile) {
-        chrome.runtime.sendMessage({
-          type: "AUTO_SYNC_LOCAL_WORKSPACE",
-          payload: {
-            profile: data.profile,
-            applicationAnswerDocs: data.applicationAnswerDocs || [],
-          },
-        }).catch(() => {});
-      }
-    }
-  } catch {
-    // Ignore non-app pages
-  }
-
   // Automatically scrape page on load & notify extension sidebar
   setTimeout(() => {
     try {
@@ -180,8 +161,8 @@ function createPill() {
   const pill = document.createElement("button");
   pill.id = PILL_ID;
   pill.type = "button";
-  pill.title = "Open Resume Optimizer (drag to move)";
-  pill.setAttribute("aria-label", "Open Resume Optimizer");
+  pill.title = "Open Tailr (drag to move)";
+  pill.setAttribute("aria-label", "Open Tailr");
   pill.style.cssText = `
     position: fixed !important;
     left: auto !important;
@@ -347,7 +328,7 @@ function createOverlay() {
     background: transparent !important;
   `;
   iframe.allow = "clipboard-write";
-  iframe.title = "Resume Optimizer";
+  iframe.title = "Tailr";
 
   overlay.appendChild(iframe);
   document.documentElement.appendChild(overlay);
@@ -437,7 +418,7 @@ function scheduleAutoScrape(delayMs = 600) {
     try {
       runAutoScrape();
     } catch (e) {
-      console.warn("[Resume Optimizer] Auto-scrape failed:", e);
+      console.warn("[Tailr] Auto-scrape failed:", e);
     }
   }, delayMs);
 }
@@ -566,7 +547,7 @@ function scrapePage() {
     title: document.title,
     site: detectSite(),
   };
-  console.log("[Resume Optimizer] Scraped:", result);
+  console.log("[Tailr] Scraped:", result);
   return result;
 }
 
@@ -959,6 +940,11 @@ function getImmediateFieldContainer(inputEl) {
  * No hardcoded preset strings.
  */
 function getFieldOptions(inputEl, explicitWrapper, fieldLabel = "") {
+  // Plain text controls have no choices. Scanning their enclosing form can
+  // misclassify unrelated consent labels or the Submit button as options.
+  if (inputEl?.tagName === "TEXTAREA" ||
+      (inputEl?.tagName === "INPUT" && !["radio", "checkbox"].includes(inputEl.type) &&
+        inputEl.getAttribute("role") !== "combobox" && !inputEl.hasAttribute("aria-haspopup"))) return [];
   // 1. Try dynamic JSON extraction first (Ashby & Greenhouse embed full choice definitions in page JSON)
   const jsonOptions = extractOptionsFromPageJson(fieldLabel);
 
@@ -1048,6 +1034,9 @@ function extractQuestionsFromContainers(roots, seen, opts = {}) {
       fields.push({
         label: label.slice(0, 400),
         selector,
+        tagName: input.tagName.toLowerCase(),
+        inputType: input.type || "",
+        maxChars: input.maxLength > 0 ? input.maxLength : 0,
         questionKey: getQuestionKey(input),
         currentValue: (input.value || input.innerText || "").trim(),
         isContentEditable:
@@ -1466,6 +1455,16 @@ function fillChoiceGroup(el, text) {
   const isCheckboxGroup = options.some(
     (o) => (o.type || "").toLowerCase() === "checkbox" || o.getAttribute?.("role") === "checkbox"
   );
+  // A single agreement checkbox often has no separate "Yes" option label.
+  // Only apply an explicit saved boolean answer; never infer agreement.
+  if (isCheckboxGroup && options.length === 1 && options[0].type === "checkbox") {
+    const answer = text.trim().toLowerCase();
+    if (["yes", "true", "agree", "i agree", "checked"].includes(answer)) return selectChoiceOption(options[0]);
+    if (["no", "false", "disagree", "unchecked"].includes(answer)) {
+      if (options[0].checked) safeClick(options[0]);
+      return !options[0].checked;
+    }
+  }
 
   const whole = matchChoiceOption(options, text);
 
@@ -2343,7 +2342,7 @@ async function autofill(answers) {
       const ok = await adapter.fillField(el, answer.text);
       if (ok) filled++; else skipped++;
     } catch (e) {
-      console.warn("[Resume Optimizer] Autofill failed for", answer.selector, e);
+      console.warn("[Tailr] Autofill failed for", answer.selector, e);
       skipped++;
     }
   }
@@ -2886,7 +2885,7 @@ async function runFieldGenerate(field, el, btn, customInstructions) {
     showFieldBtnTooltip(btn, `Done ✓${within}`, false);
   } catch (e) {
     showFieldBtnTooltip(btn, "Failed.", true);
-    console.warn("[Resume Optimizer] Field AI generate failed:", e);
+    console.warn("[Tailr] Field AI generate failed:", e);
   } finally {
     removeLoading();
     btn.innerHTML = prevHtml;

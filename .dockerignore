@@ -1,0 +1,28 @@
+.git
+.next
+node_modules
+.env*
+app/.env*
+artifacts
+test-results
+playwright-report
+coverage
+.codex
+.agents
+.aws
+profile.md
+tests
+*.log
+*.tsbuildinfo
+
+# These configure deployment but are not application build inputs.
+Dockerfile
+README.md
+DEPLOYMENT.md
+render.yaml
+deploy/*.yml
+
+# Legacy editor-created environment file; never send to a build.
+env.example.local
+.npmrc
+.mcp-workspace.json

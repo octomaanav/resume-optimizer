@@ -47,9 +47,8 @@ export interface FitResumeResult {
  * lower-priority entry on ties) and recompiles until it fits or we run out
  * of content to cut.
  *
- * Per-bullet line-wrap tightening (dropping short orphan trailing lines) is
- * always applied inside `renderJakeResumeTex` itself, so this loop only
- * kicks in for genuine overflow — too much content, not wasted wrap space.
+ * Bullet wording is preserved in full. Only complete trailing bullets may be
+ * omitted when the compiled document exceeds the page limit.
  */
 export async function fitResumeToPageLimit(
   params: FitResumeParams,
@@ -140,7 +139,7 @@ export async function fitResumeToPageLimit(
       return { latex, pdfBytes, pages, bulletsDropped, fits: true };
     }
 
-    if (!dropOneBullet()) {
+    if (attempt === maxIterations - 1 || !dropOneBullet()) {
       // Nothing left to trim — return the best (smallest) attempt we have.
       break;
     }

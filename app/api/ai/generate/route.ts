@@ -1,6 +1,14 @@
 import { z } from "zod";
+import { selectByRequiredEvidence } from "@/app/lib/resume-selection";
+import { hasUnsupportedCachePolicy, groundExperienceAnswer } from "@/app/lib/answer-fact-guard";
+import { guardResumeBulletFacts } from "@/app/lib/resume-fact-guard";
+import { generateGroqJson } from "@/app/lib/groq";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { currentUserId } from "@/auth";
 
+import { parseAiOutput } from "@/app/lib/ai-output-schema";
+import { renderSelectedResumeMarkdown } from "@/app/lib/resume-markdown";
+import { sortedExperience, sortedProjects } from "@/app/lib/sort-profile";
 import { computeResumeBulletChanges } from "../../../lib/resume-bullet-diff";
 import {
   formatOllamaConnectionError,
@@ -136,6 +144,8 @@ const OLLAMA_OPTIONS = {
   // Full context — a smaller window truncated large profiles + the prompt and
   // broke JSON output. Keep this generous for reliability.
   num_ctx: 16384,
+  num_predict: 4096,
+  repeat_penalty: 1.1,
   temperature: 0.2,
 };
 
@@ -333,7 +343,7 @@ function buildProfileBulletPrompt(input: GenerateInput) {
     draft,
     "",
     "Full profile JSON (for factual grounding only):",
-    JSON.stringify(input.profile, null, 2),
+    JSON.stringify(input.profile),
     "",
     "skills.md (optional):",
     skillsMd,
@@ -373,7 +383,7 @@ function buildApplicationAnswerPrompt(input: GenerateInput) {
     "",
     "STEP 2 — Answer EVERY part of a multi-part question. E.g. 'what problems? how would attending help? what else do you want?' must address all three.",
     "",
-    "For EXPERIENCE questions: go beyond the resume — give the WHY (the real problem/motivation), the key DECISIONS and TRADEOFFS and reasoning, what was genuinely HARD, and a specific honest LESSON. Lead with the problem in plain language, not a job title or metric. Show what was chosen AND deliberately not chosen, and why.",
+    "For EXPERIENCE questions: describe ONE stated problem, the candidate’s stated actions, and the stated result. Add decisions, tradeoffs, difficulties, or lessons ONLY when the candidate explicitly supplied them in personal context. If that context is absent, a short factual explanation is enough; never invent a story to make it sound more personal.",
     "",
     "For FORWARD-LOOKING and IDEA questions: lead with the candidate's actual interests and ideas. Be concrete about the kinds of problems, systems, or domains that excite them. Only weave in background if the question explicitly asks how their experience prepares them. It is completely fine — expected, even — for these answers to NOT mention any specific past project.",
     "",
@@ -392,8 +402,10 @@ function buildApplicationAnswerPrompt(input: GenerateInput) {
     "",
     "Hard rules:",
     lengthRule,
-    "- Do NOT restate, paraphrase, or stitch together the profile's resume bullet points. For experience answers, use them only as raw facts to build a story; for forward-looking/idea answers, you usually won't need them at all.",
+    "- Profile bullets are factual source material. For experience answers without extra context, a concise paraphrase of those facts is preferable to an invented story. Never merge details across different roles. Forward-looking answers should focus on the candidate’s stated interests and goals.",
+    "- Ground each experience story in ONE role/project. Do not combine a dashboard problem from one employer with latency results from another. Never invent implementation decisions (such as a cache TTL or invalidation policy), personal motivations, difficulties, or lessons absent from the profile/personal context. When those details are missing, describe only the stated problem, actions, and outcome.",
     "- Use AT MOST ONE number/metric, and only if it genuinely strengthens the point. Prefer plain narrative over metric lists ('saved 100+ hours, cut costs $1,000, reduced overhead 70%').",
+    "- Copy any metric exactly as stated in the profile; do not calculate percentages or convert units. For motivation or forward-looking questions, omit past-project metrics unless the question explicitly asks for measured results.",
     "- Avoid resume-speak and buzzwords (spearheaded, leveraged, utilized, robust, seamless, fully featured). Write plainly and specifically.",
     "- Do not invent the candidate's PAST facts — employers, titles, degrees, dates, awards, or metrics they didn't state. (Proposing NEW or hypothetical ideas for 'what would you build' questions is encouraged and is not fabrication.)",
     hasJd
@@ -417,7 +429,7 @@ function buildApplicationAnswerPrompt(input: GenerateInput) {
     draft,
     "",
     "Candidate profile JSON (experiences, projects, skills, education — factual source of truth):",
-    JSON.stringify(input.profile, null, 2),
+    JSON.stringify(input.profile),
     "",
     personalContext
       ? "Personal context / about me (the candidate's own words — interests, values, goals, motivations, and the stories behind their work. PREFER this for forward-looking, motivation, and idea questions, and use it to add depth and voice to experience answers):\n" +
@@ -454,9 +466,13 @@ function buildResumePrompt(input: GenerateInput) {
         "Hard rules:",
         "- You MUST select EXACTLY 4 experiences (or all of them if fewer than 4 exist) and EXACTLY 2 projects (or all if fewer than 2 exist). Never return fewer IDs than the available count up to those limits.",
         "- Only use IDs that appear in the input JSON — do NOT invent or modify IDs.",
-        "- Do not invent companies, titles, dates, degrees, or metrics.",
+        "- Select entries whose SOURCE BULLETS collectively demonstrate the JD required qualifications. Cover distinct requirements before adding redundant experience; a skill in the profile skills list alone is not work evidence. Prefer relevant source evidence over recency. Never rewrite an unrelated entry to manufacture relevance.",
+        "- Do not invent companies, titles, dates, degrees, or metrics. Copy numerical values exactly; do not derive or round new percentages.",
         "- Keep each bullet impact-first (action + scope + outcome + tech).",
-        "- Keep bullets concise. Prefer 1 line each.",
+        "- Write exactly 3 bullets per selected entry. Keep complete source facts; 1–2 lines per bullet is fine.",
+        "- Keep each ID attached to its own employer/project. Never transfer facts, tools or metrics between entries, even if another entry is a closer JD match.",
+        "- Do not add outcome clauses such as improving reliability, reducing latency, boosting coverage or showing gains unless that outcome is explicitly in that entry. A benchmark alone does not establish a gain.",
+        "- Keep the original bullet order. Before returning, compare each rewritten bullet with its source bullet at the same index. If unsupported, use the original source bullet instead.",
         "- Return ONLY valid JSON matching the schema. No backticks.",
         "",
         "Return JSON schema:",
@@ -473,10 +489,10 @@ function buildResumePrompt(input: GenerateInput) {
         "- Keys: \"e:<experienceId>:<0-based bulletIndex>\" or \"p:<projectId>:<index>\".",
         "",
         "All experience objects (JSON):",
-        JSON.stringify(allExp, null, 2),
+        JSON.stringify(allExp),
         "",
         "All project objects (JSON):",
-        JSON.stringify(allProj, null, 2),
+        JSON.stringify(allProj),
         "",
         "skills.md (optional extra context):",
         skillsMd,
@@ -500,10 +516,13 @@ function buildResumePrompt(input: GenerateInput) {
       "Goal: rewrite bullets for the selected experiences/projects to best match the job description.",
       "",
       "Hard rules:",
-      "- Do not invent companies, titles, dates, degrees, or metrics.",
+      "- Do not invent companies, titles, dates, degrees, or metrics. Copy numerical values exactly; do not derive or round new percentages.",
       "- Keep each bullet impact-first (action + scope + outcome + tech).",
       "- Preserve truthiness. If a metric is not provided, do not add a number.",
-      "- Keep bullets concise. Prefer 1 line each.",
+      "- Write exactly 3 bullets per selected entry. Keep complete source facts; 1–2 lines per bullet is fine.",
+        "- Keep each ID attached to its own employer/project. Never transfer facts, tools or metrics between entries, even if another entry is a closer JD match.",
+        "- Do not add outcome clauses such as improving reliability, reducing latency, boosting coverage or showing gains unless that outcome is explicitly in that entry. A benchmark alone does not establish a gain.",
+        "- Keep the original bullet order. Before returning, compare each rewritten bullet with its source bullet at the same index. If unsupported, use the original source bullet instead.",
       "- Return ONLY valid JSON matching the schema. No backticks.",
       "",
       "Return JSON schema:",
@@ -540,6 +559,7 @@ function buildResumePrompt(input: GenerateInput) {
     "",
     "Hard rules:",
     "- Do not invent companies, titles, dates, degrees, or metrics. You may lightly rephrase bullets but keep facts consistent.",
+    "- Omit any missing dates, links, phone, location, summary, and education. Do not substitute invented values, example URLs, [optional], or other placeholders. Include only facts explicitly present in the profile.",
     "- Prefer impact + scope + tech stack. Keep bullets concise.",
     "- You MUST select exactly 4 experiences (or all of them if the profile has fewer than 4) and exactly 2 projects (or all if fewer than 2). Never return fewer than the available count up to those limits.",
     "- Return ONLY valid JSON matching the schema described below. No backticks.",
@@ -553,7 +573,7 @@ function buildResumePrompt(input: GenerateInput) {
     "}",
     "",
     "User profile JSON:",
-    JSON.stringify(p, null, 2),
+    JSON.stringify(p),
     "",
     "skills.md (optional extra context):",
     skillsMd,
@@ -574,6 +594,7 @@ function buildCoverLetterPrompt(input: GenerateInput) {
   return [
     "You are an expert cover letter writer.",
     "Goal: write a tailored cover letter in Markdown that fits the job description.",
+    "The outputMarkdown field must be a LETTER: a salutation, three short prose paragraphs, and a sign-off with the candidate's actual name. It must NOT be a resume/CV, a template, or a list of profile fields.",
     baseTemplate
       ? "The user provided a base cover letter template. Improve and tailor it for this role; keep their voice and structure where sensible."
       : "Write from scratch using the profile.",
@@ -582,6 +603,8 @@ function buildCoverLetterPrompt(input: GenerateInput) {
     "- Do not invent facts (companies, degrees, awards).",
     "- If company name is not explicitly present in the JD, infer a reasonable placeholder like COMPANY_NAME.",
     "- Keep it 200-350 words, skimmable, confident, and specific.",
+    "- Use the candidate's actual provided details. Omit missing contact details; never output [Your Name], [Your Email], or other unfilled placeholders.",
+    "- Do not include Skills, Experience, Projects, or Education headings. Weave relevant facts into prose paragraphs addressed to the hiring team.",
     "- Return ONLY valid JSON matching the schema described below. No backticks.",
     "",
     "Return JSON schema:",
@@ -592,7 +615,7 @@ function buildCoverLetterPrompt(input: GenerateInput) {
     "}",
     "",
     "User profile JSON:",
-    JSON.stringify(p, null, 2),
+    JSON.stringify(p),
     "",
     baseTemplate ? "Base cover letter template (Markdown):\n" + baseTemplate : "",
     "",
@@ -602,7 +625,7 @@ function buildCoverLetterPrompt(input: GenerateInput) {
     "Job description:",
     jd,
     "",
-    "Now produce the JSON result.",
+    "Now write the completed cover LETTER (not a resume). Return JSON with title, companyName, and outputMarkdown containing the salutation, letter paragraphs, and candidate sign-off.",
   ].join("\n");
 }
 
@@ -634,6 +657,9 @@ function parseJsonFromModelText(text: string): unknown {
 }
 
 export async function POST(req: Request) {
+  if (!(await currentUserId())) {
+    return new Response("Unauthorized", { status: 401 });
+  }
   let body: unknown;
   try {
     body = await req.json();
@@ -664,13 +690,18 @@ export async function POST(req: Request) {
     }
   }
 
-  const provider =
-    req.headers.get("x-ai-provider")?.trim() === "ollama" ? "ollama" : "gemini";
+  const requestedProvider = req.headers.get("x-ai-provider")?.trim();
+  const provider = requestedProvider === "ollama" || requestedProvider === "groq" ? requestedProvider : "gemini";
 
   const prompt = buildPrompt(input);
 
   let text = "";
-  if (provider === "ollama") {
+  if (provider === "groq") {
+    const result = await generateGroqJson(req, prompt);
+    if (result instanceof Response) return result;
+    text = result;
+  } else if (provider === "ollama") {
+    if (process.env.ALLOW_OLLAMA === "false") return new Response("Ollama is disabled on this hosted deployment. Run the app locally to use device-local Ollama.", { status: 403 });
     try {
       const { baseUrl, model } = getOllamaConfig(req);
       text = await ollamaCompleteJson(prompt, baseUrl, model);
@@ -763,7 +794,51 @@ export async function POST(req: Request) {
   }
 
   try {
-    const json = parseJsonFromModelText(text);
+    const json = parseAiOutput(parseJsonFromModelText(text), input);
+    if (input.kind === "applicationAnswer" && "optimizedAnswer" in json &&
+        hasUnsupportedCachePolicy(json.optimizedAnswer,
+          JSON.stringify(input.profile) + input.personalContext + input.draftAnswer)) {
+      return new Response("Generated answer added an unsupported cache-policy detail. Regenerate the answer, or add the actual implementation facts to Personal Context.", { status: 422 });
+    }
+    if (input.kind === "applicationAnswer" && "optimizedAnswer" in json) {
+      const grounded = groundExperienceAnswer(json.optimizedAnswer, input.applicationQuestion,
+        input.profile as Profile, input.personalContext, input.draftAnswer, input.maxChars);
+      if (!grounded) return new Response("No complete source-backed answer fits this field. Add a concise factual draft and try again.", { status: 422 });
+      json.optimizedAnswer = grounded;
+    }
+    if (input.kind === "resume" && (input.mode === "select" || input.selectBest) && "selectedExperienceIds" in json && "selectedProjectIds" in json) {
+      const knownExperienceIds = new Set(input.profile.experience.map(entry => entry.id));
+      const knownProjectIds = new Set(input.profile.projects.map(entry => entry.id));
+      if (json.selectedExperienceIds.some(id => !knownExperienceIds.has(id)) ||
+          json.selectedProjectIds.some(id => !knownProjectIds.has(id))) {
+        throw new Error("Model selected unknown profile entries.");
+      }
+      // Honor the model's ranking, then fill omitted slots with recent profile
+      // entries so a partial model response cannot silently drop available rows.
+      json.selectedExperienceIds = [...new Set([
+        ...json.selectedExperienceIds,
+        ...sortedExperience(input.profile as Profile).map(entry => entry.id),
+      ])].slice(0, 4);
+      json.selectedProjectIds = [...new Set([
+        ...json.selectedProjectIds,
+        ...sortedProjects(input.profile as Profile).map(entry => entry.id),
+      ])].slice(0, 2);
+      const ranked = selectByRequiredEvidence(input.profile as Profile, input.jd,
+        json.selectedExperienceIds, json.selectedProjectIds);
+      json.selectedExperienceIds = ranked.experienceIds;
+      json.selectedProjectIds = ranked.projectIds;
+      if ("experienceBulletsById" in json && "projectBulletsById" in json) {
+        const experienceBullets = json.experienceBulletsById as Record<string, string[]>;
+        const projectBullets = json.projectBulletsById as Record<string, string[]>;
+        json.experienceBulletsById = Object.fromEntries(ranked.experienceIds.map(id => [id,
+          experienceBullets[id] ?? input.profile.experience.find(entry => entry.id === id)!.bullets]));
+        json.projectBulletsById = Object.fromEntries(ranked.projectIds.map(id => [id,
+          projectBullets[id] ?? input.profile.projects.find(entry => entry.id === id)!.bullets]));
+      }
+      if ("outputMarkdown" in json) {
+        json.outputMarkdown = renderSelectedResumeMarkdown(input.profile as Profile, json.selectedExperienceIds, json.selectedProjectIds);
+      }
+    }
     if (input.kind === "resume" && input.mode === "bullets" && json && typeof json === "object") {
       const o = json as Record<string, unknown>;
       const expMap =
@@ -778,6 +853,7 @@ export async function POST(req: Request) {
         !Array.isArray(o.projectBulletsById)
           ? (o.projectBulletsById as Record<string, string[]>)
           : {};
+      o.metricWarnings = guardResumeBulletFacts(input.profile as Profile, expMap, projMap);
       const ratRaw = o.bulletRationaleByKey;
       const rat =
         ratRaw && typeof ratRaw === "object" && !Array.isArray(ratRaw)

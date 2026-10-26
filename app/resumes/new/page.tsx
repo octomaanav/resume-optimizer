@@ -14,7 +14,7 @@ export default function NewResumePage() {
   const router = useRouter();
   const [profile] = useHydratedProfile();
   const [docs, , ready, persistResumes] = useHydratedResumes();
-  const [title, setTitle] = useState("manav_swe_resume");
+  const [title, setTitle] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [pickNow, setPickNow] = useState(false);
   const [selExp, setSelExp] = useState<string[]>([]);
@@ -60,7 +60,7 @@ export default function NewResumePage() {
 
   if (!ready) {
     return (
-      <p className="text-sm text-zinc-500 dark:text-zinc-400">Loading…</p>
+      <p className="text-sm text-muted">Loading…</p>
     );
   }
 
@@ -68,7 +68,7 @@ export default function NewResumePage() {
     <div className="flex flex-col gap-6">
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">New resume</h1>
-        <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">
+        <p className="mt-1 text-sm text-muted">
           Create a saved resume for{" "}
           <span className="font-medium">Documents</span>. You can limit which
           profile roles and projects appear (e.g. a cybersecurity-only resume),
@@ -77,7 +77,7 @@ export default function NewResumePage() {
       </div>
 
       {error ? (
-        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-900 dark:border-red-900/50 dark:bg-red-900/20 dark:text-red-100">
+        <div className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-900 dark:border-red-900/50 dark:bg-red-900/20 dark:text-red-100">
           {error}
         </div>
       ) : null}
@@ -87,12 +87,12 @@ export default function NewResumePage() {
         <input
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          className="rounded-xl border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-accent"
+          className="rounded-md border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-accent"
           placeholder="e.g. cyber_security_resume"
         />
       </label>
 
-      <div className="rounded-2xl border border-zinc-200 p-4 dark:border-zinc-800">
+      <div className="rounded-lg border border-border p-4 ">
         <label className="flex cursor-pointer items-start gap-3">
           <input
             type="checkbox"
@@ -111,7 +111,7 @@ export default function NewResumePage() {
             <div className="text-sm font-medium">
               Pick experiences &amp; projects now
             </div>
-            <p className="mt-1 text-xs text-zinc-600 dark:text-zinc-400">
+            <p className="mt-1 text-xs text-muted">
               When enabled, only checked entries from your profile are included.
               You can change this anytime on the resume page. When disabled, the
               resume starts in legacy mode (all profile entries).
@@ -132,7 +132,7 @@ export default function NewResumePage() {
                 setSelExp(profile.experience.map((e) => e.id));
                 setSelProj(profile.projects.map((p) => p.id));
               }}
-              className="rounded-lg border border-zinc-200 px-2 py-1 text-xs dark:border-zinc-700"
+              className="rounded-lg border border-border px-2 py-1 text-xs "
             >
               Select all
             </button>
@@ -142,15 +142,15 @@ export default function NewResumePage() {
                 setSelExp([]);
                 setSelProj([]);
               }}
-              className="rounded-lg border border-zinc-200 px-2 py-1 text-xs dark:border-zinc-700"
+              className="rounded-lg border border-border px-2 py-1 text-xs "
             >
               Clear
             </button>
           </div>
 
           <div>
-            <div className="text-xs font-semibold text-zinc-500">Experience</div>
-            <ul className="mt-1 max-h-40 space-y-1 overflow-y-auto rounded-lg border border-zinc-100 p-2 dark:border-zinc-800">
+            <div className="text-xs font-semibold text-muted">Experience</div>
+            <ul className="mt-1 max-h-40 space-y-1 overflow-y-auto rounded-lg border border-zinc-100 p-2 ">
               {experienceSorted.map((exp) => (
                 <li key={exp.id}>
                   <label className="flex cursor-pointer items-start gap-2 text-xs">
@@ -175,8 +175,8 @@ export default function NewResumePage() {
           </div>
 
           <div>
-            <div className="text-xs font-semibold text-zinc-500">Projects</div>
-            <ul className="mt-1 max-h-40 space-y-1 overflow-y-auto rounded-lg border border-zinc-100 p-2 dark:border-zinc-800">
+            <div className="text-xs font-semibold text-muted">Projects</div>
+            <ul className="mt-1 max-h-40 space-y-1 overflow-y-auto rounded-lg border border-zinc-100 p-2 ">
               {projectsSorted.map((proj) => (
                 <li key={proj.id}>
                   <label className="flex cursor-pointer items-start gap-2 text-xs">
@@ -208,7 +208,7 @@ export default function NewResumePage() {
         <button
           type="button"
           onClick={() => void onCreate()}
-          className="rounded-xl bg-accent px-4 py-2 text-sm font-medium text-white shadow-sm disabled:opacity-60 hover:bg-accent-dark"
+          className="rounded-md bg-accent px-4 py-2 text-sm font-medium text-on-accent shadow-sm disabled:opacity-60 hover:bg-accent-dark"
         >
           Create resume
         </button>

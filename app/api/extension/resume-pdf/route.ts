@@ -1,6 +1,7 @@
-import { createRequire } from "module";
+import { compileTrustedTemplateLatex, LatexCompileError } from "@/app/lib/latex-compiler";
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { currentUserId } from "@/auth";
 
 import { renderJakeResumeTex } from "@/app/lib/jake-latex";
 import { ProfileSchema } from "@/app/lib/profile-model";
@@ -8,8 +9,6 @@ import { fitResumeToPageLimit } from "@/app/lib/resume-pdf-fit";
 
 export const runtime = "nodejs";
 export const maxDuration = 120;
-
-const require = createRequire(import.meta.url);
 
 const BodySchema = z.object({
   profile: ProfileSchema,
@@ -21,41 +20,9 @@ const BodySchema = z.object({
   title: z.string().optional(),
 });
 
-class LatexCompileError extends Error {
-  stderr: string;
-  constructor(message: string, stderr: string) {
-    super(message);
-    this.stderr = stderr;
-  }
-}
-
-async function compileLatexToPdf(latex: string): Promise<Uint8Array> {
-  const { compile } = require("node-latex-compiler") as {
-    compile: (c: {
-      tex: string;
-      returnBuffer: boolean;
-    }) => Promise<{
-      status: string;
-      pdfBuffer?: Buffer;
-      error?: string;
-      stderr?: string;
-    }>;
-  };
-
-  const result = await compile({ tex: latex, returnBuffer: true });
-
-  if (result.status !== "success" || !result.pdfBuffer?.length) {
-    throw new LatexCompileError(
-      result.error ?? "LaTeX compilation failed",
-      (result.stderr ?? "").slice(0, 12_000),
-    );
-  }
-
-  return new Uint8Array(result.pdfBuffer);
-}
-
 /** Build a Jake-style PDF from profile + optimized bullets (Chrome extension). */
 export async function POST(req: Request) {
+  if (!(await currentUserId())) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   let json: unknown;
   try {
     json = await req.json();
@@ -106,9 +73,17 @@ export async function POST(req: Request) {
       experienceBulletsById,
       projectBulletsById,
       highlightMetrics: true,
-      compile: compileLatexToPdf,
+      compile: compileTrustedTemplateLatex,
       maxPages: 1,
     });
+
+    if (!fitted.fits) {
+      return NextResponse.json({
+        error: "Resume cannot fit on one page. Select fewer entries or shorten the content.",
+        pages: fitted.pages,
+        bulletsDropped: fitted.bulletsDropped,
+      }, { status: 422 });
+    }
 
     return new NextResponse(new Uint8Array(fitted.pdfBytes), {
       status: 200,
@@ -122,8 +97,8 @@ export async function POST(req: Request) {
   } catch (e) {
     if (e instanceof LatexCompileError) {
       return NextResponse.json(
-        { error: e.message, stderr: e.stderr },
-        { status: 422 },
+        { error: e.message },
+        { status: e.status },
       );
     }
     const message = e instanceof Error ? e.message : "Compilation error";

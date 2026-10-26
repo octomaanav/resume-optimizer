@@ -27,7 +27,7 @@ export default function OptimizeCoverLetterPage() {
   return (
     <Suspense
       fallback={
-        <p className="text-sm text-zinc-500 dark:text-zinc-400">Loading…</p>
+        <p className="text-sm text-muted">Loading…</p>
       }
     >
       <OptimizeCoverLetterInner />
@@ -147,7 +147,7 @@ function OptimizeCoverLetterInner() {
 
   if (!ready) {
     return (
-      <p className="text-sm text-zinc-500 dark:text-zinc-400">Loading…</p>
+      <p className="text-sm text-muted">Loading…</p>
     );
   }
 
@@ -166,7 +166,7 @@ function OptimizeCoverLetterInner() {
             </p>
           </div>
           {sorted.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-border p-8 text-center text-sm text-muted">
+            <div className="rounded-lg border border-dashed border-border p-8 text-center text-sm text-muted">
               No cover letters yet.{" "}
               <Link href="/cover-letters/new" className="font-medium text-accent underline underline-offset-2">
                 Create one
@@ -188,7 +188,7 @@ function OptimizeCoverLetterInner() {
                       `/optimize/cover-letter?baseId=${encodeURIComponent(doc.id)}`
                     )
                   }
-                  className="group flex items-center justify-between rounded-xl border border-border bg-surface px-4 py-3.5 text-left transition-all hover:border-accent/40 hover:shadow-sm"
+                  className="group flex items-center justify-between rounded-md border border-border bg-surface px-4 py-3.5 text-left transition-all hover:border-accent/40 hover:shadow-sm"
                 >
                   <div className="flex items-center gap-3">
                     <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-accent-light text-accent">
@@ -212,7 +212,7 @@ function OptimizeCoverLetterInner() {
     }
 
     return (
-      <div className="text-sm text-zinc-600 dark:text-zinc-300">
+      <div className="text-sm text-muted">
         Missing or invalid <code className="font-mono text-xs">baseId</code>.
         Pick a base cover letter from{" "}
         <Link href="/documents" className="underline">
@@ -231,7 +231,7 @@ function OptimizeCoverLetterInner() {
             <AiMagicIcon size="lg" className="drop-shadow-sm" />
             Optimize: {baseDoc.title}
           </h1>
-          <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">
+          <p className="mt-1 text-sm text-muted">
             Paste a JD to generate a tailored letter. Your base template in
             Documents stays unchanged.
           </p>
@@ -240,7 +240,7 @@ function OptimizeCoverLetterInner() {
           type="button"
           onClick={onOptimize}
           disabled={busy}
-          className="inline-flex items-center gap-2 rounded-xl bg-accent px-4 py-2 text-sm font-medium text-white shadow-sm disabled:opacity-60 hover:bg-accent-dark"
+          className="inline-flex items-center gap-2 rounded-md bg-accent px-4 py-2 text-sm font-medium text-on-accent shadow-sm disabled:opacity-60 hover:bg-accent-dark"
         >
           <AiMagicIcon size="md" className="brightness-125 dark:brightness-100" />
           {busy ? "Optimizing…" : "Optimize"}
@@ -248,13 +248,13 @@ function OptimizeCoverLetterInner() {
       </div>
 
       {error ? (
-        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-900 dark:border-red-900/50 dark:bg-red-900/20 dark:text-red-100">
+        <div className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-900 dark:border-red-900/50 dark:bg-red-900/20 dark:text-red-100">
           {error}
         </div>
       ) : null}
 
       {companyName ? (
-        <div className="text-sm text-zinc-600 dark:text-zinc-300">
+        <div className="text-sm text-muted">
           Detected company:{" "}
           <span className="font-medium text-zinc-900 dark:text-zinc-100">
             {companyName}
@@ -268,7 +268,7 @@ function OptimizeCoverLetterInner() {
           value={jd}
           onChange={(e) => setJd(e.target.value)}
           rows={10}
-          className="rounded-xl border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-accent dark:bg-zinc-950"
+          className="rounded-md border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-accent "
           placeholder="Paste the JD here…"
         />
       </label>
@@ -283,7 +283,7 @@ function OptimizeCoverLetterInner() {
               outputMarkdown
             )
           }
-          className="rounded-xl border border-border px-3 py-2 text-sm hover:bg-zinc-50 dark:hover:bg-zinc-800"
+          className="rounded-md border border-border px-3 py-2 text-sm hover:bg-surface-sunken "
         >
           Download .md
         </button>
@@ -292,7 +292,7 @@ function OptimizeCoverLetterInner() {
         value={outputMarkdown}
         onChange={(e) => setOutputMarkdown(e.target.value)}
         rows={18}
-        className="rounded-2xl border border-border bg-surface px-3 py-2 font-mono text-xs outline-none focus:border-accent dark:bg-zinc-950"
+        className="rounded-lg border border-border bg-surface px-3 py-2 font-mono text-xs outline-none focus:border-accent "
         placeholder="Run Optimize to generate text here…"
       />
 

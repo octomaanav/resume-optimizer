@@ -34,7 +34,7 @@ const INCLUDE_PATTERNS: RegExp[] = [
   /^qualifications/,
   /^nice[-\s]to[-\s]haves?/,
   /^bonus( points)?/,
-  /^(preferred|desired)$/,
+  /^(preferred|desired)\b/,
   /^(required |technical |core )?skills/,
   /^(who you are|about you|you are|you have)/,
   /^(our |the )?(tech |technology )?stack/,

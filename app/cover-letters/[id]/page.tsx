@@ -53,7 +53,6 @@ export default function CoverLetterDetailPage() {
     if (lastHydrateKey.current === key) return;
     lastHydrateKey.current = key;
     // Same guarded re-hydrate-on-identity-change pattern as resumes/[id]/page.tsx.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     hydrateFromDoc(doc);
   }, [doc, hydrateFromDoc]);
 
@@ -65,13 +64,13 @@ export default function CoverLetterDetailPage() {
 
   if (!storageReady) {
     return (
-      <p className="text-sm text-zinc-500 dark:text-zinc-400">Loading…</p>
+      <p className="text-sm text-muted">Loading…</p>
     );
   }
 
   if (!doc) {
     return (
-      <div className="text-sm text-zinc-600 dark:text-zinc-300">
+      <div className="text-sm text-muted">
         Cover letter not found.
       </div>
     );
@@ -87,7 +86,7 @@ export default function CoverLetterDetailPage() {
           <h1 className="truncate text-2xl font-semibold tracking-tight">
             {doc.title}
           </h1>
-          <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">
+          <p className="mt-1 text-sm text-muted">
             Base cover letter template. Use Optimize to tailor it for a specific
             job.
           </p>
@@ -95,7 +94,7 @@ export default function CoverLetterDetailPage() {
         <div className="flex flex-wrap items-center gap-2">
           <Link
             href={`/optimize/cover-letter?baseId=${encodeURIComponent(doc.id)}`}
-            className="inline-flex items-center gap-1.5 rounded-xl border border-accent/30 bg-accent-light px-3 py-2 text-sm font-medium text-accent hover:bg-accent/15"
+            className="inline-flex items-center gap-1.5 rounded-md border border-accent/30 bg-accent-light px-3 py-2 text-sm font-medium text-accent hover:bg-accent/15"
           >
             <AiMagicIcon size="sm" />
             Optimize for JD
@@ -108,7 +107,7 @@ export default function CoverLetterDetailPage() {
                 template
               )
             }
-            className="rounded-xl border border-border px-3 py-2 text-sm hover:bg-zinc-50 dark:hover:bg-zinc-800"
+            className="rounded-md border border-border px-3 py-2 text-sm hover:bg-surface-sunken "
           >
             Download base .md
           </button>
@@ -123,34 +122,34 @@ export default function CoverLetterDetailPage() {
               };
               persist(nextDoc);
             }}
-            className="rounded-xl bg-accent px-3 py-2 text-sm font-medium text-white shadow-sm hover:bg-accent-dark"
+            className="rounded-md bg-accent px-3 py-2 text-sm font-medium text-on-accent hover:bg-accent-hover"
           >
             Save
           </button>
         </div>
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-2">
+      <div className="grid gap-4 xl:grid-cols-2">
         <div className="flex flex-col gap-3">
           <div className="text-sm font-semibold">Meta</div>
           <label className="flex flex-col gap-1">
-            <span className="text-sm text-zinc-600 dark:text-zinc-300">
+            <span className="text-sm text-muted">
               Title
             </span>
             <input
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="rounded-xl border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-accent"
+              className="rounded-md border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-accent"
             />
           </label>
 
-          <div className="rounded-2xl border border-zinc-200 p-4 text-sm dark:border-zinc-800">
+          <div className="rounded-lg border border-border p-4 text-sm ">
             <div className="flex items-center gap-2 font-semibold">
               <AiMagicIcon size="sm" />
               Last optimized run
             </div>
             {lastOpt ? (
-              <div className="mt-2 space-y-1 text-zinc-600 dark:text-zinc-300">
+              <div className="mt-2 space-y-1 text-muted">
                 {lastOpt.companyName ? (
                   <div>
                     Company:{" "}
@@ -159,13 +158,13 @@ export default function CoverLetterDetailPage() {
                     </span>
                   </div>
                 ) : null}
-                <div className="text-xs text-zinc-500">
+                <div className="text-xs text-muted">
                   JD length: {lastOpt.jd.length} characters (stored with
                   optimization).
                 </div>
               </div>
             ) : (
-              <div className="mt-2 text-zinc-600 dark:text-zinc-300">
+              <div className="mt-2 text-muted">
                 None yet — use Optimize for a JD.
               </div>
             )}
@@ -178,7 +177,7 @@ export default function CoverLetterDetailPage() {
             value={template}
             onChange={(e) => setTemplate(e.target.value)}
             rows={14}
-            className="rounded-2xl border border-border bg-surface px-3 py-2 font-mono text-xs outline-none focus:border-accent"
+            className="rounded-lg border border-border bg-surface px-3 py-2 font-mono text-xs outline-none focus:border-accent"
             placeholder="Write or paste a starting cover letter. The optimizer will tailor it per job."
           />
         </div>
@@ -199,13 +198,13 @@ export default function CoverLetterDetailPage() {
                   tailoredPreview
                 )
               }
-              className="rounded-xl border border-border px-3 py-2 text-sm hover:bg-zinc-50 dark:hover:bg-zinc-800"
+              className="rounded-md border border-border px-3 py-2 text-sm hover:bg-surface-sunken "
             >
               Download tailored .md
             </button>
           ) : null}
         </div>
-        <div className="rounded-2xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-sm whitespace-pre-wrap text-zinc-700 dark:border-zinc-800 dark:bg-zinc-900/40 dark:text-zinc-200">
+        <div className="rounded-lg border border-border bg-zinc-50 px-4 py-3 text-sm whitespace-pre-wrap text-zinc-700  dark:bg-zinc-900/40 dark:text-zinc-200">
           {tailoredPreview ? tailoredPreview : "(Run Optimize to generate.)"}
         </div>
       </div>

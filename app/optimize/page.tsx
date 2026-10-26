@@ -56,7 +56,7 @@ export default function OptimizeHubPage() {
           <Link
             key={href}
             href={href}
-            className="group flex flex-col rounded-xl border border-border bg-surface p-5 transition-colors hover:border-accent hover:bg-surface-raised"
+            className="group flex flex-col rounded-md border border-border bg-surface p-5 transition-colors hover:border-accent hover:bg-surface-raised"
           >
             <div className="flex items-center gap-2">
               <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent-light text-accent-dark">

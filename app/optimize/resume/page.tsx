@@ -8,7 +8,7 @@ import type { ResumeDoc } from "../../lib/document-schemas";
 import type { Profile } from "../../lib/profile-model";
 import { mergeProfileForResume } from "../../lib/merge-profile-for-resume";
 import { renderJakeResumeTex } from "../../lib/jake-latex";
-import { fitResumeToPageLimit } from "../../lib/resume-pdf-fit";
+import { compileGeneratedResume } from "../../lib/resume-pdf-client";
 import { JakeResumePreview } from "../../resumes/[id]/jake-preview";
 import {
   useHydratedProfile,
@@ -37,7 +37,7 @@ export default function OptimizeResumePage() {
   return (
     <Suspense
       fallback={
-        <p className="text-sm text-zinc-500 dark:text-zinc-400">Loading…</p>
+        <p className="text-sm text-muted">Loading…</p>
       }
     >
       <OptimizeResumeInner />
@@ -63,16 +63,16 @@ function SelectionSummary({
       className={
         compact
           ? "space-y-3 text-sm"
-          : "rounded-xl border border-zinc-200 bg-zinc-50/80 p-4 dark:border-zinc-700 dark:bg-zinc-900/40"
+          : "rounded-md border border-border bg-zinc-50/80 p-4  dark:bg-zinc-900/40"
       }
     >
       {!compact ? (
-        <p className="flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-zinc-500">
+        <p className="flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-muted">
           <AiMagicIcon size="sm" />
           Selected for this JD (stage 1)
         </p>
       ) : (
-        <p className="flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-zinc-500">
+        <p className="flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-muted">
           <AiMagicIcon size="sm" />
           Selection
         </p>
@@ -85,7 +85,7 @@ function SelectionSummary({
         }
       >
         <div>
-          <div className="text-xs font-semibold text-zinc-600 dark:text-zinc-400">
+          <div className="text-xs font-semibold text-muted">
             Experience ({nExp})
           </div>
           <ul className="mt-2 list-inside list-disc space-y-1.5 text-sm text-zinc-800 dark:text-zinc-200">
@@ -98,7 +98,7 @@ function SelectionSummary({
                   </span>
                 )}
                 {row.dates ? (
-                  <span className="block pl-5 text-xs text-zinc-500">
+                  <span className="block pl-5 text-xs text-muted">
                     {row.dates}
                   </span>
                 ) : null}
@@ -107,7 +107,7 @@ function SelectionSummary({
           </ul>
         </div>
         <div>
-          <div className="text-xs font-semibold text-zinc-600 dark:text-zinc-400">
+          <div className="text-xs font-semibold text-muted">
             Projects ({nProj})
           </div>
           <ul className="mt-2 list-inside list-disc space-y-1.5 text-sm text-zinc-800 dark:text-zinc-200">
@@ -120,7 +120,7 @@ function SelectionSummary({
                   </span>
                 )}
                 {row.dates ? (
-                  <span className="block pl-5 text-xs text-zinc-500">
+                  <span className="block pl-5 text-xs text-muted">
                     {row.dates}
                   </span>
                 ) : null}
@@ -152,8 +152,8 @@ function lineDiffStats(original: string[], optimized: string[]) {
 
 function BulletOptimizationExplainer() {
   return (
-    <div className="rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-950/40">
-      <p className="flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-zinc-500">
+    <div className="rounded-md border border-border bg-surface p-4  /40">
+      <p className="flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-muted">
         <AiMagicIcon size="sm" />
         What &quot;Optimize bullets&quot; changes
       </p>
@@ -230,7 +230,7 @@ function BulletOverrideVsProfileSummary({
       return (
         <li key={s.id}>
           {name}
-          <span className="text-zinc-500">
+          <span className="text-muted">
             {" "}
             — using profile bullets (no AI block returned for this item).
           </span>
@@ -241,7 +241,7 @@ function BulletOverrideVsProfileSummary({
       return (
         <li key={s.id}>
           {name}
-          <span className="text-zinc-500">
+          <span className="text-muted">
             {" "}
             — same wording as your profile ({s.optimizedCount} bullet
             {s.optimizedCount === 1 ? "" : "s"}).
@@ -252,7 +252,7 @@ function BulletOverrideVsProfileSummary({
     return (
       <li key={s.id}>
         {name}
-        <span className="text-zinc-600 dark:text-zinc-400">
+        <span className="text-muted">
           {" "}
           — {s.linesChanged} bullet line{s.linesChanged === 1 ? "" : "s"}{" "}
           edited vs profile ({s.profileCount} → {s.optimizedCount} lines).
@@ -262,7 +262,7 @@ function BulletOverrideVsProfileSummary({
   }
 
   return (
-    <div className="rounded-xl border border-emerald-200/80 bg-emerald-50/50 p-4 dark:border-emerald-900/50 dark:bg-emerald-950/20">
+    <div className="rounded-md border border-emerald-200/80 bg-emerald-50/50 p-4 dark:border-emerald-900/50 dark:bg-emerald-950/20">
       <p className="flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-emerald-800 dark:text-emerald-200/90">
         <AiMagicIcon size="sm" />
         Last bullet optimization vs your profile
@@ -444,6 +444,8 @@ function OptimizeResumeInner() {
       const hasOverrides =
         Object.keys(existingOpt.experienceBulletsById ?? {}).length > 0 ||
         Object.keys(existingOpt.projectBulletsById ?? {}).length > 0;
+      // Hydrate the saved workflow stage after its external document loads.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setStep(hasOverrides ? 3 : 2);
     }
   }, [storageReady, baseId, resumeOptimizations]);
@@ -723,35 +725,13 @@ function OptimizeResumeInner() {
     }
   }
 
-  async function compileLatexViaApi(tex: string): Promise<Uint8Array> {
-    const res = await fetch("/api/latex/pdf", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ latex: tex }),
-    });
-    const ct = res.headers.get("content-type") ?? "";
-    if (!res.ok) {
-      let msg = `PDF compile failed (${res.status})`;
-      if (ct.includes("application/json")) {
-        const j = (await res.json()) as { error?: string; stderr?: string };
-        const parts = [j.error, j.stderr?.trim()].filter(Boolean);
-        msg = parts.join("\n\n").slice(0, 4000) || msg;
-      } else {
-        const t = await res.text();
-        msg = t.slice(0, 800) || msg;
-      }
-      throw new Error(msg);
-    }
-    return new Uint8Array(await res.arrayBuffer());
-  }
-
   async function onDownloadPdf() {
     setError(null);
     setPdfBusy(true);
     try {
       const hasPick =
         selectedExperienceIds.length > 0 || selectedProjectIds.length > 0;
-      const fitted = await fitResumeToPageLimit({
+      const fitted = await compileGeneratedResume({
         profile: resumeProfile,
         experienceIds: selectedExperienceIds,
         projectIds: selectedProjectIds,
@@ -759,9 +739,6 @@ function OptimizeResumeInner() {
         title: baseDoc?.title ?? "resume",
         experienceBulletsById,
         projectBulletsById,
-        highlightMetrics: true,
-        compile: compileLatexViaApi,
-        maxPages: 1,
       });
 
       const blob = new Blob([new Uint8Array(fitted.pdfBytes)], {
@@ -789,7 +766,7 @@ function OptimizeResumeInner() {
 
   if (!storageReady) {
     return (
-      <p className="text-sm text-zinc-500 dark:text-zinc-400">Loading…</p>
+      <p className="text-sm text-muted">Loading…</p>
     );
   }
 
@@ -808,7 +785,7 @@ function OptimizeResumeInner() {
             </p>
           </div>
           {sorted.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-border p-8 text-center text-sm text-muted">
+            <div className="rounded-lg border border-dashed border-border p-8 text-center text-sm text-muted">
               No resumes yet.{" "}
               <Link href="/resumes/new" className="font-medium text-accent underline underline-offset-2">
                 Create one
@@ -830,7 +807,7 @@ function OptimizeResumeInner() {
                       `/optimize/resume?baseId=${encodeURIComponent(doc.id)}`
                     )
                   }
-                  className="group flex items-center justify-between rounded-xl border border-border bg-surface px-4 py-3.5 text-left transition-all hover:border-accent/40 hover:shadow-sm"
+                  className="group flex items-center justify-between rounded-md border border-border bg-surface px-4 py-3.5 text-left transition-all hover:border-accent/40 hover:shadow-sm"
                 >
                   <div className="flex items-center gap-3">
                     <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-accent-light text-accent">
@@ -854,7 +831,7 @@ function OptimizeResumeInner() {
     }
 
     return (
-      <div className="text-sm text-zinc-600 dark:text-zinc-300">
+      <div className="text-sm text-muted">
         Missing or invalid <code className="font-mono text-xs">baseId</code>.
         Pick a base resume from{" "}
         <Link href="/documents" className="underline">
@@ -877,7 +854,7 @@ function OptimizeResumeInner() {
         </div>
         <Link
           href="/documents"
-          className="text-sm text-zinc-500 underline-offset-4 hover:text-zinc-800 hover:underline dark:hover:text-zinc-200"
+          className="text-sm text-muted underline-offset-4 hover:text-zinc-800 hover:underline dark:hover:text-zinc-200"
         >
           Documents
         </Link>
@@ -891,21 +868,21 @@ function OptimizeResumeInner() {
       ) : null}
 
       <section className="flex flex-col gap-3">
-        <label className="text-xs font-medium uppercase tracking-wide text-zinc-500">
+        <label className="text-xs font-medium uppercase tracking-wide text-muted">
           Job description
         </label>
         <textarea
           value={jd}
           onChange={(e) => setJd(e.target.value)}
           rows={step === 1 ? 12 : 5}
-          className="w-full rounded-xl border border-border bg-surface px-3 py-2 text-sm leading-relaxed outline-none focus:border-accent"
+          className="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm leading-relaxed outline-none focus:border-accent"
           placeholder="Paste the JD…"
         />
       </section>
 
       {step === 1 ? (
         <div className="flex flex-col gap-4">
-          <p className="text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
+          <p className="text-sm leading-relaxed text-muted">
             Pick the top four roles and two projects for this posting. Your
             saved resume file is not modified.
           </p>
@@ -913,7 +890,7 @@ function OptimizeResumeInner() {
             type="button"
             onClick={runStage1Select}
             disabled={busy}
-            className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-accent py-3 text-sm font-medium text-white shadow-sm disabled:opacity-50 hover:bg-accent-dark"
+            className="inline-flex w-full items-center justify-center gap-2 rounded-md bg-accent py-3 text-sm font-medium text-on-accent shadow-sm disabled:opacity-50 hover:bg-accent-dark"
           >
             <AiMagicIcon size="md" className="brightness-125 dark:brightness-100" />
             {busy ? "Working…" : "Continue"}
@@ -932,7 +909,7 @@ function OptimizeResumeInner() {
             experienceSections={bulletOptimizationComparison.experienceSections}
             projectSections={bulletOptimizationComparison.projectSections}
           />
-          <p className="text-sm text-zinc-600 dark:text-zinc-400">
+          <p className="text-sm text-muted">
             Run the optimizer to tailor bullets to the JD above, or skip to
             export with your profile wording.
           </p>
@@ -941,7 +918,7 @@ function OptimizeResumeInner() {
               type="button"
               onClick={runStage2Bullets}
               disabled={busy}
-              className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl border border-zinc-200 py-3 text-sm font-medium disabled:opacity-50 dark:border-zinc-600"
+              className="inline-flex flex-1 items-center justify-center gap-2 rounded-md border border-border py-3 text-sm font-medium disabled:opacity-50 dark:border-zinc-600"
             >
               <AiMagicIcon size="md" />
               {busy ? "Optimizing…" : "Optimize bullets"}
@@ -949,7 +926,7 @@ function OptimizeResumeInner() {
             <button
               type="button"
               onClick={() => setStep(3)}
-              className="flex-1 rounded-xl bg-accent py-3 text-sm font-medium text-white shadow-sm hover:bg-accent-dark"
+              className="flex-1 rounded-md bg-accent py-3 text-sm font-medium text-on-accent hover:bg-accent-hover"
             >
               Skip to export
             </button>
@@ -958,7 +935,7 @@ function OptimizeResumeInner() {
             <button
               type="button"
               onClick={() => setStep(1)}
-              className="text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-300"
+              className="text-muted hover:text-zinc-800 dark:hover:text-zinc-300"
             >
               ← Back
             </button>
@@ -986,7 +963,7 @@ function OptimizeResumeInner() {
                 setToast("Using original bullets.");
                 setTimeout(() => setToast(null), 1200);
               }}
-              className="text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-300"
+              className="text-muted hover:text-zinc-800 dark:hover:text-zinc-300"
             >
               Clear bullet edits
             </button>
@@ -996,7 +973,7 @@ function OptimizeResumeInner() {
 
       {step === 3 ? (
         <div className="flex flex-col gap-10">
-          <div className="space-y-4 text-sm text-zinc-600 dark:text-zinc-400">
+          <div className="space-y-4 text-sm text-muted">
             <SelectionSummary
               compact
               experienceRows={selectedExperienceLabels}
@@ -1024,7 +1001,7 @@ function OptimizeResumeInner() {
                     outputLatex
                   )
                 }
-                className="rounded-lg border border-zinc-200 px-3 py-1.5 text-xs dark:border-zinc-600"
+                className="rounded-lg border border-border px-3 py-1.5 text-xs dark:border-zinc-600"
               >
                 .tex
               </button>
@@ -1032,7 +1009,7 @@ function OptimizeResumeInner() {
                 type="button"
                 onClick={() => void onDownloadPdf()}
                 disabled={pdfBusy}
-                className="rounded-lg border border-zinc-200 px-3 py-1.5 text-xs disabled:opacity-50 dark:border-zinc-600"
+                className="rounded-lg border border-border px-3 py-1.5 text-xs disabled:opacity-50 dark:border-zinc-600"
               >
                 {pdfBusy ? "Building PDF…" : "Download PDF"}
               </button>
@@ -1043,24 +1020,24 @@ function OptimizeResumeInner() {
                   setToast("Copied.");
                   setTimeout(() => setToast(null), 1200);
                 }}
-                className="rounded-lg border border-zinc-200 px-3 py-1.5 text-xs dark:border-zinc-600"
+                className="rounded-lg border border-border px-3 py-1.5 text-xs dark:border-zinc-600"
               >
                 Copy LaTeX
               </button>
             </div>
             <details className="text-xs">
-              <summary className="cursor-pointer text-zinc-500">LaTeX source</summary>
+              <summary className="cursor-pointer text-muted">LaTeX source</summary>
               <textarea
                 value={outputLatex}
                 readOnly
                 rows={8}
-                className="mt-2 w-full rounded-lg border border-zinc-200 bg-zinc-50 px-2 py-2 font-mono text-[11px] dark:border-zinc-700 dark:bg-zinc-900"
+                className="mt-2 w-full rounded-lg border border-border bg-zinc-50 px-2 py-2 font-mono text-[11px]  dark:bg-zinc-900"
               />
             </details>
           </div>
 
           <div>
-            <div className="mb-2 text-xs font-medium uppercase tracking-wide text-zinc-500">
+            <div className="mb-2 text-xs font-medium uppercase tracking-wide text-muted">
               Preview
             </div>
             <JakeResumePreview
@@ -1076,13 +1053,13 @@ function OptimizeResumeInner() {
               projectBulletsById={projectBulletsById}
               highlightMetrics
             />
-            <p className="mt-2 text-xs text-zinc-500">
+            <p className="mt-2 text-xs text-muted">
               Use Download PDF to compile the LaTeX above; preview is for layout
               checks only.
             </p>
           </div>
 
-          <div className="flex flex-wrap gap-4 text-sm text-zinc-500">
+          <div className="flex flex-wrap gap-4 text-sm text-muted">
             <button
               type="button"
               onClick={() => setStep(2)}

@@ -18,6 +18,9 @@ export async function GET() {
   if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+  if (process.env.NEXT_PUBLIC_CLOUD_WORKSPACES_ENABLED !== "true") {
+    return NextResponse.json({ error: "Cloud workspaces are disabled. Your data stays in device storage." }, { status: 403 });
+  }
 
   let row = await db.query.profiles.findFirst({
     where: eq(profiles.id, userId),
@@ -53,6 +56,9 @@ export async function PUT(request: Request) {
   const userId = await currentUserId();
   if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+  if (process.env.NEXT_PUBLIC_CLOUD_WORKSPACES_ENABLED !== "true") {
+    return NextResponse.json({ error: "Cloud workspaces are disabled. Your data stays in device storage." }, { status: 403 });
   }
 
   let body: unknown;

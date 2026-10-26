@@ -39,7 +39,7 @@ function DocumentColumn({
   emptyHint: string;
 }) {
   return (
-    <section className="flex flex-col rounded-xl border border-border bg-surface">
+    <section className="flex min-w-0 flex-col rounded-md border border-border bg-surface">
       <header className="flex items-center gap-2 border-b border-border px-4 py-3">
         <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-accent-light text-accent-dark">
           {icon}
@@ -60,7 +60,7 @@ function DocumentColumn({
             {docs.map((doc) => (
               <li
                 key={doc.id}
-                className="group rounded-lg border border-border bg-surface-raised px-3 py-2.5 transition-colors hover:border-border-hover"
+                className="group min-w-0 rounded-md border border-border bg-surface-raised px-3 py-2.5 transition-colors hover:border-border-hover"
               >
                 <div className="truncate text-sm font-medium" title={doc.title}>
                   {doc.title}

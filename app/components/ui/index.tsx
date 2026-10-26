@@ -7,6 +7,7 @@
  * palette change lands everywhere at once.
  */
 import Link from "next/link";
+import { handleRadioKeyDown } from "../../lib/radio-keyboard";
 
 /* ── Page header ───────────────────────────────────────────────────────── */
 
@@ -22,7 +23,7 @@ export function PageHeader({
   actions?: React.ReactNode;
 }) {
   return (
-    <div className="flex flex-wrap items-end justify-between gap-4">
+    <div className="flex flex-wrap items-end justify-between gap-4 border-b border-border pb-6">
       <div className="min-w-0 max-w-2xl">
         {eyebrow && <div className="eyebrow mb-2">{eyebrow}</div>}
         <h1 className="text-2xl sm:text-[1.75rem]">{title}</h1>
@@ -73,7 +74,7 @@ export function Tile({
 
   return (
     <section
-      className={`col-span-6 flex flex-col overflow-hidden rounded-xl border border-border bg-surface transition-colors ${spanClass} ${className}`}
+      className={`col-span-6 flex flex-col overflow-hidden rounded-md border border-border bg-surface transition-colors ${spanClass} ${className}`}
     >
       {(title || description) && (
         <div className={padded ? "p-5 pb-0" : "px-5 pt-5"}>
@@ -133,9 +134,11 @@ export function ChoiceCard({
       type="button"
       role="radio"
       aria-checked={selected}
+      tabIndex={selected ? 0 : -1}
       onClick={onSelect}
+      onKeyDown={handleRadioKeyDown}
       className={[
-        "flex w-full items-start gap-3 rounded-lg border p-3 text-left transition-colors",
+        "flex w-full items-start gap-3 rounded-md border p-3 text-left transition-colors",
         selected
           ? "border-accent bg-accent-light"
           : "border-border bg-surface-raised hover:border-border-hover hover:bg-surface-sunken",
@@ -187,27 +190,137 @@ export function Field({
   children?: React.ReactNode;
 }) {
   return (
-    <label className="flex flex-col gap-1.5">
-      <span className="text-xs font-medium text-muted">{label}</span>
-      {children}
+    <div className="flex min-w-0 flex-col gap-1.5">
+      <label className="flex min-w-0 flex-col gap-1.5">
+        <span className="text-xs font-medium text-muted">{label}</span>
+        {children}
+      </label>
       {hint && <span className="text-xs leading-relaxed text-faint">{hint}</span>}
-    </label>
+    </div>
   );
 }
 
 export const inputClass =
-  "w-full rounded-lg border border-border bg-surface-raised px-3 py-2 text-sm outline-none placeholder:text-faint";
+  "w-full rounded-md border border-border bg-surface-raised px-3 py-2 text-sm outline-none placeholder:text-faint";
 
 export const inputMonoClass =
-  "w-full rounded-lg border border-border bg-surface-raised px-3 py-2 font-mono text-xs outline-none placeholder:text-faint";
+  "w-full rounded-md border border-border bg-surface-raised px-3 py-2 font-mono text-xs outline-none placeholder:text-faint";
 
 /* ── Buttons ───────────────────────────────────────────────────────────── */
 
 export const buttonPrimary =
-  "inline-flex shrink-0 items-center justify-center gap-1.5 rounded-lg bg-accent px-3.5 py-2 text-sm font-medium text-on-accent transition-colors hover:bg-accent-hover disabled:opacity-60";
+  "inline-flex shrink-0 items-center justify-center gap-1.5 rounded-md bg-accent px-3.5 py-2 text-sm font-medium text-on-accent transition-colors hover:bg-accent-hover disabled:opacity-60";
+
+export const buttonSecondary =
+  "inline-flex shrink-0 items-center justify-center gap-1.5 rounded-md border border-border bg-surface-raised px-3.5 py-2 text-sm font-medium text-foreground transition-colors hover:border-border-hover hover:bg-surface-sunken disabled:opacity-60";
 
 export const buttonGhost =
-  "inline-flex shrink-0 items-center justify-center gap-1.5 rounded-lg border border-border bg-surface-raised px-3.5 py-2 text-sm font-medium transition-colors hover:border-border-hover hover:bg-surface-sunken";
+  "inline-flex shrink-0 items-center justify-center gap-1.5 rounded-md border border-border bg-surface-raised px-3.5 py-2 text-sm font-medium transition-colors hover:border-border-hover hover:bg-surface-sunken";
+
+export const buttonSubtle =
+  "inline-flex shrink-0 items-center justify-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-medium text-muted transition-colors hover:bg-surface-sunken hover:text-foreground";
+
+export const buttonDanger =
+  "inline-flex shrink-0 items-center justify-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-medium text-danger transition-colors hover:bg-danger-light";
+
+/* ── Badges ────────────────────────────────────────────────────────────── */
+
+export function Badge({
+  children,
+  variant = "default",
+  size = "sm",
+  className = "",
+}: {
+  children: React.ReactNode;
+  variant?: "default" | "accent" | "success" | "muted" | "outline";
+  size?: "xs" | "sm";
+  className?: string;
+}) {
+  const variantStyles = {
+    default: "bg-surface-sunken text-muted border border-border/70",
+    accent: "bg-accent-light text-accent-dark font-medium",
+    success: "bg-success-light text-success font-medium",
+    muted: "bg-surface-sunken text-faint",
+    outline: "border border-border text-muted",
+  }[variant];
+
+  const sizeStyles = {
+    xs: "px-1.5 py-0.5 text-[10px]",
+    sm: "px-2 py-0.5 text-xs",
+  }[size];
+
+  return (
+    <span
+      className={`inline-flex items-center gap-1 rounded-md leading-none ${sizeStyles} ${variantStyles} ${className}`}
+    >
+      {children}
+    </span>
+  );
+}
+
+/* ── Segmented Control (Accessible Tabs) ────────────────────────────────── */
+
+export function SegmentedControl<T extends string>({
+  value,
+  onChange,
+  options,
+  size = "md",
+}: {
+  value: T;
+  onChange: (val: T) => void;
+  options: Array<{
+    value: T;
+    label: React.ReactNode;
+    icon?: React.ReactNode;
+    badge?: React.ReactNode;
+  }>;
+  size?: "sm" | "md";
+}) {
+  const sizeClasses = {
+    sm: "p-0.5 text-xs gap-0.5",
+    md: "p-1 text-xs sm:text-sm gap-1",
+  }[size];
+
+  const itemSizeClasses = {
+    sm: "px-2.5 py-1 rounded-md",
+    md: "px-3 py-1.5 rounded-md",
+  }[size];
+
+  return (
+    <div
+      role="tablist"
+      className={`inline-flex max-w-full items-center overflow-x-auto rounded-md border border-border bg-surface-sunken ${sizeClasses}`}
+    >
+      {options.map((opt) => {
+        const active = value === opt.value;
+        return (
+          <button
+            key={opt.value}
+            type="button"
+            role="tab"
+            aria-selected={active}
+            onClick={() => onChange(opt.value)}
+            className={`inline-flex shrink-0 items-center gap-1.5 font-medium transition-all ${itemSizeClasses} ${
+              active
+                ? "bg-surface-raised text-foreground shadow-xs border border-border/80"
+                : "text-muted hover:text-foreground hover:bg-surface/50 border border-transparent"
+            }`}
+          >
+            {opt.icon && (
+              <span
+                className={`shrink-0 ${active ? "text-accent" : "text-faint"}`}
+              >
+                {opt.icon}
+              </span>
+            )}
+            <span>{opt.label}</span>
+            {opt.badge && <span className="ml-0.5">{opt.badge}</span>}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
 
 /* ── Empty state ───────────────────────────────────────────────────────── */
 
@@ -223,16 +336,22 @@ export function EmptyState({
   action?: { href: string; label: string };
 }) {
   return (
-    <div className="flex flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-border px-6 py-10 text-center">
-      {icon && <span className="text-faint">{icon}</span>}
-      <div className="text-sm font-medium">{title}</div>
-      {description && (
-        <p className="max-w-xs text-xs leading-relaxed text-muted">
-          {description}
-        </p>
+    <div className="flex flex-col items-center justify-center gap-3 rounded-md border border-dashed border-border bg-surface/50 px-6 py-10 text-center transition-colors">
+      {icon && (
+        <span className="flex h-11 w-11 items-center justify-center rounded-md bg-surface-sunken text-muted ring-1 ring-border/50">
+          {icon}
+        </span>
       )}
+      <div className="space-y-1">
+        <div className="text-sm font-semibold text-foreground">{title}</div>
+        {description && (
+          <p className="max-w-xs text-xs leading-relaxed text-muted">
+            {description}
+          </p>
+        )}
+      </div>
       {action && (
-        <Link href={action.href} className={`${buttonGhost} mt-2`}>
+        <Link href={action.href} className={`${buttonPrimary} mt-1 text-xs`}>
           {action.label}
         </Link>
       )}

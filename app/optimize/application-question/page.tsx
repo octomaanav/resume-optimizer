@@ -32,7 +32,7 @@ export default function OptimizeApplicationQuestionPage() {
   return (
     <Suspense
       fallback={
-        <p className="text-sm text-zinc-500 dark:text-zinc-400">Loading…</p>
+        <p className="text-sm text-muted">Loading…</p>
       }
     >
       <OptimizeApplicationQuestionInner />
@@ -155,7 +155,7 @@ function OptimizeApplicationQuestionInner() {
 
   if (!ready) {
     return (
-      <p className="text-sm text-zinc-500 dark:text-zinc-400">Loading…</p>
+      <p className="text-sm text-muted">Loading…</p>
     );
   }
 
@@ -173,7 +173,7 @@ function OptimizeApplicationQuestionInner() {
             </p>
           </div>
           {sortedDocs.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-border p-8 text-center text-sm text-muted">
+            <div className="rounded-lg border border-dashed border-border p-8 text-center text-sm text-muted">
               No templates yet.{" "}
               <Link href="/application-questions/new" className="font-medium text-accent underline underline-offset-2">
                 Create one
@@ -195,7 +195,7 @@ function OptimizeApplicationQuestionInner() {
                       `/optimize/application-question?baseId=${encodeURIComponent(d.id)}`
                     )
                   }
-                  className="group flex items-center justify-between rounded-xl border border-border bg-surface px-4 py-3.5 text-left transition-all hover:border-accent/40 hover:shadow-sm"
+                  className="group flex items-center justify-between rounded-md border border-border bg-surface px-4 py-3.5 text-left transition-all hover:border-accent/40 hover:shadow-sm"
                 >
                   <div className="flex items-center gap-3">
                     <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-accent-light text-accent">
@@ -219,7 +219,7 @@ function OptimizeApplicationQuestionInner() {
     }
 
     return (
-      <div className="text-sm text-zinc-600 dark:text-zinc-300">
+      <div className="text-sm text-muted">
         Missing or invalid <code className="font-mono text-xs">baseId</code>.
         Pick a template from{" "}
         <Link href="/application-questions" className="underline">
@@ -238,7 +238,7 @@ function OptimizeApplicationQuestionInner() {
             <WandSparkles size={20} className="shrink-0 drop-shadow-sm" />
             Optimize: {baseDoc.title}
           </h1>
-          <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">
+          <p className="mt-1 text-sm text-muted">
             Paste a JD to tailor your base answer. The template on file is not
             modified.
           </p>
@@ -247,7 +247,7 @@ function OptimizeApplicationQuestionInner() {
           type="button"
           onClick={onOptimize}
           disabled={busy}
-          className="inline-flex items-center gap-2 rounded-xl bg-accent px-4 py-2 text-sm font-medium text-white shadow-sm disabled:opacity-60 hover:bg-accent-dark"
+          className="inline-flex items-center gap-2 rounded-md bg-accent px-4 py-2 text-sm font-medium text-on-accent shadow-sm disabled:opacity-60 hover:bg-accent-dark"
         >
           <WandSparkles
             size={16}
@@ -257,8 +257,8 @@ function OptimizeApplicationQuestionInner() {
         </button>
       </div>
 
-      <div className="rounded-xl border border-zinc-200 bg-zinc-50/80 p-4 text-sm dark:border-zinc-800 dark:bg-zinc-900/40">
-        <div className="text-xs font-medium uppercase tracking-wide text-zinc-500">
+      <div className="rounded-md border border-border bg-zinc-50/80 p-4 text-sm  dark:bg-zinc-900/40">
+        <div className="text-xs font-medium uppercase tracking-wide text-muted">
           Template question
         </div>
         <p className="mt-2 whitespace-pre-wrap text-zinc-800 dark:text-zinc-200">
@@ -266,14 +266,14 @@ function OptimizeApplicationQuestionInner() {
         </p>
         <Link
           href={`/application-questions/${baseDoc.id}`}
-          className="mt-3 inline-block text-xs text-zinc-500 underline"
+          className="mt-3 inline-block text-xs text-muted underline"
         >
           Edit template
         </Link>
       </div>
 
       {error ? (
-        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-900 dark:border-red-900/50 dark:bg-red-900/20 dark:text-red-100">
+        <div className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-900 dark:border-red-900/50 dark:bg-red-900/20 dark:text-red-100">
           {error}
         </div>
       ) : null}
@@ -287,7 +287,7 @@ function OptimizeApplicationQuestionInner() {
           value={jd}
           onChange={(e) => setJd(e.target.value)}
           rows={10}
-          className="rounded-xl border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-accent dark:bg-zinc-950"
+          className="rounded-md border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-accent "
           placeholder="Paste the full JD or the most relevant sections…"
         />
       </label>
@@ -304,7 +304,7 @@ function OptimizeApplicationQuestionInner() {
               )
             }
             disabled={!tailoredAnswer.trim()}
-            className="rounded-xl border border-border px-3 py-2 text-sm disabled:opacity-40 hover:bg-zinc-50 dark:hover:bg-zinc-800"
+            className="rounded-md border border-border px-3 py-2 text-sm disabled:opacity-40 hover:bg-surface-sunken "
           >
             Download .txt
           </button>
@@ -317,7 +317,7 @@ function OptimizeApplicationQuestionInner() {
               setTimeout(() => setToast(null), 1200);
             }}
             disabled={!tailoredAnswer.trim()}
-            className="rounded-xl border border-border px-3 py-2 text-sm disabled:opacity-40 hover:bg-zinc-50 dark:hover:bg-zinc-800"
+            className="rounded-md border border-border px-3 py-2 text-sm disabled:opacity-40 hover:bg-surface-sunken "
           >
             Copy
           </button>
@@ -327,11 +327,11 @@ function OptimizeApplicationQuestionInner() {
         value={tailoredAnswer}
         onChange={(e) => setTailoredAnswer(e.target.value)}
         rows={16}
-        className="rounded-2xl border border-border bg-surface px-3 py-2 text-sm leading-relaxed outline-none focus:border-accent dark:bg-zinc-950"
+        className="rounded-lg border border-border bg-surface px-3 py-2 text-sm leading-relaxed outline-none focus:border-accent "
         placeholder="Run Tailor to JD to generate text here…"
       />
 
-      <p className="text-sm text-zinc-500">
+      <p className="text-sm text-muted">
         <Link href="/optimize" className="underline">
           ← Optimize hub
         </Link>

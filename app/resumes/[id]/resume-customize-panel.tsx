@@ -37,7 +37,7 @@ function Field({
 }) {
   return (
     <label className="flex flex-col gap-1">
-      <span className="text-xs font-medium text-zinc-600 dark:text-zinc-400">
+      <span className="text-xs font-medium text-muted">
         {label}
       </span>
       {children}
@@ -214,7 +214,7 @@ export function ResumeCustomizePanel({
   return (
     <div className="flex flex-col gap-6 text-sm">
       <div>
-        <p className="text-xs text-zinc-600 dark:text-zinc-400">
+        <p className="text-xs text-muted">
           Edits here are stored on <span className="font-medium">this resume</span>{" "}
           only. Your global Profile is unchanged—useful for a cybersecurity-only
           wording without touching other resumes.
@@ -226,7 +226,7 @@ export function ResumeCustomizePanel({
         ) : null}
       </div>
 
-      <div className="rounded-2xl border border-border p-4">
+      <div className="rounded-lg border border-border p-4">
         <div className="font-semibold">Header &amp; summary</div>
         <div className="mt-3 grid gap-3 sm:grid-cols-2">
           <Field label="Name">
@@ -269,7 +269,7 @@ export function ResumeCustomizePanel({
           </Field>
         </div>
         {usesSkillCategories(mergedProfile) ? (
-          <p className="mt-3 text-xs text-zinc-500">
+          <p className="mt-3 text-xs text-muted">
             Skill labels and groups are edited on the Profile page (Skills
             section).
           </p>
@@ -288,10 +288,10 @@ export function ResumeCustomizePanel({
         )}
       </div>
 
-      <div className="rounded-2xl border border-border p-4">
+      <div className="rounded-lg border border-border p-4">
         <div className="font-semibold">Experience on this resume</div>
         {includedExperience.length === 0 ? (
-          <p className="mt-2 text-xs text-zinc-500">
+          <p className="mt-2 text-xs text-muted">
             None selected—adjust checkboxes under “Profile entries”.
           </p>
         ) : (
@@ -302,17 +302,17 @@ export function ResumeCustomizePanel({
               return (
                 <div
                   key={exp.id}
-                  className="rounded-xl border border-border p-3"
+                  className="rounded-md border border-border p-3"
                 >
                   <div className="flex flex-wrap items-center justify-between gap-2">
-                    <span className="text-xs font-medium text-zinc-500">
+                    <span className="text-xs font-medium text-muted">
                       Role card
                     </span>
                     {overrides.experience[exp.id] ? (
                       <button
                         type="button"
                         onClick={() => clearExp(exp.id)}
-                        className="text-xs text-zinc-500 underline"
+                        className="text-xs text-muted underline"
                       >
                         Reset to profile
                       </button>
@@ -398,10 +398,10 @@ export function ResumeCustomizePanel({
         )}
       </div>
 
-      <div className="rounded-2xl border border-border p-4">
+      <div className="rounded-lg border border-border p-4">
         <div className="font-semibold">Projects on this resume</div>
         {includedProjects.length === 0 ? (
-          <p className="mt-2 text-xs text-zinc-500">
+          <p className="mt-2 text-xs text-muted">
             None selected—adjust checkboxes under “Profile entries”.
           </p>
         ) : (
@@ -412,17 +412,17 @@ export function ResumeCustomizePanel({
               return (
                 <div
                   key={proj.id}
-                  className="rounded-xl border border-border p-3"
+                  className="rounded-md border border-border p-3"
                 >
                   <div className="flex flex-wrap items-center justify-between gap-2">
-                    <span className="text-xs font-medium text-zinc-500">
+                    <span className="text-xs font-medium text-muted">
                       Project card
                     </span>
                     {overrides.projects[proj.id] ? (
                       <button
                         type="button"
                         onClick={() => clearProj(proj.id)}
-                        className="text-xs text-zinc-500 underline"
+                        className="text-xs text-muted underline"
                       >
                         Reset to profile
                       </button>
@@ -521,10 +521,10 @@ export function ResumeCustomizePanel({
         )}
       </div>
 
-      <div className="rounded-2xl border border-border p-4">
+      <div className="rounded-lg border border-border p-4">
         <div className="font-semibold">Education (always on Jake template)</div>
         {profile.education.length === 0 ? (
-          <p className="mt-2 text-xs text-zinc-500">No education in profile.</p>
+          <p className="mt-2 text-xs text-muted">No education in profile.</p>
         ) : (
           <div className="mt-3 space-y-6">
             {profile.education.map((ed) => {
@@ -533,17 +533,17 @@ export function ResumeCustomizePanel({
               return (
                 <div
                   key={ed.id}
-                  className="rounded-xl border border-border p-3"
+                  className="rounded-md border border-border p-3"
                 >
                   <div className="flex flex-wrap items-center justify-between gap-2">
-                    <span className="text-xs font-medium text-zinc-500">
+                    <span className="text-xs font-medium text-muted">
                       {ed.school || "School"}
                     </span>
                     {overrides.education[ed.id] ? (
                       <button
                         type="button"
                         onClick={() => clearEdu(ed.id)}
-                        className="text-xs text-zinc-500 underline"
+                        className="text-xs text-muted underline"
                       >
                         Reset to profile
                       </button>
@@ -624,7 +624,7 @@ export function ResumeCustomizePanel({
         type="button"
         onClick={onSave}
         className={cx(
-          "self-start rounded-xl px-4 py-2 text-sm font-medium text-white",
+          "self-start rounded-md px-4 py-2 text-sm font-medium text-on-accent",
           "bg-accent hover:bg-accent-dark",
         )}
       >

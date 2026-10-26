@@ -15,7 +15,7 @@ import {
 import { AuthHeader } from "./components/auth-header";
 import { NavLinkPending } from "./components/nav-link-pending";
 import { ThemeToggle } from "./components/theme-toggle";
-import { WorkspaceProvider } from "./lib/workspace-context";
+import { WorkspaceProvider, useWorkspace } from "./lib/workspace-context";
 
 const dockItems: Array<{
   href: string;
@@ -32,6 +32,7 @@ const dockItems: Array<{
 
 function isActive(pathname: string, href: string) {
   if (href === "/") return pathname === "/";
+  if (href === "/documents" && /^\/(resumes|cover-letters)(\/|$)/.test(pathname)) return true;
   return pathname === href || pathname.startsWith(href + "/");
 }
 
@@ -40,61 +41,52 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <WorkspaceProvider>
-      <div className="flex min-h-full flex-col bg-background text-foreground">
-        <header className="sticky top-0 z-40 border-b border-border bg-background/85 backdrop-blur-xl">
-          <div className="mx-auto flex h-14 w-full max-w-6xl items-center gap-3 px-4 sm:px-6">
-            <Link
-              href="/"
-              className="group flex shrink-0 items-center gap-2"
-              aria-label="Resume Optimizer home"
-            >
-              <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-accent text-on-accent">
-                <FileText size={14} />
-              </span>
-              <span className="hidden text-[15px] font-semibold tracking-tight transition-colors group-hover:text-accent sm:inline">
-                Resume Optimizer
-              </span>
-            </Link>
-
-            <div className="ml-auto flex items-center gap-2">
-              <ThemeToggle />
-              <span className="hidden h-5 w-px bg-border sm:inline" aria-hidden />
-              <AuthHeader />
-            </div>
-          </div>
-        </header>
-
-        <main className="mx-auto w-full max-w-6xl flex-1 px-4 pb-28 pt-6 sm:px-6">
-          {children}
-        </main>
-
-        <nav
-          className="fixed bottom-5 left-1/2 z-50 flex -translate-x-1/2 items-center gap-0.5 rounded-2xl border border-border bg-surface-raised/90 px-2 py-1.5 shadow-lg shadow-black/10 backdrop-blur-xl dark:shadow-black/40"
-          aria-label="Main navigation"
-        >
-          {dockItems.map((item) => {
-            const active = isActive(pathname, item.href);
-            const Icon = item.icon;
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                aria-current={active ? "page" : undefined}
-                className={[
-                  "relative inline-flex flex-col items-center justify-center gap-0.5 rounded-xl px-3 py-2 text-[10px] font-medium transition-all sm:flex-row sm:gap-1.5 sm:px-3.5 sm:text-xs",
-                  active
-                    ? "bg-accent text-on-accent shadow-sm"
-                    : "text-muted hover:bg-surface-sunken hover:text-foreground",
-                ].join(" ")}
-              >
-                <Icon size={16} className="shrink-0" />
+      <div className="workspace-shell min-h-screen bg-background text-foreground">
+        <a href="#main-content" className="skip-link">Skip to content</a>
+        <aside className="workspace-rail">
+          <Link href="/" className="workspace-brand" aria-label="Tailr home">
+            <span className="brand-mark" aria-hidden><FileText size={19} /></span>
+            <span>Tailr<span className="block text-muted font-normal text-xs tracking-normal">Workspace</span></span>
+          </Link>
+          <div className="rail-label">Your workspace</div>
+          <nav className="workspace-nav" aria-label="Main navigation">
+            {dockItems.map((item, index) => {
+              const active = isActive(pathname, item.href);
+              const Icon = item.icon;
+              return <Link key={item.href} href={item.href} aria-current={active ? "page" : undefined} className="workspace-nav-item">
+                <Icon size={17} className="shrink-0" />
                 <span>{item.label}</span>
+                <span className="nav-index" aria-hidden>{String(index + 1).padStart(2, "0")}</span>
                 <NavLinkPending />
-              </Link>
-            );
-          })}
-        </nav>
+              </Link>;
+            })}
+          </nav>
+          <div className="rail-note"><span className="eyebrow">A considered application.</span><p>Your experience.<br />A sharper presentation.</p></div>
+        </aside>
+        <div className="workspace-body">
+          <header className="workspace-topbar">
+            <div className="flex min-w-0 items-center gap-2 text-xs text-muted">
+              <span className="hidden sm:inline">Workspace</span><span className="hidden sm:inline text-faint" aria-hidden>/</span>
+              <span className="truncate font-medium text-foreground">{dockItems.find(item => isActive(pathname, item.href))?.label ?? (pathname === "/login" ? "Sign in" : pathname === "/signup" ? "Create account" : "Document editor")}</span>
+            </div>
+            <div className="ml-auto flex shrink-0 items-center gap-2 sm:gap-4"><ThemeToggle /><AuthHeader /></div>
+          </header>
+          <main id="main-content" tabIndex={-1} className="workspace-main">
+            <WorkspaceGuard>{children}</WorkspaceGuard>
+          </main>
+        </div>
       </div>
     </WorkspaceProvider>
   );
+}
+
+function WorkspaceGuard({ children }: { children: React.ReactNode }) {
+  const { loadError, refresh } = useWorkspace();
+  return <>
+    {loadError ? <div role="alert" className="mb-4 rounded-xl border border-red-300 bg-red-50 p-4 text-red-900 dark:bg-red-950 dark:text-red-100">
+      <p>Could not load your workspace: {loadError}. Editing is paused to protect your saved data.</p>
+      <button type="button" onClick={() => void refresh()} className="mt-2 rounded border px-3 py-1">Retry loading</button>
+    </div> : null}
+    <fieldset disabled={Boolean(loadError)} className="min-w-0 border-0 p-0 m-0">{children}</fieldset>
+  </>;
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { StorageSettings } from "../components/storage-settings";
 import {
   Check,
   Cpu,
@@ -44,10 +45,22 @@ export default function SettingsPage() {
   const [settings, setSettings, storageReady, persistSettings] =
     useHydratedSettings();
   const [savedAt, setSavedAt] = useState<number | null>(null);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
 
   async function onSave() {
-    await persistSettings(settings);
-    setSavedAt(Date.now());
+    setSaving(true);
+    setSaveError(null);
+    setSavedAt(null);
+    try {
+      await persistSettings(settings);
+      setSavedAt(Date.now());
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Could not save settings.";
+      setSaveError(message === "Unauthorized" ? "Your session expired. Sign in again to save your settings." : message);
+    } finally {
+      setSaving(false);
+    }
   }
 
   async function onImportSkillsMd(file: File) {
@@ -84,21 +97,24 @@ export default function SettingsPage() {
                 Saved {formatSavedBannerTime(savedAt)}
               </span>
             )}
-            <button type="button" onClick={() => void onSave()} className={buttonPrimary}>
+            <button type="button" onClick={() => void onSave()} disabled={saving} className={buttonPrimary}>
               <Save size={14} />
-              Save
+              {saving ? "Saving…" : "Save"}
             </button>
           </>
         }
       />
 
+      {saveError && <p role="alert" className="text-sm text-danger">{saveError}</p>}
+
       <Bento>
+        <StorageSettings />
         {/* ── AI provider ─────────────────────────────────────────────── */}
         <Tile
           span={4}
           title="AI provider"
           icon={<Sparkles size={15} />}
-          description="Generation runs through this app's API route — the key never leaves your machine."
+          description="Hosted providers receive the profile and job description through the app’s server. API keys are never included in prompts."
         >
           <div className="mt-4 flex flex-col gap-2" role="radiogroup" aria-label="AI provider">
             <ChoiceCard
@@ -108,12 +124,15 @@ export default function SettingsPage() {
               title="Google Gemini"
               description="Hosted. Needs an API key."
             />
+            <ChoiceCard selected={provider === "groq"}
+              onSelect={() => setSettings((s) => ({ ...s, aiProvider: "groq" }))}
+              icon={<Sparkles size={15} />} title="Groq" description="Hosted. Uses a personal key or GROQ_API_KEY on the server." />
             <ChoiceCard
               selected={provider === "ollama"}
               onSelect={() => setSettings((s) => ({ ...s, aiProvider: "ollama" }))}
               icon={<Cpu size={15} />}
               title="Ollama"
-              description="Local model. Nothing leaves your machine."
+              description="Runs on the app server’s machine. Self-host locally for device-local AI."
             />
           </div>
 
@@ -138,6 +157,17 @@ export default function SettingsPage() {
                   type="password"
                 />
               </Field>
+            ) : provider === "groq" ? (
+              <div className="flex flex-col gap-3">
+                <Field label="Groq API key" hint="Leave blank to use GROQ_API_KEY on the server.">
+                  <input type="password" autoComplete="off" value={settings.groqApiKey ?? ""}
+                    onChange={(e) => setSettings((s) => ({ ...s, groqApiKey: e.target.value }))} className={inputClass} />
+                </Field>
+                <Field label="Groq model">
+                  <input value={settings.groqModel ?? "openai/gpt-oss-120b"}
+                    onChange={(e) => setSettings((s) => ({ ...s, groqModel: e.target.value }))} className={inputMonoClass} />
+                </Field>
+              </div>
             ) : (
               <div className="grid gap-3 sm:grid-cols-2">
                 <Field label="Base URL">
@@ -194,7 +224,7 @@ export default function SettingsPage() {
                 </span>
               ) : (
                 <span className="truncate font-mono text-[11px]">
-                  {settings.ollamaModel ?? "llama3.2"}
+                  {provider === "groq" ? settings.groqModel : settings.ollamaModel ?? "llama3.2"}
                 </span>
               )}
             </div>
@@ -231,7 +261,7 @@ export default function SettingsPage() {
             </div>
           }
         >
-          <label className="mt-4 flex cursor-pointer items-center justify-center gap-2 rounded-lg border border-dashed border-border px-4 py-2.5 text-xs text-muted transition-colors hover:border-accent hover:bg-accent-light hover:text-accent-dark">
+          <label className="mt-4 flex cursor-pointer items-center justify-center gap-2 rounded-lg border border-dashed border-border px-4 py-2.5 text-xs text-muted transition-colors hover:border-accent hover:bg-accent-light hover:text-accent-dark focus-within:outline-2 focus-within:outline-accent">
             <Upload size={14} />
             Upload a .md file
             <input
@@ -241,11 +271,12 @@ export default function SettingsPage() {
                 const file = e.target.files?.[0];
                 if (file) void onImportSkillsMd(file);
               }}
-              className="hidden"
+              className="sr-only"
             />
           </label>
 
           <textarea
+            aria-label="skills.md"
             value={skillsMd}
             onChange={(e) => setSettings((s) => ({ ...s, skillsMd: e.target.value }))}
             rows={12}
@@ -268,6 +299,7 @@ export default function SettingsPage() {
           }
         >
           <textarea
+            aria-label="Personal context"
             value={personalContext}
             onChange={(e) =>
               setSettings((s) => ({ ...s, personalContext: e.target.value }))

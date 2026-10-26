@@ -12,7 +12,7 @@ const dimMap = {
 };
 
 /**
- * Purple / fuchsia / violet sparkles for AI-powered actions (no client hooks — safe in RSC).
+ * Monochrome sparkles for AI-powered actions (no client hooks — safe in RSC).
  */
 export function AiMagicIcon({ className = "", size = "md" }: Props) {
   const dim = dimMap[size];
@@ -26,19 +26,19 @@ export function AiMagicIcon({ className = "", size = "md" }: Props) {
       aria-hidden
     >
       <path
-        fill="#9333ea"
+        fill="currentColor"
         d="M12 1.5l1.35 4.73 4.73 1.35-4.73 1.35L12 13.5l-1.35-4.57-4.73-1.35 4.73-1.35L12 1.5Z"
       />
       <path
-        fill="#c026d3"
+        fill="currentColor"
         d="M18.5 13.5l.65 2.28 2.28.65-2.28.65-.65 2.28-.65-2.28-2.28-.65 2.28-.65.65-2.28Z"
       />
       <path
-        fill="#6366f1"
+        fill="currentColor"
         d="M5 15.5l.5 1.75 1.75.5-1.75.5-.5 1.75-.5-1.75-1.75-.5 1.75-.5.5-1.75Z"
       />
       <path
-        fill="#e879f9"
+        fill="currentColor"
         opacity="0.9"
         d="M20.5 5.5l.35 1.2 1.2.35-1.2.35-.35 1.2-.35-1.2-1.2-.35 1.2-.35.35-1.2Z"
       />

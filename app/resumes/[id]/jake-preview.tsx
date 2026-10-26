@@ -29,7 +29,7 @@ function renderBullet(text: string): React.ReactNode {
     nodes.push(
       <strong
         key={match.index}
-        className="font-semibold text-zinc-950 dark:text-zinc-50"
+        className="font-semibold text-foreground"
       >
         {display}
       </strong>,
@@ -67,19 +67,19 @@ export function JakeResumePreview({
   const edu = profile.education;
 
   return (
-    <div className="rounded-2xl border border-zinc-200 bg-white p-6 text-zinc-950 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-50">
+    <div className="resume-paper rounded-sm border border-border bg-surface p-6 text-foreground">
       <div className="text-center">
         <div className="text-xl font-semibold tracking-tight">
           {profile.name || "Your Name"}
         </div>
-        <div className="mt-1 text-xs text-zinc-600 dark:text-zinc-300">
+        <div className="mt-1 text-xs text-muted">
           {[profile.phone, profile.email, profile.location]
             .map((x) => x?.trim())
             .filter(Boolean)
             .join(" | ")}
         </div>
         {profile.links.length ? (
-          <div className="mt-1 text-xs text-zinc-600 dark:text-zinc-300">
+          <div className="mt-1 text-xs text-muted">
             {profile.links
               .slice(0, 3)
               .map((l) => l.label || l.url)
@@ -91,7 +91,7 @@ export function JakeResumePreview({
 
       {edu.length ? (
         <section className="mt-6">
-          <div className="border-b border-zinc-200 pb-1 text-sm font-semibold uppercase tracking-wide dark:border-zinc-800">
+          <div className="border-b border-border pb-1 text-sm font-semibold uppercase tracking-wide ">
             Education
           </div>
           <div className="mt-3 space-y-3">
@@ -101,23 +101,23 @@ export function JakeResumePreview({
                   <div className="text-sm font-semibold">
                     {e.school}
                     {e.location ? (
-                      <span className="font-normal text-zinc-600 dark:text-zinc-300">
+                      <span className="font-normal text-muted">
                         {" "}
                         — {e.location}
                       </span>
                     ) : null}
                   </div>
-                  <div className="text-xs text-zinc-600 dark:text-zinc-300">
+                  <div className="text-xs text-muted">
                     {[e.start, e.end].filter(Boolean).join(" - ")}
                   </div>
                 </div>
                 {e.degree ? (
-                  <div className="text-xs italic text-zinc-600 dark:text-zinc-300">
+                  <div className="text-xs italic text-muted">
                     {e.degree}
                   </div>
                 ) : null}
                 {e.details?.length ? (
-                  <ul className="mt-1 list-disc pl-5 text-xs text-zinc-700 dark:text-zinc-200">
+                  <ul className="mt-1 list-disc pl-5 text-xs text-foreground">
                     {e.details.map((d, idx) => (
                       <li key={idx}>{d}</li>
                     ))}
@@ -131,7 +131,7 @@ export function JakeResumePreview({
 
       {exp.length ? (
         <section className="mt-6">
-          <div className="border-b border-zinc-200 pb-1 text-sm font-semibold uppercase tracking-wide dark:border-zinc-800">
+          <div className="border-b border-border pb-1 text-sm font-semibold uppercase tracking-wide ">
             Experience
           </div>
           <div className="mt-3 space-y-4">
@@ -141,21 +141,21 @@ export function JakeResumePreview({
                   <div className="text-sm font-semibold">
                     {e.company}
                     {e.location ? (
-                      <span className="font-normal text-zinc-600 dark:text-zinc-300">
+                      <span className="font-normal text-muted">
                         {" "}
                         — {e.location}
                       </span>
                     ) : null}
                   </div>
-                  <div className="text-xs text-zinc-600 dark:text-zinc-300">
+                  <div className="text-xs text-muted">
                     {[e.start, e.end].filter(Boolean).join(" - ")}
                   </div>
                 </div>
-                <div className="text-xs italic text-zinc-600 dark:text-zinc-300">
+                <div className="text-xs italic text-muted">
                   {e.title}
                 </div>
                 {(experienceBulletsById?.[e.id] ?? e.bullets).length ? (
-                  <ul className="mt-1 list-disc pl-5 text-xs text-zinc-700 dark:text-zinc-200">
+                  <ul className="mt-1 list-disc pl-5 text-xs text-foreground">
                     {(experienceBulletsById?.[e.id] ?? e.bullets).map((b, idx) => (
                       <li key={idx}>{highlightMetrics ? renderBullet(b) : b}</li>
                     ))}
@@ -169,7 +169,7 @@ export function JakeResumePreview({
 
       {proj.length ? (
         <section className="mt-6">
-          <div className="border-b border-zinc-200 pb-1 text-sm font-semibold uppercase tracking-wide dark:border-zinc-800">
+          <div className="border-b border-border pb-1 text-sm font-semibold uppercase tracking-wide ">
             Projects
           </div>
           <div className="mt-3 space-y-4">
@@ -179,12 +179,12 @@ export function JakeResumePreview({
                   <div className="text-sm">
                     <span className="font-semibold">{p.name}</span>
                     {p.tech.length > 0 ? (
-                      <span className="text-zinc-600 dark:text-zinc-300">
+                      <span className="text-muted">
                         {" "}| <span className="italic">{p.tech.slice(0, 10).join(", ")}</span>
                       </span>
                     ) : null}
                     {p.link?.trim() ? (
-                      <span className="text-zinc-600 dark:text-zinc-300">
+                      <span className="text-muted">
                         {" "}|{" "}
                         <a
                           href={p.link.trim()}
@@ -197,12 +197,12 @@ export function JakeResumePreview({
                       </span>
                     ) : null}
                   </div>
-                  <div className="shrink-0 text-xs text-zinc-600 dark:text-zinc-300">
+                  <div className="shrink-0 text-xs text-muted">
                     {[p.start, p.end].filter(Boolean).join(" - ")}
                   </div>
                 </div>
                 {(projectBulletsById?.[p.id] ?? p.bullets).length ? (
-                  <ul className="mt-1 list-disc pl-5 text-xs text-zinc-700 dark:text-zinc-200">
+                  <ul className="mt-1 list-disc pl-5 text-xs text-foreground">
                     {(projectBulletsById?.[p.id] ?? p.bullets).map((b, idx) => (
                       <li key={idx}>{highlightMetrics ? renderBullet(b) : b}</li>
                     ))}
@@ -216,10 +216,10 @@ export function JakeResumePreview({
 
       {profileSkillDisplayRows(profile).length > 0 ? (
         <section className="mt-6">
-          <div className="border-b border-zinc-200 pb-1 text-sm font-semibold uppercase tracking-wide dark:border-zinc-800">
+          <div className="border-b border-border pb-1 text-sm font-semibold uppercase tracking-wide ">
             Skills
           </div>
-          <div className="mt-3 space-y-2 text-xs text-zinc-700 dark:text-zinc-200">
+          <div className="mt-3 space-y-2 text-xs text-foreground">
             {profileSkillDisplayRows(profile).map((row, idx) => (
               <div key={`${row.label}-${idx}`}>
                 <span className="font-semibold">{row.label}:</span>{" "}

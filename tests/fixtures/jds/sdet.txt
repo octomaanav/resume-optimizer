@@ -1,0 +1,19 @@
+SYNTHETIC TEST JOB DESCRIPTION — QA Automation Engineer / SDET
+Company: Example Sdet Labs (fictional)
+Location: Boston / Remote, United States
+
+Responsibilities and selection priorities
+Own test automation for web forms and backend APIs. Write Playwright browser tests for authentication, keyboard navigation, validation and screen-reader labels, plus Jest unit tests and integration tests in GitHub Actions CI/CD. Favor entries with concrete test counts and regression prevention. Development experience is useful when it demonstrates test coverage.
+
+Required qualifications
+- Playwright
+- Jest
+- integration tests
+- GitHub Actions
+- CI/CD
+- keyboard
+
+Preferred, not mandatory
+- Cypress
+
+Applications are assessed on demonstrated work. Candidates may apply without preferred tools. Do not claim skills you have not used.

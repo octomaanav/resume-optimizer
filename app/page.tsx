@@ -1,140 +1,64 @@
+"use client";
+
 import Link from "next/link";
-import {
-  ArrowRight,
-  FileText,
-  FolderOpen,
-  Mail,
-  MessageSquareText,
-  Settings,
-  Sparkles,
-  User,
-} from "lucide-react";
+import { ArrowRight, ArrowUpRight, Check, FileText, Mail, MessageSquareText, Plus } from "lucide-react";
+import { useWorkspace } from "./lib/workspace-context";
+import { buttonPrimary, buttonSecondary } from "./components/ui";
+import { formatListTimestamp } from "./lib/format-date";
 
-const steps = [
-  {
-    href: "/profile",
-    step: "01",
-    title: "Build your profile",
-    body: "Experience, projects, education and skills — the single source every document draws from.",
-    icon: User,
-  },
-  {
-    href: "/documents",
-    step: "02",
-    title: "Save base documents",
-    body: "Resume and cover letter templates you reuse. Tailoring never overwrites them.",
-    icon: FolderOpen,
-  },
-];
-
-const shortcuts = [
-  { href: "/optimize/resume", label: "Resume", icon: FileText },
-  { href: "/optimize/cover-letter", label: "Cover letter", icon: Mail },
-  {
-    href: "/optimize/application-question",
-    label: "Application Q&A",
-    icon: MessageSquareText,
-  },
+const workflows = [
+  { href: "/optimize/resume", title: "Resume", detail: "Select the experience that fits the role.", icon: FileText },
+  { href: "/optimize/cover-letter", title: "Cover letter", detail: "Connect your experience to the company.", icon: Mail },
+  { href: "/optimize/application-question", title: "Application answer", detail: "Give a specific, grounded response.", icon: MessageSquareText },
 ];
 
 export default function Home() {
-  return (
-    <div className="flex flex-col gap-6">
-      {/* Hero */}
-      <section className="relative overflow-hidden rounded-xl border border-border bg-surface px-6 py-10 sm:px-10 sm:py-14">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute -right-16 -top-16 h-56 w-56 rounded-full bg-accent opacity-[0.07] blur-3xl"
-        />
-        <div className="relative max-w-2xl">
-          <div className="eyebrow mb-3">Resume Optimizer</div>
-          <h1 className="text-3xl sm:text-4xl">
-            Tailor every application without rewriting from scratch.
-          </h1>
-          <p className="mt-4 text-base leading-relaxed text-muted">
-            Store your profile and base documents once. Paste a job description
-            when you apply — the tailored output stays separate from your
-            originals.
-          </p>
-          <div className="mt-7 flex flex-wrap items-center gap-2">
-            <Link
-              href="/optimize"
-              className="inline-flex items-center gap-2 rounded-lg bg-accent px-4 py-2.5 text-sm font-medium text-on-accent transition-colors hover:bg-accent-hover"
-            >
-              <Sparkles size={15} />
-              Optimize for a job
-            </Link>
-            <Link
-              href="/profile"
-              className="inline-flex items-center gap-2 rounded-lg border border-border bg-surface-raised px-4 py-2.5 text-sm font-medium transition-colors hover:border-border-hover hover:bg-surface-sunken"
-            >
-              Set up profile
-              <ArrowRight size={15} />
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Setup steps */}
-      <div className="grid gap-4 sm:grid-cols-2">
-        {steps.map(({ href, step, title, body, icon: Icon }) => (
-          <Link
-            key={href}
-            href={href}
-            className="group flex flex-col rounded-xl border border-border bg-surface p-5 transition-colors hover:border-accent hover:bg-surface-raised"
-          >
-            <div className="flex items-center justify-between">
-              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent-light text-accent-dark">
-                <Icon size={15} />
-              </span>
-              <span className="font-mono text-xs text-faint">{step}</span>
-            </div>
-            <div className="mt-4 flex items-center gap-1.5 text-base font-semibold transition-colors group-hover:text-accent">
-              {title}
-              <ArrowRight
-                size={14}
-                className="opacity-0 transition-opacity group-hover:opacity-100"
-              />
-            </div>
-            <p className="mt-1.5 text-sm leading-relaxed text-muted">{body}</p>
-          </Link>
-        ))}
+  const { workspace, profile, ready } = useWorkspace();
+  const documents = [
+    ...workspace.resumes.map(doc => ({ ...doc, kind: "Resume", href: `/resumes/${doc.id}`, icon: FileText })),
+    ...workspace.coverLetters.map(doc => ({ ...doc, kind: "Cover letter", href: `/cover-letters/${doc.id}`, icon: Mail })),
+    ...workspace.applicationAnswerDocs.map(doc => ({ ...doc, kind: "Application Q&A", href: `/application-questions/${doc.id}`, icon: MessageSquareText })),
+  ].sort((a, b) => b.updatedAt - a.updatedAt).slice(0, 4);
+  const total = workspace.resumes.length + workspace.coverLetters.length + workspace.applicationAnswerDocs.length;
+  const tasks = [
+    { href: "/profile", title: "Build your source profile", detail: "Experience, projects, education, and skills.", complete: Boolean(profile.name && profile.experience.length) },
+    { href: "/documents", title: "Create a base document", detail: "A starting point you can reuse for every role.", complete: total > 0 },
+    { href: "/settings", title: "Choose your AI provider", detail: "Configure a hosted model or local Ollama.", complete: Boolean(workspace.settings.aiProvider === "ollama" || workspace.settings.aiProvider === "groq" || workspace.settings.geminiApiKey) },
+  ];
+  return <div>
+    <div className="workbench-intro">
+      <div>
+        <p className="eyebrow mb-3">Application workbench</p>
+        <h1 className="workbench-heading">Your next role starts here.</h1>
+        <p className="mt-3 max-w-xl text-sm leading-relaxed text-muted">Keep your experience in one place. Shape it for the opportunity ahead.</p>
       </div>
-
-      {/* Jump straight in */}
-      <section className="rounded-xl border border-border bg-surface p-5">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <h2 className="text-sm font-semibold">Jump straight in</h2>
-            <p className="mt-1 text-xs text-muted">
-              Already set up? Go directly to what you need to tailor.
-            </p>
-          </div>
-          <Link
-            href="/settings"
-            className="inline-flex items-center gap-1.5 text-xs text-muted transition-colors hover:text-accent"
-          >
-            <Settings size={13} />
-            Configure AI provider
-          </Link>
-        </div>
-        <div className="mt-4 grid gap-2 sm:grid-cols-3">
-          {shortcuts.map(({ href, label, icon: Icon }) => (
-            <Link
-              key={href}
-              href={href}
-              className="group flex items-center gap-2.5 rounded-lg border border-border bg-surface-raised px-3.5 py-3 text-sm font-medium transition-colors hover:border-accent hover:bg-accent-light hover:text-accent-dark"
-            >
-              <Icon size={15} className="text-muted group-hover:text-accent" />
-              {label}
-              <ArrowRight
-                size={14}
-                className="ml-auto opacity-0 transition-opacity group-hover:opacity-100"
-              />
-            </Link>
-          ))}
-        </div>
-      </section>
+      <Link href="/optimize" className={buttonPrimary}>Tailor an application <ArrowUpRight size={15} /></Link>
     </div>
-  );
+    <div className="workbench-stats" aria-label="Workspace summary" aria-busy={!ready}>
+      {[
+        ["Experiences", profile.experience.length], ["Projects", profile.projects.length],
+        ["Base documents", total], ["Education entries", profile.education.length],
+      ].map(([label, count]) => <div className="workbench-stat" key={label}><strong>{ready ? String(count).padStart(2, "0") : "—"}</strong><span>{label}</span></div>)}
+    </div>
+    <div className="workbench-columns">
+      <div>
+        <div className="workbench-section-label"><h2>Recent documents</h2><Link href="/documents" className="text-xs font-normal text-muted hover:text-accent">View library <span aria-hidden>↗</span></Link></div>
+        {!ready ? <p className="py-8 text-sm text-muted" role="status">Loading your workspace…</p> : documents.length ? documents.map(doc => <Link href={doc.href} key={`${doc.kind}-${doc.id}`} className="workbench-row">
+          <span className="workbench-row-icon"><doc.icon size={18} /></span>
+          <span className="min-w-0 flex-1"><span className="workbench-row-title block truncate text-sm font-medium">{doc.title}</span><span className="mt-1 block text-xs text-muted">{doc.kind} · Updated {formatListTimestamp(doc.updatedAt)}</span></span>
+          <ArrowUpRight size={15} className="shrink-0 text-muted" />
+        </Link>) : <div className="workbench-panel"><FileText size={24} className="text-muted mb-4" /><h3 className="text-sm">A home for your application documents.</h3><p className="mt-2 mb-5 text-sm text-muted leading-relaxed">Create your first base resume. Your tailored versions stay separate from the original.</p><Link href="/resumes/new" className={buttonSecondary}><Plus size={14} />Create a resume</Link></div>}
+        <div className="mt-8 workbench-section-label"><h2>Tailor for a role</h2><span className="eyebrow text-[9px]">One job description at a time</span></div>
+        {workflows.map(({ href, title, detail, icon: Icon }) => <Link href={href} key={href} className="workbench-row"><Icon size={17} className="shrink-0 text-muted" /><span className="flex-1 min-w-0"><span className="workbench-row-title text-sm font-medium">{title}</span><span className="block mt-1 text-xs text-muted">{detail}</span></span><ArrowRight size={15} className="text-muted shrink-0" /></Link>)}
+      </div>
+      <div>
+        <section className="workbench-panel" aria-labelledby="foundation-title">
+          <p className="eyebrow mb-3">The foundation</p><h2 id="foundation-title" className="text-lg font-medium">Good applications start<br className="hidden sm:block" /> with your actual work.</h2>
+          <p className="mt-3 text-xs leading-relaxed text-muted">Build a complete profile, then choose what each application needs.</p>
+          {tasks.map((task, index) => <Link href={task.href} key={task.href} className="workbench-task"><span className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border text-[10px] font-mono ${ready && task.complete ? "border-accent text-accent bg-accent-light" : "border-border text-muted"}`}>{ready && task.complete ? <Check size={12} /> : index + 1}</span><span><span className="block text-xs font-medium">{task.title}</span><span className="block mt-1 text-xs leading-relaxed text-muted">{task.detail}</span></span></Link>)}
+        </section>
+        <p className="mt-4 px-1 text-xs leading-relaxed text-muted">Your profile is the source. Base documents are reusable. Every tailored application is its own draft.</p>
+      </div>
+    </div>
+  </div>;
 }

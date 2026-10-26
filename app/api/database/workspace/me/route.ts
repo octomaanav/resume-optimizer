@@ -9,6 +9,7 @@ import {
   rowToWorkspacePayload,
   workspacePayloadToRow,
 } from "@/app/lib/database/workspace-row";
+import { withoutApiKeys } from "@/app/lib/storage-policy";
 import { WorkspacePatchSchema } from "@/app/lib/document-schemas";
 
 export const runtime = "nodejs";
@@ -42,13 +43,16 @@ export async function GET() {
   if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+  if (process.env.NEXT_PUBLIC_CLOUD_WORKSPACES_ENABLED !== "true") {
+    return NextResponse.json({ error: "Cloud workspaces are disabled. Your data stays in device storage." }, { status: 403 });
+  }
 
   const row = await loadOrCreateRow(db, userId);
   if (!row) {
     return NextResponse.json({ error: "Workspace not found" }, { status: 500 });
   }
 
-  return NextResponse.json({ workspace: rowToWorkspacePayload(row) });
+  return NextResponse.json({ workspace: { ...rowToWorkspacePayload(row), settings: withoutApiKeys(rowToWorkspacePayload(row).settings) } });
 }
 
 /**
@@ -58,6 +62,9 @@ export async function PUT(request: Request) {
   const userId = await currentUserId();
   if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+  if (process.env.NEXT_PUBLIC_CLOUD_WORKSPACES_ENABLED !== "true") {
+    return NextResponse.json({ error: "Cloud workspaces are disabled. Your data stays in device storage." }, { status: 403 });
   }
 
   let body: unknown;
@@ -96,6 +103,7 @@ export async function PUT(request: Request) {
         rowToWorkspacePayload(locked),
         parsed.data,
       );
+      mergedPayload.settings = withoutApiKeys(mergedPayload.settings);
       const next = workspacePayloadToRow(userId, mergedPayload);
 
       await tx

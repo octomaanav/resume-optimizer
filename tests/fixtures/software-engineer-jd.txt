@@ -1,0 +1,14 @@
+Northstar Developer Tools — Software Engineer, Early Career (synthetic posting)
+Boston, Massachusetts, United States. Hybrid; full time.
+
+About the role
+Build reliable developer tools with TypeScript, Node.js and React. Design REST API services backed by PostgreSQL and Redis. Deploy Docker services to AWS and maintain CI/CD pipelines with GitHub Actions. Add OpenTelemetry instrumentation and debug latency regressions. Write integration tests and Playwright end-to-end tests. Build accessible interfaces and document technical tradeoffs.
+
+Requirements
+Bachelor's degree in Computer Science or equivalent experience. Strong TypeScript, SQL, React and Node.js skills. Experience with PostgreSQL, Redis, Docker, AWS, GitHub Actions, CI/CD, OpenTelemetry, Playwright, Integration Testing and Accessibility. Clear written communication and evidence of measurable performance improvements.
+
+Preferred
+Kubernetes and Go experience are useful but not required. Do not claim them if you have not used them.
+
+Application
+Provide contact details, education, recent employment, work authorization, sponsorship and relocation preferences. Answer why you want to join us and describe a technical challenge. Upload a tailored PDF resume. This is a local test application; no real application will be submitted.

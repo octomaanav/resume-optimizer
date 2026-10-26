@@ -37,9 +37,14 @@ function applyEnvRecord(record: Record<string, string>) {
   }
 }
 
-applyEnvRecord(parseDotEnvFile(path.join(process.cwd(), "app", ".env")));
+if (process.env.NODE_ENV === "development") applyEnvRecord(parseDotEnvFile(path.join(process.cwd(), "app", ".env")));
 
 const nextConfig: NextConfig = {
+  output: "standalone",
+  experimental: { cpus: 1, webpackMemoryOptimizations: true },
+  // Container builds run tsc in a separate process first to release its memory.
+  typescript: { ignoreBuildErrors: process.env.TYPECHECK_ALREADY_PASSED === "true" },
+  outputFileTracingExcludes: { "/*": ["./.env*", "./app/.env*", "./env.example.local", "./.npmrc", "./tests/**", "./artifacts/**", "./.git/**"] },
   serverExternalPackages: ["node-latex-compiler", "postgres", "bcryptjs"],
 };
 

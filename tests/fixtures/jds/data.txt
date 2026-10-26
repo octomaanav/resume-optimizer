@@ -1,0 +1,20 @@
+SYNTHETIC TEST JOB DESCRIPTION — Junior Python and SQL Data Engineer
+Company: Example Data Labs (fictional)
+Location: Boston / Remote, United States
+
+Responsibilities and selection priorities
+Build Python ingestion and validation pipelines for structured datasets. Use SQL for duplicate detection, data-quality checks, reports and reproducible processing. Prioritize experiment records, transport data, transaction parsing and weather observations. PostgreSQL query performance and Linux documentation are useful. Frontend components and Java game algorithms are less relevant.
+
+Required qualifications
+- Python
+- SQL
+- validation
+- records
+- PostgreSQL
+- Linux
+
+Preferred, not mandatory
+- Snowflake
+- Airflow
+
+Applications are assessed on demonstrated work. Candidates may apply without preferred tools. Do not claim skills you have not used.

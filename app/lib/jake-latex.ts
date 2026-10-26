@@ -1,6 +1,5 @@
 import type { Profile } from "./profile-model";
 import { profileSkillDisplayRows } from "./profile-skills";
-import { tightenBulletOrphanLine } from "./resume-bullet-fit";
 import {
   resumeFilteredExperience,
   resumeFilteredProjects,
@@ -92,6 +91,9 @@ export function renderJakeResumeTex(args: {
       String.raw`\href{mailto:${latexEscape(email)}}{\underline{${latexEscape(email)}}}`
     );
   }
+  if ((profile.location ?? "").trim()) {
+    contactParts.push(latexEscape(profile.location ?? ""));
+  }
   for (const link of profile.links.slice(0, 3)) {
     const url = normalizeUrl(link.url);
     if (!url) continue;
@@ -113,7 +115,7 @@ export function renderJakeResumeTex(args: {
   lines.push(String.raw`% License : MIT`);
   lines.push(String.raw`%------------------------`);
   lines.push("");
-  lines.push(String.raw`\documentclass[letterpaper,10pt]{article}`);
+  lines.push(String.raw`\documentclass[letterpaper,11pt]{article}`);
   lines.push("");
   lines.push(String.raw`\usepackage{latexsym}`);
   lines.push(String.raw`\usepackage[empty]{fullpage}`);
@@ -252,10 +254,10 @@ export function renderJakeResumeTex(args: {
       if (bullets.length > 0) {
         lines.push(String.raw`      \resumeItemListStart`);
         for (const b of bullets) {
-          const tightened = tightenBulletOrphanLine(b);
+          const text = b.trim();
           const rendered = highlightMetrics
-            ? latexBullet(tightened)
-            : latexEscape(tightened);
+            ? latexBullet(text)
+            : latexEscape(text);
           lines.push(`        \\resumeItem{${rendered}}`);
         }
         lines.push(String.raw`      \resumeItemListEnd`);
@@ -274,7 +276,7 @@ export function renderJakeResumeTex(args: {
       const tech = latexEscape(p.tech.join(", "));
       const dates = latexEscape(joinNonEmpty([p.start, p.end]));
       const linkPart = p.link?.trim()
-        ? String.raw` $|$ \href{${p.link.trim()}}{\underline{Link}}`
+        ? String.raw` $|$ \href{${latexEscape(normalizeUrl(p.link))}}{\underline{Link}}`
         : "";
       const techPart = tech ? String.raw` $|$ \emph{${tech}}` : "";
       const left = String.raw`\textbf{${name}}${techPart}${linkPart}`;
@@ -284,10 +286,10 @@ export function renderJakeResumeTex(args: {
       if (bullets.length > 0) {
         lines.push(String.raw`          \resumeItemListStart`);
         for (const b of bullets) {
-          const tightened = tightenBulletOrphanLine(b);
+          const text = b.trim();
           const rendered = highlightMetrics
-            ? latexBullet(tightened)
-            : latexEscape(tightened);
+            ? latexBullet(text)
+            : latexEscape(text);
           lines.push(`            \\resumeItem{${rendered}}`);
         }
         lines.push(String.raw`          \resumeItemListEnd`);

@@ -42,7 +42,7 @@ export default function NewApplicationQuestionPage() {
 
   if (!ready) {
     return (
-      <p className="text-sm text-zinc-500 dark:text-zinc-400">Loading…</p>
+      <p className="text-sm text-muted">Loading…</p>
     );
   }
 
@@ -52,7 +52,7 @@ export default function NewApplicationQuestionPage() {
         <h1 className="text-2xl font-semibold tracking-tight">
           New Q&A template
         </h1>
-        <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">
+        <p className="mt-1 text-sm text-muted">
           You&apos;ll add the employer&apos;s exact question and your base
           answer on the next screen. Then use Optimize with a JD to tailor the
           answer for each application.
@@ -60,7 +60,7 @@ export default function NewApplicationQuestionPage() {
       </div>
 
       {error ? (
-        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-900 dark:border-red-900/50 dark:bg-red-900/20 dark:text-red-100">
+        <div className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-900 dark:border-red-900/50 dark:bg-red-900/20 dark:text-red-100">
           {error}
         </div>
       ) : null}
@@ -71,7 +71,7 @@ export default function NewApplicationQuestionPage() {
           <input
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="rounded-xl border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-accent"
+            className="rounded-md border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-accent"
             placeholder="e.g. why_this_company"
           />
         </label>
@@ -81,7 +81,7 @@ export default function NewApplicationQuestionPage() {
           <select
             value={source}
             onChange={(e) => setSource(e.target.value)}
-            className="rounded-xl border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-accent"
+            className="rounded-md border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-accent"
           >
             {BOARD_OPTIONS.map((o) => (
               <option key={o.value} value={o.value}>
@@ -96,7 +96,7 @@ export default function NewApplicationQuestionPage() {
         <button
           type="button"
           onClick={() => void onCreate()}
-          className="rounded-xl bg-accent px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-accent-dark"
+          className="rounded-md bg-accent px-4 py-2 text-sm font-medium text-on-accent hover:bg-accent-hover"
         >
           Create template
         </button>

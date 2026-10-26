@@ -1,4 +1,4 @@
-import { createRequire } from "module";
+import { compileIsolatedLatex, LatexCompileError } from "@/app/lib/latex-compiler";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
@@ -7,7 +7,6 @@ import { currentUserId } from "@/auth";
 export const runtime = "nodejs";
 export const maxDuration = 120;
 
-const require = createRequire(import.meta.url);
 
 const BodySchema = z.object({
   latex: z.string().max(1_500_000),
@@ -52,31 +51,9 @@ export async function POST(req: Request) {
   }
 
   try {
-    const { compile } = require("node-latex-compiler") as {
-      compile: (c: {
-        tex: string;
-        returnBuffer: boolean;
-      }) => Promise<{
-        status: string;
-        pdfBuffer?: Buffer;
-        error?: string;
-        stderr?: string;
-      }>;
-    };
+    const pdfBytes = await compileIsolatedLatex(latex);
 
-    const result = await compile({ tex: latex, returnBuffer: true });
-
-    if (result.status !== "success" || !result.pdfBuffer?.length) {
-      return NextResponse.json(
-        {
-          error: result.error ?? "LaTeX compilation failed",
-          stderr: (result.stderr ?? "").slice(0, 12_000),
-        },
-        { status: 422 }
-      );
-    }
-
-    return new NextResponse(new Uint8Array(result.pdfBuffer), {
+    return new NextResponse(new Uint8Array(pdfBytes), {
       status: 200,
       headers: {
         "Content-Type": "application/pdf",
@@ -84,7 +61,7 @@ export async function POST(req: Request) {
       },
     });
   } catch (e) {
-    const message = e instanceof Error ? e.message : "Compilation error";
-    return NextResponse.json({ error: message }, { status: 500 });
+    const message = e instanceof LatexCompileError ? e.message : "Compilation error";
+    return NextResponse.json({ error: message }, { status: e instanceof LatexCompileError ? e.status : 500 });
   }
 }

@@ -19,7 +19,7 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Resume Optimizer",
+  title: "Tailr",
   description: "Optimize resumes and cover letters using AI.",
 };
 

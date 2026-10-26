@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { WandSparkles } from 'lucide-react';
+import { BriefcaseBusiness, FolderCode, Link2, WandSparkles } from 'lucide-react';
 import { buildAiHeaders } from "../lib/ai-client";
 import { formatSavedBannerTime } from "../lib/format-date";
 import type { Profile } from "../lib/document-schemas";
@@ -60,7 +60,7 @@ function Field({
   children: React.ReactNode;
 }) {
   return (
-    <label className="flex flex-col gap-1">
+    <label className="flex min-w-0 flex-col gap-1">
       <span className="text-sm font-medium">{label}</span>
       {children}
     </label>
@@ -72,7 +72,7 @@ function Input(props: React.InputHTMLAttributes<HTMLInputElement>) {
     <input
       {...props}
       className={cx(
-        "rounded-xl border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-accent",
+        "min-w-0 w-full rounded-md border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-accent",
         props.className
       )}
     />
@@ -103,7 +103,6 @@ function SkillsInput({
   // in-progress edits: syncFromExternalItems only calls setRaw when `items`
   // differs from what we last committed ourselves.
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     syncFromExternalItems(items);
   }, [items, syncFromExternalItems]);
 
@@ -133,7 +132,7 @@ function Textarea(props: React.TextareaHTMLAttributes<HTMLTextAreaElement>) {
     <textarea
       {...props}
       className={cx(
-        "rounded-xl border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-accent",
+        "min-w-0 w-full rounded-md border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-accent",
         props.className
       )}
     />
@@ -149,11 +148,11 @@ function SectionHeader({
 }) {
   return (
     <div className="flex items-center justify-between gap-3">
-      <div className="text-base font-semibold">{title}</div>
+      <h2 id={`profile-${title.toLowerCase().replace(/[^a-z]+/g, "-")}`} className="profile-section-title text-base font-semibold">{title}</h2>
       {onAdd ? (
         <button
           onClick={onAdd}
-          className="flex h-9 w-9 items-center justify-center rounded-xl border border-border text-lg leading-none hover:bg-zinc-50 dark:hover:bg-zinc-800"
+          className="flex h-9 w-9 items-center justify-center rounded-md border border-border text-lg leading-none hover:bg-surface-sunken "
           aria-label={`Add ${title}`}
           title={`Add ${title}`}
         >
@@ -188,13 +187,19 @@ export default function ProfilePage() {
   } | null>(null);
 
   async function persistProfileSnapshot(next: Profile) {
+    setSavedAt(null);
     try {
       await saveProfileToCloud(next);
       setCloudSyncError(null);
+      // This runs after an awaited save from an event handler, never during render.
+      // eslint-disable-next-line react-hooks/purity
+      setSavedAt(Date.now());
+      return true;
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Profile sync failed";
       console.error("Profile save failed:", e);
       setCloudSyncError(msg);
+      return false;
     }
   }
 
@@ -219,8 +224,7 @@ export default function ProfilePage() {
   }
 
   async function saveProfileFromState() {
-    setSavedAt(Date.now());
-    await persistProfileSnapshot(profile);
+    return persistProfileSnapshot(profile);
   }
 
   async function onSave() {
@@ -238,8 +242,7 @@ export default function ProfilePage() {
     }
     setProfile(next);
     setTechDraftByProjId({});
-    setSavedAt(Date.now());
-    await persistProfileSnapshot(next);
+    return persistProfileSnapshot(next);
   }
 
   function flashCardSaved(key: string) {
@@ -272,8 +275,7 @@ export default function ProfilePage() {
       });
     }
     setProfile(next);
-    setSavedAt(Date.now());
-    await persistProfileSnapshot(next);
+    return persistProfileSnapshot(next);
   }
 
   async function optimizeExperienceBullet(expId: string, bulletIndex: number) {
@@ -312,7 +314,8 @@ export default function ProfilePage() {
         nextExp[eIdx] = { ...nextExp[eIdx], bullets };
         const nextProfile = { ...profile, experience: nextExp };
         setProfile(nextProfile);
-        setSavedAt(Date.now());
+        // This runs after an awaited save from an event handler, never during render.
+      setSavedAt(Date.now());
         void persistProfileSnapshot(nextProfile);
         setOptModal(null);
       }
@@ -369,7 +372,8 @@ export default function ProfilePage() {
         nextProj[pIdx] = { ...nextProj[pIdx], bullets };
         const nextProfile = { ...profile, projects: nextProj };
         setProfile(nextProfile);
-        setSavedAt(Date.now());
+        // This runs after an awaited save from an event handler, never during render.
+      setSavedAt(Date.now());
         void persistProfileSnapshot(nextProfile);
         setOptModal(null);
       }
@@ -392,17 +396,18 @@ export default function ProfilePage() {
 
   if (!storageReady) {
     return (
-      <p className="text-sm text-zinc-500 dark:text-zinc-400">Loading…</p>
+      <p className="text-sm text-muted">Loading…</p>
     );
   }
 
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
+        <div className="max-w-2xl">
+          <div className="eyebrow mb-2">Your source of truth</div>
           <h1 className="text-2xl font-semibold tracking-tight">Profile</h1>
-          <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">
-            Fill this once. We’ll tailor resumes/cover letters per job description.
+          <p className="mt-1 text-sm text-muted">
+            Your full experience, ready to draw from for every application.
             Use{" "}
             <span className="inline-flex items-center gap-1.5 font-medium">
               <WandSparkles size={14} className="shrink-0" />
@@ -420,33 +425,37 @@ export default function ProfilePage() {
         <button
           type="button"
           onClick={() => void onSave()}
-          className="rounded-xl bg-accent px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-accent-dark"
+          className="rounded-md bg-accent px-4 py-2 text-sm font-medium text-on-accent hover:bg-accent-hover"
         >
           Save
         </button>
       </div>
 
+      <nav aria-label="Profile sections" className="profile-sections">
+        {[["Basics", "Basics"], ["Work Experience", "Experience"], ["Projects & Outside Experience", "Projects"], ["Education", "Education"], ["Portfolio & Links", "Links"], ["Skills", "Skills"]].map(([section, label]) => <a key={section} href={`#profile-${section.toLowerCase().replace(/[^a-z]+/g, "-")}`}>{label}</a>)}
+      </nav>
+
       {savedAt ? (
-        <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900 dark:border-emerald-900/50 dark:bg-emerald-900/20 dark:text-emerald-100">
+        <div className="rounded-md border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900 dark:border-emerald-900/50 dark:bg-emerald-900/20 dark:text-emerald-100">
           Saved {formatSavedBannerTime(savedAt)}.
         </div>
       ) : null}
 
       {bulletError ? (
-        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-900 dark:border-red-900/50 dark:bg-red-900/20 dark:text-red-100">
+        <div className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-900 dark:border-red-900/50 dark:bg-red-900/20 dark:text-red-100">
           {bulletError}
         </div>
       ) : null}
 
       {cloudSyncError ? (
-        <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950 dark:border-amber-900/50 dark:bg-amber-950/30 dark:text-amber-100">
-          Could not save profile to the database: {cloudSyncError}. Your edits
-          are still on this page. Check that the <code className="rounded bg-amber-100/80 px-1 dark:bg-amber-900/60">profiles</code> table exists (run the migration SQL) and you are signed in.
+        <div className="rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950 dark:border-amber-900/50 dark:bg-amber-950/30 dark:text-amber-100">
+          Could not save profile: {cloudSyncError}. Your edits
+          are still on this page. Check device storage permissions or sign in again before retrying.
         </div>
       ) : null}
 
       <div className="flex flex-col gap-4">
-        <div className="rounded-2xl border border-zinc-200 p-4 dark:border-zinc-800">
+        <div className="rounded-lg border border-border p-4 ">
           <SectionHeader title="Basics" />
           <div className="mt-3 grid gap-3 sm:grid-cols-2">
             <Field label="Name">
@@ -496,7 +505,7 @@ export default function ProfilePage() {
         </div>
       </div>
 
-      <div className="rounded-2xl border border-zinc-200 p-4 dark:border-zinc-800">
+      <div className="rounded-lg border border-border p-4 ">
         <SectionHeader
           title="Work Experience"
           onAdd={() => {
@@ -524,18 +533,18 @@ export default function ProfilePage() {
             return (
             <div
               key={exp.id}
-              className="rounded-2xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-950"
+              className="min-w-0 rounded-md border border-border bg-surface p-4"
             >
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div className="flex min-w-0 items-start gap-3">
-                    <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-200">
-                      <span className="text-sm font-semibold">💼</span>
+                    <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-surface-sunken text-muted">
+                      <BriefcaseBusiness size={18} aria-hidden />
                     </div>
                     <div className="min-w-0">
                       <div className="truncate text-sm font-semibold">
                         {exp.title || "(Role title)"}
                       </div>
-                      <div className="truncate text-xs text-zinc-600 dark:text-zinc-300">
+                      <div className="truncate text-xs text-muted">
                         {exp.company || "(Company)"}
                       </div>
                       <div className="mt-2 flex flex-wrap gap-2">
@@ -559,22 +568,22 @@ export default function ProfilePage() {
                       onClick={() =>
                         setExpanded((m) => ({ ...m, [exp.id]: !m[exp.id] }))
                       }
-                      className="rounded-xl border border-zinc-200 px-3 py-2 text-sm hover:bg-zinc-50 dark:border-zinc-800 dark:hover:bg-zinc-900/60"
+                      className="rounded-md border border-border px-3 py-2 text-sm hover:bg-surface-sunken  "
                     >
                       {expanded[exp.id] ? "Close" : "Edit"}
                     </button>
                     <button
                       type="button"
                       onClick={() => {
-                        void saveProfileFromState().then(() =>
-                          flashCardSaved(`exp:${exp.id}`),
+                        void saveProfileFromState().then((saved) =>
+                          saved && flashCardSaved(`exp:${exp.id}`),
                         );
                       }}
                       className={cx(
-                        "rounded-xl border px-3 py-2 text-sm font-medium transition",
+                        "rounded-md border px-3 py-2 text-sm font-medium transition",
                         saveFlashByCard[`exp:${exp.id}`]
                           ? "border-emerald-300 bg-emerald-50 text-emerald-900 dark:border-emerald-800 dark:bg-emerald-900/25 dark:text-emerald-100"
-                          : "border-zinc-200 text-zinc-800 hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-100 dark:hover:bg-zinc-900/60",
+                          : "border-border text-zinc-800 hover:bg-surface-sunken  dark:text-zinc-100 ",
                       )}
                     >
                       {saveFlashByCard[`exp:${exp.id}`] ? "Saved" : "Save"}
@@ -589,7 +598,7 @@ export default function ProfilePage() {
                           ),
                         });
                       }}
-                      className="rounded-xl px-3 py-2 text-sm text-zinc-600 hover:bg-zinc-50 dark:text-zinc-300 dark:hover:bg-zinc-900/60"
+                      className="rounded-md px-3 py-2 text-sm text-zinc-600 hover:bg-surface-sunken dark:text-zinc-300 "
                     >
                       Delete
                     </button>
@@ -597,14 +606,14 @@ export default function ProfilePage() {
                 </div>
 
                 {exp.bullets.length ? (
-                  <ul className="mt-3 space-y-2 text-sm text-zinc-700 dark:text-zinc-200">
+                  <ul className="mt-3 space-y-2 text-sm text-foreground">
                     {exp.bullets.map((b, bIdx) => {
                       const bKey = `exp:${exp.id}:${bIdx}`;
                       const busy = bulletBusyKey === bKey;
                       return (
                         <li
                           key={`${exp.id}-b-${bIdx}`}
-                          className="flex flex-wrap items-start gap-2 border-l-2 border-zinc-200 pl-3 dark:border-zinc-700"
+                          className="flex flex-wrap items-start gap-2 border-l-2 border-border pl-3 "
                         >
                           <span className="min-w-0 flex-1 leading-relaxed">
                             {b}
@@ -615,7 +624,7 @@ export default function ProfilePage() {
                             onClick={() =>
                               void optimizeExperienceBullet(exp.id, bIdx)
                             }
-                            className="inline-flex shrink-0 items-center gap-2 rounded-lg border border-violet-200/90 bg-gradient-to-br from-violet-100 via-purple-50 to-violet-100 px-3 py-1.5 text-xs font-medium text-violet-950 shadow-sm hover:from-violet-200/90 hover:via-purple-100 hover:to-violet-200/90 disabled:opacity-40 dark:border-violet-800/80 dark:from-violet-950/70 dark:via-purple-950/50 dark:to-violet-950/70 dark:text-violet-100 dark:hover:from-violet-900/80 dark:hover:via-purple-900/60 dark:hover:to-violet-900/80"
+                            className="inline-flex shrink-0 items-center gap-1.5 rounded-md border border-border bg-surface px-2.5 py-1.5 text-xs font-medium text-muted hover:border-accent hover:text-accent disabled:opacity-40"
                             title="Rewrite as Google-style XYZ (Accomplished X as measured by Y by doing Z)"
                           >
                             <WandSparkles size={14} className="shrink-0" />
@@ -626,13 +635,13 @@ export default function ProfilePage() {
                     })}
                   </ul>
                 ) : (
-                  <div className="mt-3 text-sm text-zinc-500">
+                  <div className="mt-3 text-sm text-muted">
                     No bullets yet.
                   </div>
                 )}
 
                 {expanded[exp.id] ? (
-                  <div className="mt-4 grid gap-3 rounded-2xl bg-zinc-50 p-4 dark:bg-zinc-900/40 sm:grid-cols-2">
+                  <div className="mt-4 grid gap-3 rounded-lg bg-zinc-50 p-4 dark:bg-zinc-900/40 sm:grid-cols-2">
                     <Field label="Role title">
                       <Input
                         value={exp.title}
@@ -723,14 +732,14 @@ export default function ProfilePage() {
           );
           })}
           {profile.experience.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-zinc-200 p-6 text-sm text-zinc-600 dark:border-zinc-800 dark:text-zinc-300">
+            <div className="rounded-lg border border-dashed border-border p-6 text-sm text-zinc-600  dark:text-zinc-300">
               No work experience yet. Click “+” to add one.
             </div>
           ) : null}
         </div>
       </div>
 
-      <div className="rounded-2xl border border-zinc-200 p-4 dark:border-zinc-800">
+      <div className="rounded-lg border border-border p-4 ">
         <SectionHeader
           title="Projects & Outside Experience"
           onAdd={() => {
@@ -759,17 +768,17 @@ export default function ProfilePage() {
             return (
             <div
               key={proj.id}
-              className="rounded-2xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-950"
+              className="min-w-0 rounded-md border border-border bg-surface p-4"
             >
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div className="flex min-w-0 items-start gap-3">
-                    <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-200">
-                      <span className="text-sm font-semibold">🛠</span>
+                    <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-surface-sunken text-muted">
+                      <FolderCode size={18} aria-hidden />
                     </div>
                     <div className="min-w-0">
                       <div className="truncate text-sm font-semibold">
                         {proj.role || "(Role)"}{" "}
-                        <span className="font-normal text-zinc-500">•</span>{" "}
+                        <span className="font-normal text-muted">•</span>{" "}
                         {proj.name || "(Project)"}
                       </div>
                       <div className="mt-2 flex flex-wrap gap-2">
@@ -788,22 +797,22 @@ export default function ProfilePage() {
                       onClick={() =>
                         setExpanded((m) => ({ ...m, [proj.id]: !m[proj.id] }))
                       }
-                      className="rounded-xl border border-zinc-200 px-3 py-2 text-sm hover:bg-zinc-50 dark:border-zinc-800 dark:hover:bg-zinc-900/60"
+                      className="rounded-md border border-border px-3 py-2 text-sm hover:bg-surface-sunken  "
                     >
                       {expanded[proj.id] ? "Close" : "Edit"}
                     </button>
                     <button
                       type="button"
                       onClick={() => {
-                        void saveProjectCard(proj.id).then(() =>
-                          flashCardSaved(`proj:${proj.id}`),
+                        void saveProjectCard(proj.id).then((saved) =>
+                          saved && flashCardSaved(`proj:${proj.id}`),
                         );
                       }}
                       className={cx(
-                        "rounded-xl border px-3 py-2 text-sm font-medium transition",
+                        "rounded-md border px-3 py-2 text-sm font-medium transition",
                         saveFlashByCard[`proj:${proj.id}`]
                           ? "border-emerald-300 bg-emerald-50 text-emerald-900 dark:border-emerald-800 dark:bg-emerald-900/25 dark:text-emerald-100"
-                          : "border-zinc-200 text-zinc-800 hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-100 dark:hover:bg-zinc-900/60",
+                          : "border-border text-zinc-800 hover:bg-surface-sunken  dark:text-zinc-100 ",
                       )}
                     >
                       {saveFlashByCard[`proj:${proj.id}`] ? "Saved" : "Save"}
@@ -818,7 +827,7 @@ export default function ProfilePage() {
                           ),
                         });
                       }}
-                      className="rounded-xl px-3 py-2 text-sm text-zinc-600 hover:bg-zinc-50 dark:text-zinc-300 dark:hover:bg-zinc-900/60"
+                      className="rounded-md px-3 py-2 text-sm text-zinc-600 hover:bg-surface-sunken dark:text-zinc-300 "
                     >
                       Delete
                     </button>
@@ -826,14 +835,14 @@ export default function ProfilePage() {
                 </div>
 
                 {proj.bullets.length ? (
-                  <ul className="mt-3 space-y-2 text-sm text-zinc-700 dark:text-zinc-200">
+                  <ul className="mt-3 space-y-2 text-sm text-foreground">
                     {proj.bullets.map((b, bIdx) => {
                       const bKey = `proj:${proj.id}:${bIdx}`;
                       const busy = bulletBusyKey === bKey;
                       return (
                         <li
                           key={`${proj.id}-b-${bIdx}`}
-                          className="flex flex-wrap items-start gap-2 border-l-2 border-zinc-200 pl-3 dark:border-zinc-700"
+                          className="flex flex-wrap items-start gap-2 border-l-2 border-border pl-3 "
                         >
                           <span className="min-w-0 flex-1 leading-relaxed">
                             {b}
@@ -844,7 +853,7 @@ export default function ProfilePage() {
                             onClick={() =>
                               void optimizeProjectBullet(proj.id, bIdx)
                             }
-                            className="inline-flex shrink-0 items-center gap-2 rounded-lg border border-violet-200/90 bg-gradient-to-br from-violet-100 via-purple-50 to-violet-100 px-3 py-1.5 text-xs font-medium text-violet-950 shadow-sm hover:from-violet-200/90 hover:via-purple-100 hover:to-violet-200/90 disabled:opacity-40 dark:border-violet-800/80 dark:from-violet-950/70 dark:via-purple-950/50 dark:to-violet-950/70 dark:text-violet-100 dark:hover:from-violet-900/80 dark:hover:via-purple-900/60 dark:hover:to-violet-900/80"
+                            className="inline-flex shrink-0 items-center gap-1.5 rounded-md border border-border bg-surface px-2.5 py-1.5 text-xs font-medium text-muted hover:border-accent hover:text-accent disabled:opacity-40"
                             title="Rewrite as Google-style XYZ (Accomplished X as measured by Y by doing Z)"
                           >
                             <WandSparkles size={14} className="shrink-0" />
@@ -855,19 +864,19 @@ export default function ProfilePage() {
                     })}
                   </ul>
                 ) : (
-                  <div className="mt-3 text-sm text-zinc-500">
+                  <div className="mt-3 text-sm text-muted">
                     No bullets yet.
                   </div>
                 )}
 
                 {proj.link ? (
-                  <div className="mt-2 text-sm text-sky-700 underline underline-offset-2 dark:text-sky-300">
+                  <div className="mt-2 break-all text-sm text-accent underline underline-offset-2">
                     {proj.link}
                   </div>
                 ) : null}
 
                 {expanded[proj.id] ? (
-                  <div className="mt-4 grid gap-3 rounded-2xl bg-zinc-50 p-4 dark:bg-zinc-900/40 sm:grid-cols-2">
+                  <div className="mt-4 grid gap-3 rounded-lg bg-zinc-50 p-4 dark:bg-zinc-900/40 sm:grid-cols-2">
                     <Field label="Role (e.g. Full Stack Developer)">
                       <Input
                         value={proj.role ?? ""}
@@ -976,14 +985,14 @@ export default function ProfilePage() {
           );
           })}
           {profile.projects.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-zinc-200 p-6 text-sm text-zinc-600 dark:border-zinc-800 dark:text-zinc-300">
+            <div className="rounded-lg border border-dashed border-border p-6 text-sm text-zinc-600  dark:text-zinc-300">
               No projects yet. Click “+” to add one.
             </div>
           ) : null}
         </div>
       </div>
 
-      <div className="rounded-2xl border border-zinc-200 p-4 dark:border-zinc-800">
+      <div className="rounded-lg border border-border p-4 ">
         <SectionHeader
           title="Education"
           onAdd={() => {
@@ -1008,14 +1017,14 @@ export default function ProfilePage() {
           {profile.education.map((ed, idx) => (
             <div
               key={ed.id}
-              className="rounded-2xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-950"
+              className="min-w-0 rounded-md border border-border bg-surface p-4"
             >
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div className="min-w-0">
                     <div className="truncate text-sm font-semibold">
                       {ed.school || "(School)"} {ed.degree ? `• ${ed.degree}` : ""}
                     </div>
-                    <div className="mt-1 text-xs text-zinc-500">
+                    <div className="mt-1 text-xs text-muted">
                       {(ed.start || "Start")} — {(ed.end || "End")}
                     </div>
                   </div>
@@ -1023,15 +1032,15 @@ export default function ProfilePage() {
                     <button
                       type="button"
                       onClick={() =>
-                        void saveProfileFromState().then(() =>
-                          flashCardSaved(`edu:${ed.id}`),
+                        void saveProfileFromState().then((saved) =>
+                          saved && flashCardSaved(`edu:${ed.id}`),
                         )
                       }
                       className={cx(
-                        "rounded-xl border px-3 py-2 text-sm font-medium transition",
+                        "rounded-md border px-3 py-2 text-sm font-medium transition",
                         saveFlashByCard[`edu:${ed.id}`]
                           ? "border-emerald-300 bg-emerald-50 text-emerald-900 dark:border-emerald-800 dark:bg-emerald-900/25 dark:text-emerald-100"
-                          : "border-zinc-200 text-zinc-800 hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-100 dark:hover:bg-zinc-900/60",
+                          : "border-border text-zinc-800 hover:bg-surface-sunken  dark:text-zinc-100 ",
                       )}
                     >
                       {saveFlashByCard[`edu:${ed.id}`] ? "Saved" : "Save"}
@@ -1044,7 +1053,7 @@ export default function ProfilePage() {
                           education: profile.education.filter((e) => e.id !== ed.id),
                         });
                       }}
-                      className="rounded-xl px-3 py-2 text-sm text-zinc-600 hover:bg-zinc-50 dark:text-zinc-300 dark:hover:bg-zinc-900/60"
+                      className="rounded-md px-3 py-2 text-sm text-zinc-600 hover:bg-surface-sunken dark:text-zinc-300 "
                     >
                       Delete
                     </button>
@@ -1117,14 +1126,14 @@ export default function ProfilePage() {
             </div>
           ))}
           {profile.education.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-zinc-200 p-6 text-sm text-zinc-600 dark:border-zinc-800 dark:text-zinc-300">
+            <div className="rounded-lg border border-dashed border-border p-6 text-sm text-zinc-600  dark:text-zinc-300">
               No education entries yet. Click “+” to add one.
             </div>
           ) : null}
         </div>
       </div>
 
-      <div className="rounded-2xl border border-zinc-200 p-4 dark:border-zinc-800">
+      <div className="rounded-lg border border-border p-4 ">
         <SectionHeader
           title="Portfolio & Links"
           onAdd={() => {
@@ -1147,13 +1156,13 @@ export default function ProfilePage() {
             return (
             <div
               key={linkRowKey}
-              className="rounded-2xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-950"
+              className="min-w-0 rounded-md border border-border bg-surface p-4"
             >
-              <div className="flex items-start gap-3">
-                <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-200">
-                  <span className="text-sm font-semibold">🔗</span>
+              <div className="flex flex-wrap items-start gap-3">
+                <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-surface-sunken text-muted">
+                  <Link2 size={18} aria-hidden />
                 </div>
-                <div className="grid flex-1 gap-3">
+                <div className="grid min-w-0 flex-1 basis-36 gap-3">
                   <Field label="Label">
                     <Input
                       value={l.label}
@@ -1181,15 +1190,15 @@ export default function ProfilePage() {
                   <button
                     type="button"
                     onClick={() =>
-                      void saveProfileFromState().then(() =>
-                        flashCardSaved(`link:${linkRowKey}`),
+                      void saveProfileFromState().then((saved) =>
+                        saved && flashCardSaved(`link:${linkRowKey}`),
                       )
                     }
                     className={cx(
-                      "rounded-xl border px-3 py-2 text-sm font-medium transition",
+                      "rounded-md border px-3 py-2 text-sm font-medium transition",
                       saveFlashByCard[`link:${linkRowKey}`]
                         ? "border-emerald-300 bg-emerald-50 text-emerald-900 dark:border-emerald-800 dark:bg-emerald-900/25 dark:text-emerald-100"
-                        : "border-zinc-200 text-zinc-800 hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-100 dark:hover:bg-zinc-900/60",
+                        : "border-border text-zinc-800 hover:bg-surface-sunken  dark:text-zinc-100 ",
                     )}
                   >
                     {saveFlashByCard[`link:${linkRowKey}`] ? "Saved" : "Save"}
@@ -1202,7 +1211,7 @@ export default function ProfilePage() {
                         links: profile.links.filter((_, i) => i !== idx),
                       });
                     }}
-                    className="rounded-xl px-3 py-2 text-sm text-zinc-600 hover:bg-zinc-50 dark:text-zinc-300 dark:hover:bg-zinc-900/60"
+                    className="rounded-md px-3 py-2 text-sm text-zinc-600 hover:bg-surface-sunken dark:text-zinc-300 "
                   >
                     Delete
                   </button>
@@ -1212,14 +1221,14 @@ export default function ProfilePage() {
           );
           })}
           {profile.links.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-zinc-200 p-6 text-sm text-zinc-600 dark:border-zinc-800 dark:text-zinc-300 sm:col-span-2">
+            <div className="rounded-lg border border-dashed border-border p-6 text-sm text-zinc-600  dark:text-zinc-300 sm:col-span-2">
               No links yet. Click “+” to add LinkedIn/GitHub/Portfolio.
             </div>
           ) : null}
         </div>
       </div>
 
-      <div className="rounded-2xl border border-zinc-200 p-4 dark:border-zinc-800">
+      <div className="rounded-lg border border-border p-4 ">
         <SectionHeader
           title="Skills"
           onAdd={() => {
@@ -1232,7 +1241,7 @@ export default function ProfilePage() {
             });
           }}
         />
-        <p className="mt-1 text-xs text-zinc-600 dark:text-zinc-400">
+        <p className="mt-1 text-xs text-muted">
           Optional: add labeled groups (e.g. Technical vs. soft skills), each with a
           comma-separated list. Use “+” to add a group. Leave this empty if you do not
           want a skills block on your resume.
@@ -1240,7 +1249,7 @@ export default function ProfilePage() {
 
         <div className="mt-4 grid gap-4">
           {profile.skillCategories.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-zinc-200 p-6 text-sm text-zinc-600 dark:border-zinc-800 dark:text-zinc-300">
+            <div className="rounded-lg border border-dashed border-border p-6 text-sm text-zinc-600  dark:text-zinc-300">
               No skill groups yet. Click “+” above only if you want skills on your
               resume.
             </div>
@@ -1248,25 +1257,25 @@ export default function ProfilePage() {
           {profile.skillCategories.map((cat, catIdx) => (
             <div
               key={cat.id}
-              className="rounded-2xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-950"
+              className="min-w-0 rounded-md border border-border bg-surface p-4"
             >
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <span className="text-xs font-medium text-zinc-500">
+                <span className="text-xs font-medium text-muted">
                   Group {catIdx + 1}
                 </span>
                 <div className="flex flex-wrap gap-2">
                   <button
                     type="button"
                     onClick={() =>
-                      void saveProfileFromState().then(() =>
-                        flashCardSaved(`skillcat:${cat.id}`),
+                      void saveProfileFromState().then((saved) =>
+                        saved && flashCardSaved(`skillcat:${cat.id}`),
                       )
                     }
                     className={cx(
                       "rounded-lg border px-2 py-1 text-xs font-medium",
                       saveFlashByCard[`skillcat:${cat.id}`]
                         ? "border-emerald-300 bg-emerald-50 text-emerald-900 dark:border-emerald-800 dark:bg-emerald-900/25 dark:text-emerald-100"
-                        : "border-zinc-200 dark:border-zinc-700",
+                        : "border-border ",
                     )}
                   >
                     {saveFlashByCard[`skillcat:${cat.id}`] ? "Saved" : "Save"}
@@ -1281,7 +1290,7 @@ export default function ProfilePage() {
                         ),
                       });
                     }}
-                    className="text-xs text-zinc-500 hover:underline"
+                    className="text-xs text-muted hover:underline"
                   >
                     Remove group
                   </button>
@@ -1317,8 +1326,8 @@ export default function ProfilePage() {
                         skillCategories: nextCats,
                       };
                       setProfile(nextProfile);
-                      void persistProfileSnapshot(nextProfile).then(() =>
-                        flashCardSaved(`skillcat:${cat.id}`),
+                      void persistProfileSnapshot(nextProfile).then((saved) =>
+                        saved && flashCardSaved(`skillcat:${cat.id}`),
                       );
                     }}
                     placeholder="Python, AWS, Docker, …"
@@ -1338,7 +1347,7 @@ export default function ProfilePage() {
                   </span>
                 ))}
                 {cat.items.length > 24 ? (
-                  <span className="text-xs text-zinc-500">
+                  <span className="text-xs text-muted">
                     +{cat.items.length - 24} more
                   </span>
                 ) : null}

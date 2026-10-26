@@ -159,8 +159,10 @@ export const CoverLetterOptimizationSchema = z.object({
 export type CoverLetterOptimization = z.infer<typeof CoverLetterOptimizationSchema>;
 
 export const SettingsSchema = z.object({
-  aiProvider: z.enum(["gemini", "ollama"]).default("gemini"),
+  aiProvider: z.enum(["gemini", "ollama", "groq"]).default("gemini"),
   geminiApiKey: z.string().trim().optional().default(""),
+  groqApiKey: z.string().trim().optional().default(""),
+  groqModel: z.string().trim().default("openai/gpt-oss-120b"),
   ollamaBaseUrl: z.string().trim().optional().default("http://127.0.0.1:11434"),
   ollamaModel: z.string().trim().optional().default("llama3.2"),
   skillsMd: z.string().default(""),
@@ -170,6 +172,19 @@ export const SettingsSchema = z.object({
 });
 
 export type Settings = z.infer<typeof SettingsSchema>;
+
+// Zod defaults still execute inside .partial() in Zod 4. Remove them first,
+// otherwise a one-field settings patch silently resets every other setting.
+const SettingsPatchSchema = z.object({
+  aiProvider: SettingsSchema.shape.aiProvider.removeDefault().optional(),
+  geminiApiKey: SettingsSchema.shape.geminiApiKey.removeDefault().optional(),
+  groqApiKey: SettingsSchema.shape.groqApiKey.removeDefault().optional(),
+  groqModel: SettingsSchema.shape.groqModel.removeDefault().optional(),
+  ollamaBaseUrl: SettingsSchema.shape.ollamaBaseUrl.removeDefault().optional(),
+  ollamaModel: SettingsSchema.shape.ollamaModel.removeDefault().optional(),
+  skillsMd: SettingsSchema.shape.skillsMd.removeDefault().optional(),
+  personalContext: SettingsSchema.shape.personalContext.removeDefault().optional(),
+}).strict();
 
 export const ApplicationQuestionSchema = z.object({
   id: z.string(),
@@ -277,7 +292,7 @@ export type WorkspacePayload = z.infer<typeof WorkspacePayloadSchema>;
 
 export const WorkspacePatchSchema = z
   .object({
-    settings: SettingsSchema.optional(),
+    settings: SettingsPatchSchema.optional(),
     resumes: z.array(ResumeDocSchema).optional(),
     coverLetters: z.array(CoverLetterDocSchema).optional(),
     applicationAnswerDocs: z.array(ApplicationAnswerDocSchema).optional(),

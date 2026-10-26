@@ -1,0 +1,519 @@
+{
+  "name": "Jordan Patel",
+  "email": "jordan.patel@example.com",
+  "phone": "+1 202-555-0148",
+  "location": "Boston, Massachusetts, United States",
+  "links": [
+    {
+      "label": "LinkedIn",
+      "url": "https://www.linkedin.com/in/jordan-patel-synthetic"
+    },
+    {
+      "label": "GitHub",
+      "url": "https://github.com/jordan-patel-synthetic"
+    },
+    {
+      "label": "Portfolio",
+      "url": "https://jordan-patel.example.com"
+    }
+  ],
+  "summary": "Computer science graduate building reliable APIs and accessible interfaces. Interested in developer tools and observable backend services.",
+  "skills": [],
+  "skillCategories": [
+    {
+      "id": "languages",
+      "label": "Languages",
+      "items": [
+        "TypeScript",
+        "Python",
+        "SQL",
+        "Java"
+      ]
+    },
+    {
+      "id": "web",
+      "label": "Web",
+      "items": [
+        "React",
+        "Next.js",
+        "Node.js",
+        "REST API",
+        "Accessibility"
+      ]
+    },
+    {
+      "id": "data",
+      "label": "Data and infrastructure",
+      "items": [
+        "PostgreSQL",
+        "Redis",
+        "Docker",
+        "AWS",
+        "GitHub Actions",
+        "CI/CD",
+        "Linux"
+      ]
+    },
+    {
+      "id": "quality",
+      "label": "Quality",
+      "items": [
+        "Playwright",
+        "Jest",
+        "Unit Testing",
+        "Integration Testing",
+        "OpenTelemetry"
+      ]
+    }
+  ],
+  "experience": [
+    {
+      "id": "exp-northstar",
+      "company": "Northstar Systems (synthetic)",
+      "title": "Software Engineer Intern",
+      "location": "Boston, MA",
+      "start": "2025-05",
+      "end": "2025-12",
+      "type": "Internship",
+      "bullets": [
+        "Reduced REST API p95 latency from 240 ms to 150 ms by caching PostgreSQL reads in Redis for 12000 daily requests.",
+        "Added 65 integration tests for TypeScript Node.js services and CI/CD checks in GitHub Actions, reducing escaped regressions from 8 to 3 per release.",
+        "Instrumented 6 Docker services with OpenTelemetry traces and AWS CloudWatch alerts, reducing incident diagnosis time from 45 minutes to 20 minutes."
+      ]
+    },
+    {
+      "id": "exp-harbor",
+      "company": "Harbor Labs (synthetic)",
+      "title": "Full Stack Developer Intern",
+      "location": "Remote",
+      "start": "2024-06",
+      "end": "2024-12",
+      "type": "Internship",
+      "bullets": [
+        "Built 8 accessible React and Next.js workflows for a customer dashboard serving 600 weekly users.",
+        "Added 42 Playwright end-to-end tests covering authentication, forms and keyboard navigation.",
+        "Replaced sequential SQL queries with batched PostgreSQL queries, reducing dashboard load time from 3.2 seconds to 1.6 seconds."
+      ]
+    },
+    {
+      "id": "exp-campus",
+      "company": "Campus Computing Lab (synthetic)",
+      "title": "Undergraduate Research Assistant",
+      "location": "Boston, MA",
+      "start": "2023-09",
+      "end": "2024-05",
+      "type": "Part time",
+      "bullets": [
+        "Built a Python data-processing pipeline that validated 250000 experiment records for 4 researchers.",
+        "Designed SQL validation checks that identified 320 duplicate records before analysis.",
+        "Documented reproducible Linux and Docker environments used by 12 student researchers."
+      ]
+    },
+    {
+      "id": "exp-stress-1",
+      "company": "Cedar Observability (synthetic)",
+      "title": "Developer Tools Contractor",
+      "location": "Remote",
+      "start": "2024-01",
+      "end": "2024-03",
+      "type": "Part time",
+      "bullets": [
+        "Built TypeScript REST API endpoints backed by PostgreSQL for 14 internal debugging workflows.",
+        "Instrumented 5 Node.js services with OpenTelemetry spans and AWS CloudWatch dashboards.",
+        "Added 48 integration tests and GitHub Actions CI/CD checks for Docker releases."
+      ]
+    },
+    {
+      "id": "exp-stress-2",
+      "company": "Maple Community Network (synthetic)",
+      "title": "Volunteer Web Developer",
+      "location": "Remote",
+      "start": "2024-04",
+      "end": "2024-06",
+      "type": "Part time",
+      "bullets": [
+        "Built 6 accessible React registration forms for 230 community members.",
+        "Added 24 Playwright tests for keyboard navigation and form validation.",
+        "Reduced PostgreSQL query latency from 700 ms to 310 ms using SQL indexes."
+      ]
+    },
+    {
+      "id": "exp-stress-3",
+      "company": "Birch Retail Lab (synthetic)",
+      "title": "Data Analyst Contractor",
+      "location": "Remote",
+      "start": "2024-07",
+      "end": "2024-09",
+      "type": "Part time",
+      "bullets": [
+        "Validated 18000 sales records using Python and SQL.",
+        "Built 4 spreadsheet reports for inventory review.",
+        "Documented 12 data-quality checks for weekly imports."
+      ]
+    },
+    {
+      "id": "exp-stress-4",
+      "company": "Spruce Robotics Club (synthetic)",
+      "title": "Java Programming Mentor",
+      "location": "Remote",
+      "start": "2024-10",
+      "end": "2024-12",
+      "type": "Part time",
+      "bullets": [
+        "Taught Java collections and algorithms to 16 club members.",
+        "Reviewed 28 pull requests for robot-control exercises.",
+        "Added 32 unit tests for sensor parsing."
+      ]
+    },
+    {
+      "id": "exp-stress-5",
+      "company": "Elm Library Collective (synthetic)",
+      "title": "Website Maintenance Volunteer",
+      "location": "Remote",
+      "start": "2023-01",
+      "end": "2023-03",
+      "type": "Part time",
+      "bullets": [
+        "Maintained 9 HTML and CSS information pages.",
+        "Resolved 18 broken links and documented editorial updates.",
+        "Helped 7 volunteers publish event announcements."
+      ]
+    },
+    {
+      "id": "exp-stress-6",
+      "company": "Willow Infrastructure Lab (synthetic)",
+      "title": "Backend Research Contributor",
+      "location": "Remote",
+      "start": "2023-04",
+      "end": "2023-06",
+      "type": "Part time",
+      "bullets": [
+        "Built Redis caching for Node.js REST API requests in a Docker development environment.",
+        "Compared PostgreSQL execution plans across 20 SQL queries.",
+        "Added 30 integration tests for cache misses and expired records."
+      ]
+    },
+    {
+      "id": "exp-stress-7",
+      "company": "Aspen Accessibility Group (synthetic)",
+      "title": "Frontend Contributor",
+      "location": "Remote",
+      "start": "2023-07",
+      "end": "2023-09",
+      "type": "Part time",
+      "bullets": [
+        "Implemented 5 accessible React components with explicit screen-reader labels.",
+        "Added 26 Playwright tests for focus order and keyboard navigation.",
+        "Reviewed 11 interface flows with student accessibility volunteers."
+      ]
+    },
+    {
+      "id": "exp-stress-8",
+      "company": "Oak Student Services (synthetic)",
+      "title": "IT Support Assistant",
+      "location": "Remote",
+      "start": "2023-10",
+      "end": "2023-12",
+      "type": "Part time",
+      "bullets": [
+        "Resolved 95 Linux workstation support requests.",
+        "Wrote 8 troubleshooting guides for account setup.",
+        "Prepared 22 laptops for student workshops."
+      ]
+    },
+    {
+      "id": "exp-stress-9",
+      "company": "Pine Open Data Group (synthetic)",
+      "title": "Python Contributor",
+      "location": "Remote",
+      "start": "2022-01",
+      "end": "2022-03",
+      "type": "Part time",
+      "bullets": [
+        "Parsed 45000 public transport rows using Python.",
+        "Built SQL validation checks for 6 imported datasets.",
+        "Documented 14 reproducible data-processing commands."
+      ]
+    },
+    {
+      "id": "exp-stress-10",
+      "company": "Fir Design Collective (synthetic)",
+      "title": "Static Site Volunteer",
+      "location": "Remote",
+      "start": "2022-04",
+      "end": "2022-06",
+      "type": "Part time",
+      "bullets": [
+        "Built 7 responsive HTML and CSS pages for a student exhibition.",
+        "Compressed 60 images for faster page loading.",
+        "Collected usability feedback from 19 visitors."
+      ]
+    }
+  ],
+  "projects": [
+    {
+      "id": "proj-observe",
+      "name": "TraceBoard",
+      "role": "Backend Developer",
+      "link": "https://github.com/jordan-patel-synthetic/traceboard",
+      "location": "Boston, MA",
+      "start": "2025-01",
+      "end": "2025-04",
+      "tech": [
+        "TypeScript",
+        "Node.js",
+        "PostgreSQL",
+        "OpenTelemetry",
+        "Docker"
+      ],
+      "bullets": [
+        "Built a REST API and PostgreSQL storage layer for 100000 synthetic tracing events.",
+        "Added OpenTelemetry spans and Redis caching to expose slow requests in a React dashboard.",
+        "Tested 35 API scenarios with Jest and automated container builds with GitHub Actions."
+      ]
+    },
+    {
+      "id": "proj-access",
+      "name": "Accessible Course Planner",
+      "role": "Full Stack Developer",
+      "link": "https://github.com/jordan-patel-synthetic/course-planner",
+      "location": "Boston, MA",
+      "start": "2024-09",
+      "end": "2024-12",
+      "tech": [
+        "React",
+        "Next.js",
+        "TypeScript",
+        "PostgreSQL",
+        "Playwright"
+      ],
+      "bullets": [
+        "Built keyboard-accessible course search and schedule planning for 180 student testers.",
+        "Added 28 Playwright tests for form validation, screen-reader labels and keyboard navigation.",
+        "Designed SQL indexes that reduced course-search response time from 900 ms to 250 ms."
+      ]
+    },
+    {
+      "id": "proj-java",
+      "name": "Java Chess Engine",
+      "role": "Developer",
+      "link": "https://github.com/jordan-patel-synthetic/chess",
+      "location": "Boston, MA",
+      "start": "2023-01",
+      "end": "2023-04",
+      "tech": [
+        "Java",
+        "Algorithms"
+      ],
+      "bullets": [
+        "Implemented minimax search with alpha-beta pruning for a Java chess engine.",
+        "Added 80 unit tests for legal moves and board evaluation.",
+        "Documented search tradeoffs using 20 fixed board positions."
+      ]
+    },
+    {
+      "id": "proj-stress-1",
+      "name": "QueueLens",
+      "role": "Developer",
+      "link": "https://github.com/jordan-patel-synthetic/queuelens",
+      "location": "Boston, MA",
+      "start": "2025-01",
+      "end": "2025-03",
+      "tech": [
+        "TypeScript",
+        "Node.js",
+        "Redis",
+        "OpenTelemetry"
+      ],
+      "bullets": [
+        "Built a REST API exposing 12 Redis queue health signals in a React dashboard.",
+        "Stored 80000 synthetic events in PostgreSQL and traced requests with OpenTelemetry.",
+        "Added 38 integration tests and Docker builds through GitHub Actions CI/CD."
+      ]
+    },
+    {
+      "id": "proj-stress-2",
+      "name": "ReleaseWatch",
+      "role": "Developer",
+      "link": "https://github.com/jordan-patel-synthetic/releasewatch",
+      "location": "Boston, MA",
+      "start": "2025-04",
+      "end": "2025-06",
+      "tech": [
+        "React",
+        "TypeScript",
+        "PostgreSQL",
+        "Playwright"
+      ],
+      "bullets": [
+        "Built an accessible React interface comparing 40 synthetic deployment runs.",
+        "Created Node.js REST API endpoints with PostgreSQL indexes for release history.",
+        "Added 31 Playwright tests for keyboard navigation and deployment filtering."
+      ]
+    },
+    {
+      "id": "proj-stress-3",
+      "name": "Weather Notebook",
+      "role": "Developer",
+      "link": "https://github.com/jordan-patel-synthetic/weather notebook",
+      "location": "Boston, MA",
+      "start": "2025-07",
+      "end": "2025-09",
+      "tech": [
+        "Python",
+        "SQL"
+      ],
+      "bullets": [
+        "Imported 12000 weather observations using Python.",
+        "Validated 8 sensor fields before storing rows in SQL.",
+        "Wrote 21 unit tests for missing observations."
+      ]
+    },
+    {
+      "id": "proj-stress-4",
+      "name": "Maze Explorer",
+      "role": "Developer",
+      "link": "https://github.com/jordan-patel-synthetic/maze explorer",
+      "location": "Boston, MA",
+      "start": "2025-10",
+      "end": "2025-12",
+      "tech": [
+        "Java",
+        "Algorithms"
+      ],
+      "bullets": [
+        "Implemented 4 graph-search algorithms in Java.",
+        "Benchmarked 50 generated maze layouts.",
+        "Added 45 unit tests for path reconstruction."
+      ]
+    },
+    {
+      "id": "proj-stress-5",
+      "name": "Reading Tracker",
+      "role": "Developer",
+      "link": "https://github.com/jordan-patel-synthetic/reading tracker",
+      "location": "Boston, MA",
+      "start": "2024-01",
+      "end": "2024-03",
+      "tech": [
+        "HTML",
+        "CSS",
+        "JavaScript"
+      ],
+      "bullets": [
+        "Built 5 responsive reading-list views.",
+        "Persisted 300 synthetic book records in browser storage.",
+        "Tested 12 import and export scenarios."
+      ]
+    },
+    {
+      "id": "proj-stress-6",
+      "name": "CacheBench",
+      "role": "Developer",
+      "link": "https://github.com/jordan-patel-synthetic/cachebench",
+      "location": "Boston, MA",
+      "start": "2024-04",
+      "end": "2024-06",
+      "tech": [
+        "TypeScript",
+        "Node.js",
+        "PostgreSQL",
+        "Redis",
+        "Docker"
+      ],
+      "bullets": [
+        "Benchmarked Redis caching against PostgreSQL reads across 20000 synthetic requests.",
+        "Added OpenTelemetry tracing to Node.js REST API handlers.",
+        "Ran 29 integration tests in GitHub Actions CI/CD using Docker."
+      ]
+    },
+    {
+      "id": "proj-stress-7",
+      "name": "FocusKit",
+      "role": "Developer",
+      "link": "https://github.com/jordan-patel-synthetic/focuskit",
+      "location": "Boston, MA",
+      "start": "2024-07",
+      "end": "2024-09",
+      "tech": [
+        "React",
+        "Playwright",
+        "Accessibility"
+      ],
+      "bullets": [
+        "Created 9 accessible React form components.",
+        "Added 34 Playwright tests for keyboard focus and screen-reader labels.",
+        "Documented 15 validation and error-message examples."
+      ]
+    },
+    {
+      "id": "proj-stress-8",
+      "name": "Budget Sandbox",
+      "role": "Developer",
+      "link": "https://github.com/jordan-patel-synthetic/budget sandbox",
+      "location": "Boston, MA",
+      "start": "2024-10",
+      "end": "2024-12",
+      "tech": [
+        "Python",
+        "SQL"
+      ],
+      "bullets": [
+        "Parsed 9000 synthetic transactions using Python.",
+        "Designed 7 SQL reports for expense categories.",
+        "Added 23 tests for currency parsing."
+      ]
+    },
+    {
+      "id": "proj-stress-9",
+      "name": "Pixel Sketch",
+      "role": "Developer",
+      "link": "https://github.com/jordan-patel-synthetic/pixel sketch",
+      "location": "Boston, MA",
+      "start": "2023-01",
+      "end": "2023-03",
+      "tech": [
+        "JavaScript",
+        "Canvas"
+      ],
+      "bullets": [
+        "Built 6 drawing tools with browser Canvas.",
+        "Implemented undo history for 100 drawing operations.",
+        "Documented 10 pointer interaction scenarios."
+      ]
+    },
+    {
+      "id": "proj-stress-10",
+      "name": "Study Cards",
+      "role": "Developer",
+      "link": "https://github.com/jordan-patel-synthetic/study cards",
+      "location": "Boston, MA",
+      "start": "2023-04",
+      "end": "2023-06",
+      "tech": [
+        "Java",
+        "Algorithms"
+      ],
+      "bullets": [
+        "Implemented spaced repetition for 500 synthetic flashcards.",
+        "Added 36 unit tests for scheduling rules.",
+        "Measured lookup behavior across 18 study sessions."
+      ]
+    }
+  ],
+  "education": [
+    {
+      "id": "edu-cs",
+      "school": "Northeastern University (synthetic candidate)",
+      "degree": "Bachelor of Science in Computer Science",
+      "location": "Boston, MA",
+      "start": "2022-09",
+      "end": "2026-05",
+      "details": [
+        "GPA: 3.80/4.00",
+        "Coursework: Data Structures, Algorithms, Database Systems, Distributed Systems, Software Engineering",
+        "Teaching volunteer for introductory Python workshops"
+      ]
+    }
+  ]
+}

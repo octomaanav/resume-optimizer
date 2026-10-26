@@ -534,64 +534,10 @@ async function requestCachedScrape() {
   }
 }
 
+// Fresh installs start empty; never autofill an unrelated sample identity.
 const DEFAULT_STANDALONE_PROFILE = {
-  name: "Manav Sharma",
-  email: "manavsharma@example.com",
-  phone: "+1 (555) 019-2834",
-  location: "Buffalo, NY",
-  education: [
-    {
-      id: "edu-1",
-      school: "University at Buffalo - SUNY",
-      degree: "Bachelor of Science in Computer Science",
-      start: "Aug 2023",
-      end: "May 2027",
-      details: [
-        "GPA: 3.8 / 4.0",
-        "Relevant Coursework: Data Structures, Algorithms, Operating Systems, Machine Learning",
-      ],
-    },
-  ],
-  experience: [
-    {
-      id: "exp-1",
-      company: "Tech Solutions Inc.",
-      title: "Software Engineering Intern",
-      location: "New York, NY",
-      start: "May 2025",
-      end: "Aug 2025",
-      bullets: [
-        "Architected and deployed full-stack features using React, Next.js, and TypeScript, improving user engagement by **25%**.",
-        "Optimized backend REST API endpoints and SQL database queries, reducing average response latency by **40ms**.",
-      ],
-    },
-  ],
-  projects: [
-    {
-      id: "proj-1",
-      name: "AI Resume & Job Application Optimizer",
-      role: "Lead Developer",
-      start: "Jan 2026",
-      end: "Present",
-      tech: ["TypeScript", "Next.js", "Tailwind CSS", "Ollama", "Supabase"],
-      bullets: [
-        "Engineered an autonomous Chrome extension & web app for AI-powered resume tailoring and automated job application filling.",
-        "Integrated local LLMs via Ollama to generate context-aware answers and customized LaTeX resumes.",
-      ],
-    },
-  ],
-  skills: [
-    "TypeScript",
-    "React",
-    "Next.js",
-    "Node.js",
-    "Python",
-    "C++",
-    "Tailwind CSS",
-    "Git",
-    "Docker",
-    "SQL",
-  ],
+  name: "", email: "", phone: "", location: "", links: [], summary: "",
+  education: [], experience: [], projects: [], skills: [], skillCategories: [],
 };
 
 function normalizeOllamaBaseUrl(url) {
@@ -601,19 +547,21 @@ function normalizeOllamaBaseUrl(url) {
 }
 
 function mergeAiSettings(from) {
-  const provider = from?.aiProvider === "gemini" ? "gemini" : "ollama";
+  const provider = ["gemini", "groq", "ollama"].includes(from?.aiProvider) ? from.aiProvider : "ollama";
   state.settings.aiProvider = provider;
+  state.settings.groqApiKey = (from?.groqApiKey || "").trim();
+  state.settings.groqModel = (from?.groqModel || "openai/gpt-oss-120b").trim();
   state.settings.geminiApiKey = (from?.geminiApiKey || "").trim();
   state.settings.ollamaBaseUrl = normalizeOllamaBaseUrl(from?.ollamaBaseUrl);
   state.settings.ollamaModel = (from?.ollamaModel || "llama3.2").trim();
 }
 
 function isAiConfigured() {
-  return !!state.settings.profile;
+  return !!state.settings.profile?.name?.trim();
 }
 
 function aiSetupErrorMessage() {
-  return "Profile ready. Run `ollama serve` locally before optimizing.";
+  return "Connect and sync your profile, then choose a configured AI provider in the app’s Settings.";
 }
 
 // EEOC / voluntary self-identification answers. Every field defaults to
@@ -634,6 +582,8 @@ async function loadSettings() {
     "appUrl",
     "aiProvider",
     "geminiApiKey",
+    "groqApiKey",
+    "groqModel",
     "ollamaBaseUrl",
     "ollamaModel",
     "skillsMd",
@@ -995,8 +945,10 @@ async function connectAndSync({ silent }) {
   const { profile, settings, applicationAnswerDocs: syncedDocs } = response || {};
   const skillsMd = settings?.skillsMd || state.settings.skillsMd || "";
   const personalContext = settings?.personalContext || state.settings.personalContext || "";
-  const aiProvider = settings?.aiProvider === "gemini" ? "gemini" : "ollama";
+  const aiProvider = ["gemini", "groq", "ollama"].includes(settings?.aiProvider) ? settings.aiProvider : "ollama";
   const geminiApiKey = (settings?.geminiApiKey || "").trim();
+  const groqApiKey = (settings?.groqApiKey || "").trim();
+  const groqModel = (settings?.groqModel || "openai/gpt-oss-120b").trim();
   const ollamaBaseUrl = (settings?.ollamaBaseUrl || "http://127.0.0.1:11434").trim();
   const ollamaModel = (settings?.ollamaModel || "llama3.2").trim();
   const applicationAnswerDocs = Array.isArray(syncedDocs) ? syncedDocs : [];
@@ -1005,6 +957,8 @@ async function connectAndSync({ silent }) {
     appUrl,
     aiProvider,
     geminiApiKey,
+    groqApiKey,
+    groqModel,
     ollamaBaseUrl,
     ollamaModel,
     skillsMd,
@@ -1019,6 +973,8 @@ async function connectAndSync({ silent }) {
       appUrl,
       aiProvider,
       geminiApiKey,
+    groqApiKey,
+    groqModel,
       ollamaBaseUrl,
       ollamaModel,
       skillsMd,
@@ -1184,6 +1140,7 @@ async function handleHeroAutofill() {
       await handleAutofill();
     }
   } catch (e) {
+    showError(errEl, e.message || "Autofill failed.");
     console.error("[RO] Autofill pipeline error:", e);
   } finally {
     setHeroLoading(false);
@@ -1209,8 +1166,25 @@ async function handleOptimize() {
     state.selectedFields.has(f.selector)
   );
 
-  // Common fields fill from profile; unique fields from saved templates. No AI.
   state.editableAnswers = buildEditableAnswers(selectedQuestions);
+  const known = new Set(state.editableAnswers.map(a => a.selector));
+  // Generate prose only. Missing identity, legal, choice and consent values
+  // require the user's explicit profile/preferences, never an AI guess.
+  for (const field of selectedQuestions) {
+    if (known.has(field.selector) || field.currentValue || field.options?.length || field.tagName !== "textarea") continue;
+    if (/authorization|sponsor|salary|compensation|consent|agree|disabil|veteran|gender|ethnic|race/i.test(field.label)) continue;
+    const generated = await sendToBackground({ type: "GENERATE_FIELD_ANSWER", payload: {
+      question: field.label, jd: state.scraped?.jd || "", maxChars: field.maxChars || 0,
+    }});
+    if (generated?.error) throw new Error(generated.error);
+    let text = (generated?.optimizedAnswer || "").trim();
+    if (field.maxChars > 0 && text.length > field.maxChars) {
+      text = text.slice(0, field.maxChars);
+      const boundary = text.lastIndexOf(" ");
+      if (boundary > field.maxChars * 0.7) text = text.slice(0, boundary);
+    }
+    if (text) state.editableAnswers.push({ selector: field.selector, label: field.label, text });
+  }
   console.log(`[RO] editableAnswers:`, state.editableAnswers.length, "fillable out of", selectedQuestions.length, "selected");
   state.results = { answers: [] };
 }
@@ -1288,6 +1262,10 @@ function renderResumeOptimizePanel() {
     badge.textContent = changes.length
       ? `${changes.length} bullet${changes.length === 1 ? "" : "s"} updated`
       : "No bullet edits";
+    const omitted = state.lastResumeOptimize?.exportStats?.bulletsDropped || 0;
+    if (omitted) badge.textContent += ` · ${omitted} whole bullet${omitted === 1 ? "" : "s"} omitted to fit one page`;
+    const guarded = state.lastResumeOptimize?.metricWarnings?.length || 0;
+    if (guarded) badge.textContent += ` · ${guarded} unsupported rewrite${guarded === 1 ? "" : "s"} reverted`;
   }
 
   const box = $("ro-bullet-changes");
@@ -1370,7 +1348,7 @@ async function runExtensionResumeOptimize({ autoAttach }) {
       return false;
     }
 
-    state.lastResumeOptimize = response.resume;
+    state.lastResumeOptimize = { ...response.resume, exportStats: { pages: response.pages, bulletsDropped: response.bulletsDropped } };
     state.resumePdfBase64 = response.pdfBase64;
     disposeResumePdfObjectUrl();
     if (response.pdfBase64) {
@@ -1627,16 +1605,28 @@ function getCommonFieldValue(label, profile) {
   if (/\be-?mail\b/.test(l)) return profile.email || null;
   if (/country/.test(l) && /phone|code/.test(l)) return null; // phone country code — skip
   if (/\bphone\b|\bmobile\b|\bcontact number\b|\btelephone\b/.test(l)) return profile.phone || null;
-  if (/\blinkedin\b/.test(l)) return findLink("linkedin") || (profile.name ? `https://www.linkedin.com/in/${slugifyName(profile.name)}` : null);
+  if (/\blinkedin\b/.test(l)) return findLink("linkedin");
   if (/\bgithub\b/.test(l)) return findLink("github");
   if (/\b(portfolio|personal website|personal site)\b/.test(l)) return findLink("portfolio") || findLink("http");
   if (/\bwebsite\b/.test(l)) return findLink("http");
-  if (/\b(city|location|current location)\b/.test(l)) return profile.location || null;
-  if (/\b(legally authorized|work authorization|authorized to work|eligible to work)\b/i.test(l)) return "Yes";
-  if (/\b(sponsorship|require visa|require sponsorship|need sponsorship)\b/i.test(l)) return "No";
+  const locationParts = (profile.location || "").split(",").map(s => s.trim());
+  if (/^city$|^current city$/.test(l)) return locationParts[0] || null;
+  if (/^state$|^state.*province|^province$/.test(l)) return locationParts[1] || null;
+  if (/^country$|^country of residence$/.test(l)) return locationParts[2] || null;
+  if (/\b(location|current location)\b/.test(l)) return profile.location || null;
+  const experiences = [...(profile.experience || [])].sort((a, b) => (Date.parse(b.start || "") || 0) - (Date.parse(a.start || "") || 0));
+  const currentRole = experiences.find(e => !e.end?.trim() || /^(present|current|now)$/i.test(e.end.trim()));
+  if (/current company|current employer/.test(l)) return currentRole?.company || null;
+  if (/most recent employer|company name/.test(l)) return experiences[0]?.company || null;
+  if (/current job title/.test(l)) return currentRole?.title || null;
+  if (/most recent job title|^job title$/.test(l)) return experiences[0]?.title || null;
+  if (/^gpa$|grade point average/.test(l)) return (profile.education?.[0]?.details || []).join(" ").match(/GPA\s*:?\s*(\d(?:\.\d+)?)/i)?.[1] || null;
+  if (/\b(legally authorized|work authorization|authorized to work|eligible to work)\b/i.test(l)) return null;
+  if (/\b(sponsorship|require visa|require sponsorship|need sponsorship)\b/i.test(l)) return null;
   if (/\bschool\b|\buniversity\b|\bcollege\b/.test(l)) return profile.education?.[0]?.school || null;
   if (/\bdegree\b/.test(l)) return profile.education?.[0]?.degree || null;
-  if (/\bmajor\b|\bfield of study\b|\bdiscipline\b/.test(l)) return profile.education?.[0]?.major || null;
+  if (/\bmajor\b|\bfield of study\b|\bdiscipline\b/.test(l)) return profile.education?.[0]?.major || profile.education?.[0]?.degree?.split(/\s+in\s+/i)[1] || null;
+  if (/graduation year/.test(l)) return profile.education?.[0]?.end?.match(/\d{4}/)?.[0] || null;
   if (/\bgraduats?ion\b|\bgrad date\b/.test(l)) return profile.education?.[0]?.end || null;
   return null;
 }

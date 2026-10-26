@@ -63,13 +63,13 @@ export default function ApplicationQuestionDetailPage() {
 
   if (!storageReady) {
     return (
-      <p className="text-sm text-zinc-500 dark:text-zinc-400">Loading…</p>
+      <p className="text-sm text-muted">Loading…</p>
     );
   }
 
   if (!doc) {
     return (
-      <div className="text-sm text-zinc-600 dark:text-zinc-300">
+      <div className="text-sm text-muted">
         Template not found.
       </div>
     );
@@ -82,7 +82,7 @@ export default function ApplicationQuestionDetailPage() {
           <h1 className="truncate text-2xl font-semibold tracking-tight">
             {doc.title}
           </h1>
-          <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">
+          <p className="mt-1 text-sm text-muted">
             Base question + answer for reuse. Your template is not overwritten
             when you optimize for a JD.
           </p>
@@ -90,7 +90,7 @@ export default function ApplicationQuestionDetailPage() {
         <div className="flex flex-wrap items-center gap-2">
           <Link
             href={`/optimize/application-question?baseId=${encodeURIComponent(doc.id)}`}
-            className="inline-flex items-center gap-1.5 rounded-xl border border-accent/30 bg-accent-light px-3 py-2 text-sm font-medium text-accent hover:bg-accent/15"
+            className="inline-flex items-center gap-1.5 rounded-md border border-accent/30 bg-accent-light px-3 py-2 text-sm font-medium text-accent hover:bg-accent/15"
           >
             <AiMagicIcon size="sm" />
             Optimize for JD
@@ -103,7 +103,7 @@ export default function ApplicationQuestionDetailPage() {
                 `Question:\n${doc.question ?? ""}\n\n---\n\n${doc.templateAnswer ?? ""}`
               )
             }
-            className="rounded-xl border border-border px-3 py-2 text-sm hover:bg-zinc-50 dark:hover:bg-zinc-800"
+            className="rounded-md border border-border px-3 py-2 text-sm hover:bg-surface-sunken "
           >
             Download template
           </button>
@@ -111,7 +111,7 @@ export default function ApplicationQuestionDetailPage() {
       </div>
 
       {lastOpt?.tailoredAnswer?.trim() ? (
-        <div className="rounded-xl border border-emerald-200/80 bg-emerald-50/50 p-4 text-sm dark:border-emerald-900/40 dark:bg-emerald-950/20">
+        <div className="rounded-md border border-emerald-200/80 bg-emerald-50/50 p-4 text-sm dark:border-emerald-900/40 dark:bg-emerald-950/20">
           <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-emerald-800 dark:text-emerald-200/90">
             <AiMagicIcon size="sm" />
             Last JD-tailored answer (from Optimize)
@@ -137,7 +137,7 @@ export default function ApplicationQuestionDetailPage() {
             onChange={(e) =>
               persist({ ...doc, title: e.target.value, updatedAt: Date.now() })
             }
-            className="rounded-xl border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-accent"
+            className="rounded-md border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-accent"
           />
         </label>
         <label className="flex flex-col gap-1">
@@ -147,7 +147,7 @@ export default function ApplicationQuestionDetailPage() {
             onChange={(e) =>
               persist({ ...doc, source: e.target.value, updatedAt: Date.now() })
             }
-            className="rounded-xl border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-accent"
+            className="rounded-md border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-accent"
           >
             {BOARD_OPTIONS.map((o) => (
               <option key={o.value} value={o.value}>
@@ -174,7 +174,7 @@ export default function ApplicationQuestionDetailPage() {
               onClick={() =>
                 persist({ ...doc, question: q, updatedAt: Date.now() })
               }
-              className="rounded-full border border-border px-2.5 py-1 text-[11px] text-muted hover:bg-zinc-50 hover:text-foreground dark:hover:bg-zinc-800"
+              className="rounded-full border border-border px-2.5 py-1 text-[11px] text-muted hover:bg-surface-sunken hover:text-foreground "
             >
               Use: {q.length > 42 ? `${q.slice(0, 40)}…` : q}
             </button>
@@ -187,13 +187,13 @@ export default function ApplicationQuestionDetailPage() {
           }
           rows={3}
           placeholder="e.g. Why are you interested in this role?"
-          className="rounded-xl border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-accent"
+          className="rounded-md border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-accent"
         />
       </div>
 
       <label className="flex flex-col gap-1">
         <span className="text-sm font-medium">Base template answer</span>
-        <span className="text-xs text-zinc-500">
+        <span className="text-xs text-muted">
           Generic reusable draft. Optimize for a JD rewrites this into a
           posting-specific answer you can paste into the form.
         </span>
@@ -203,12 +203,12 @@ export default function ApplicationQuestionDetailPage() {
             persist({ ...doc, templateAnswer: e.target.value, updatedAt: Date.now() })
           }
           rows={12}
-          className="rounded-xl border border-border bg-surface px-3 py-2 text-sm leading-relaxed outline-none focus:border-accent"
+          className="rounded-md border border-border bg-surface px-3 py-2 text-sm leading-relaxed outline-none focus:border-accent"
           placeholder="Write a solid default answer grounded in your profile…"
         />
       </label>
 
-      <p className="text-sm text-zinc-500">
+      <p className="text-sm text-muted">
         <Link href="/application-questions" className="underline">
           ← All Q&A templates
         </Link>

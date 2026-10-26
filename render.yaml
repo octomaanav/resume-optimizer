@@ -1,0 +1,25 @@
+# Free web service only. Neon Free supplies the account database separately.
+# No Render database: its free database expires. No disk or paid resource here.
+services:
+  - type: web
+    name: resume-optimizer
+    runtime: docker
+    plan: free
+    region: oregon
+    healthCheckPath: /api/health
+    autoDeployTrigger: "off"
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: DATABASE_REQUIRE_TLS
+        value: "true"
+      - key: ALLOW_OLLAMA
+        value: "false"
+      - key: AUTH_SECRET
+        generateValue: true
+      - key: AUTH_URL
+        sync: false
+      - key: AUTH_TRUST_HOST
+        value: "true"
+      - key: NEXT_PUBLIC_CLOUD_WORKSPACES_ENABLED
+        value: "false"

@@ -69,6 +69,16 @@ export const ProfileSchema = z.object({
       }),
     )
     .default([]),
+}).superRefine((profile, ctx) => {
+  for (const key of ["experience", "projects", "education", "skillCategories"] as const) {
+    const seen = new Set<string>();
+    profile[key].forEach((entry, index) => {
+      if (!entry.id.trim() || seen.has(entry.id)) {
+        ctx.addIssue({ code: "custom", path: [key, index, "id"], message: "Entry IDs must be non-empty and unique within their section." });
+      }
+      seen.add(entry.id);
+    });
+  }
 });
 
 export type Profile = z.infer<typeof ProfileSchema>;

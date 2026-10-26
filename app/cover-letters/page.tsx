@@ -47,7 +47,7 @@ export default function CoverLettersPage() {
         </div>
         <Link
           href="/cover-letters/new"
-          className="inline-flex items-center gap-1.5 rounded-xl bg-accent px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-accent-dark"
+          className="inline-flex items-center gap-1.5 rounded-md bg-accent px-4 py-2 text-sm font-medium text-on-accent hover:bg-accent-hover"
         >
           <Plus size={14} />
           New cover letter
@@ -55,7 +55,7 @@ export default function CoverLettersPage() {
       </div>
 
       {sorted.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-border p-8 text-center text-sm text-muted">
+        <div className="rounded-lg border border-dashed border-border p-8 text-center text-sm text-muted">
           No saved cover letters yet.
         </div>
       ) : (
@@ -63,7 +63,7 @@ export default function CoverLettersPage() {
           {sorted.map((doc) => (
             <div
               key={doc.id}
-              className="rounded-2xl border border-border bg-surface p-4 transition-all hover:border-border-hover hover:shadow-sm"
+              className="rounded-lg border border-border bg-surface p-4 transition-all hover:border-border-hover hover:shadow-sm"
             >
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="min-w-0">
@@ -77,13 +77,13 @@ export default function CoverLettersPage() {
                 <div className="flex items-center gap-2">
                   <Link
                     href={`/cover-letters/${doc.id}`}
-                    className="rounded-xl border border-border px-3 py-2 text-sm hover:bg-zinc-50 dark:hover:bg-zinc-800"
+                    className="rounded-md border border-border px-3 py-2 text-sm hover:bg-surface-sunken "
                   >
                     Open
                   </Link>
                   <Link
                     href={`/optimize/cover-letter?baseId=${encodeURIComponent(doc.id)}`}
-                    className="inline-flex items-center gap-1.5 rounded-xl border border-accent/30 bg-accent-light px-3 py-2 text-sm font-medium text-accent hover:bg-accent/15"
+                    className="inline-flex items-center gap-1.5 rounded-md border border-accent/30 bg-accent-light px-3 py-2 text-sm font-medium text-accent hover:bg-accent/15"
                   >
                     <AiMagicIcon size="sm" />
                     Optimize
@@ -95,7 +95,7 @@ export default function CoverLettersPage() {
                       setDocs(next);
                       void persistCoverLetters(next);
                     }}
-                    className="inline-flex items-center gap-1 rounded-xl px-3 py-2 text-sm text-muted hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/30 dark:hover:text-red-400"
+                    className="inline-flex items-center gap-1 rounded-md px-3 py-2 text-sm text-muted hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/30 dark:hover:text-red-400"
                   >
                     <Trash2 size={13} />
                     Delete

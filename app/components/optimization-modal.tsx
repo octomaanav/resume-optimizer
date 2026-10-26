@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useId, useRef } from "react";
 import { X, Undo2, RotateCw, Check } from "lucide-react";
 import { AiMagicIcon } from "./ai-magic-icon";
 
@@ -33,25 +33,42 @@ export function OptimizationModal({
   onClose,
   busy,
 }: OptimizationModalProps) {
-  const backdropRef = useRef<HTMLDivElement>(null);
+  const backdropRef = useRef<HTMLDialogElement>(null);
+  const titleId = useId();
 
   useEffect(() => {
-    if (!open) return;
-    function onKey(e: KeyboardEvent) {
-      if (e.key === "Escape") onClose();
-    }
-    document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
-  }, [open, onClose]);
+    const dialog = backdropRef.current;
+    if (!open || !dialog) return;
+    dialog.showModal();
+    return () => dialog.close();
+  }, [open]);
 
   if (!open) return null;
 
   const changed = before.trim() !== after.trim();
 
   return (
-    <div
+    <dialog
       ref={backdropRef}
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm p-4"
+      aria-labelledby={titleId}
+      className="fixed inset-0 m-0 h-full max-h-none w-full max-w-none items-center justify-center bg-black/40 p-4 text-foreground backdrop-blur-sm open:flex"
+      onCancel={(event) => {
+        event.preventDefault();
+        onClose();
+      }}
+      onKeyDown={(event) => {
+        if (event.key !== "Tab") return;
+        const buttons = Array.from(event.currentTarget.querySelectorAll<HTMLButtonElement>("button:not(:disabled)"));
+        const first = buttons[0];
+        const last = buttons.at(-1);
+        if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault();
+          last?.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault();
+          first?.focus();
+        }
+      }}
       onClick={(e) => {
         if (e.target === backdropRef.current) onClose();
       }}
@@ -59,7 +76,7 @@ export function OptimizationModal({
       <div className="relative flex max-h-[85vh] w-full max-w-2xl flex-col rounded-2xl border border-border bg-surface shadow-2xl">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-border px-5 py-4">
-          <h2 className="flex items-center gap-2 text-base font-semibold">
+          <h2 id={titleId} className="flex items-center gap-2 text-base font-semibold">
             <AiMagicIcon size="md" />
             {title}
           </h2>
@@ -130,7 +147,7 @@ export function OptimizationModal({
               type="button"
               onClick={onAccept}
               disabled={busy}
-              className="inline-flex items-center gap-1.5 rounded-xl bg-accent px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-accent-dark disabled:opacity-50"
+              className="inline-flex items-center gap-1.5 rounded-xl bg-accent px-4 py-2 text-sm font-medium text-on-accent shadow-sm hover:bg-accent-dark disabled:opacity-50"
             >
               <Check size={14} />
               Accept
@@ -138,6 +155,6 @@ export function OptimizationModal({
           </div>
         </div>
       </div>
-    </div>
+    </dialog>
   );
 }

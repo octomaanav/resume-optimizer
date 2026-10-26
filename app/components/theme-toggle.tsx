@@ -1,5 +1,6 @@
 "use client";
 
+import { handleRadioKeyDown } from "../lib/radio-keyboard";
 import { Monitor, Moon, Sun } from "lucide-react";
 
 import { useTheme, type ThemeChoice } from "./theme-provider";
@@ -22,7 +23,7 @@ export function ThemeToggle() {
     <div
       role="radiogroup"
       aria-label="Color theme"
-      className="inline-flex items-center gap-0.5 rounded-full border border-border bg-surface p-0.5"
+      className="inline-flex items-center gap-0.5 rounded-md border border-border bg-surface p-0.5"
     >
       {OPTIONS.map(({ value, label, icon: Icon }) => {
         const active = theme === value;
@@ -32,13 +33,15 @@ export function ThemeToggle() {
             type="button"
             role="radio"
             aria-checked={active}
+            tabIndex={active ? 0 : -1}
+            onKeyDown={handleRadioKeyDown}
             aria-label={label}
             title={label}
             onClick={() => setTheme(value)}
             className={[
-              "inline-flex h-7 w-7 items-center justify-center rounded-full transition-colors",
+              "inline-flex h-7 w-7 items-center justify-center rounded-md transition-colors",
               active
-                ? "bg-accent text-on-accent"
+                ? "bg-surface-sunken text-foreground"
                 : "text-muted hover:bg-surface-sunken hover:text-foreground",
             ].join(" ")}
           >

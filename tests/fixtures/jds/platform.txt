@@ -1,0 +1,21 @@
+SYNTHETIC TEST JOB DESCRIPTION — Observability and Platform Engineer
+Company: Example Platform Labs (fictional)
+Location: Boston / Remote, United States
+
+Responsibilities and selection priorities
+Build developer tooling for observable Node.js services. Instrument OpenTelemetry traces, expose Redis queue health signals, compare deployment runs, and analyze PostgreSQL latency. Package with Docker and automate GitHub Actions CI/CD on AWS. Favor monitoring, tracing, debugging, reproducible Linux environments and cache benchmarking over unrelated UI and algorithm work.
+
+Required qualifications
+- OpenTelemetry
+- Docker
+- AWS
+- GitHub Actions
+- CI/CD
+- Redis
+- Linux
+
+Preferred, not mandatory
+- Kubernetes
+- Terraform
+
+Applications are assessed on demonstrated work. Candidates may apply without preferred tools. Do not claim skills you have not used.

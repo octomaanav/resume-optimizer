@@ -1,36 +1,43 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Tailr
 
-## Getting Started
+A Next.js 16 / React 19 application for maintaining a profile, tailoring application documents, and exporting resumes. Authentication uses Auth.js v5 with Drizzle and Postgres. Styling uses Tailwind v4.
 
-First, run the development server:
+Personal workspaces use browser IndexedDB by default. The zero-budget deployment keeps cloud document storage disabled and uses Postgres for accounts. Settings provides encrypted backups and an explicit optional cloud-workspace mode. AI and PDF requests still involve server processing; see the privacy boundaries in [DEPLOYMENT.md](DEPLOYMENT.md).
 
-```bash
+## Local development
+
+```sh
+npm install
+cp .env.example .env.local
+# Configure DATABASE_URL and a generated AUTH_SECRET in .env.local.
+# Reuse the existing local Postgres server if available.
+npm run db:push
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+`db:push` is for local schema synchronization. Deployment uses checked-in migrations against a fresh database or a deliberately baselined migration history. Do not point a new deployment at an existing database initialized by `db:push` without reviewing that history.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+For production output locally:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```sh
+npm run build
+npm run start
+```
 
-## Learn More
+`npm run start` loads local environment values at runtime and runs standalone output with its static assets. Docker startup additionally applies migrations before serving traffic.
 
-To learn more about Next.js, take a look at the following resources:
+## Verification
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```sh
+npm run lint
+npm run typecheck
+npm run test:e2e
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+The legacy cloud regressions require a compatibility build with `NEXT_PUBLIC_CLOUD_WORKSPACES_ENABLED=true` and `NEXT_PUBLIC_DEFAULT_STORAGE=cloud`. The private deployment defaults to device storage; test it with `tests/e2e/local-first.spec.ts`. Live-provider checks are opt-in. See [test instructions](tests/e2e/README.md) and the [privacy/deployment audit](tests/PRIVACY-DEPLOYMENT-AUDIT.md).
 
-## Deploy on Vercel
+## Free deployment
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+The prepared configuration uses a Render Free Docker service and Neon Free Postgres. No paid resources are declared. Render and Neon accounts must be connected before live provisioning, and free tiers have sleep/usage limits.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+See [deployment setup and release checks](DEPLOYMENT.md), [Dockerfile](Dockerfile), and [Render blueprint](render.yaml). The Chrome extension lives in `chrome-extension/`; Connect & Sync reads a saved device workspace from an open signed-in app tab.

@@ -1,0 +1,20 @@
+SYNTHETIC TEST JOB DESCRIPTION — Backend API Engineer
+Company: Example Backend Labs (fictional)
+Location: Boston / Remote, United States
+
+Responsibilities and selection priorities
+Build TypeScript and Node.js REST API services backed by PostgreSQL and Redis. Improve query plans, caching and p95 latency. Ship Docker services on AWS using GitHub Actions CI/CD, integration tests and OpenTelemetry. This is an early-career position; do not require previous leadership.
+
+Required qualifications
+- TypeScript
+- Node.js
+- REST API
+- PostgreSQL
+- Redis
+- Docker
+- integration tests
+
+Preferred, not mandatory
+- Kafka
+
+Applications are assessed on demonstrated work. Candidates may apply without preferred tools. Do not claim skills you have not used.

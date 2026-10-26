@@ -1,0 +1,16 @@
+# A local production rehearsal. Use an external account database in production.
+services:
+  app:
+    platform: linux/amd64
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    env_file: ${RESUME_RUNTIME_ENV_FILE:?Set a dedicated test runtime environment file}
+    environment:
+      NODE_ENV: production
+      AUTH_URL: http://127.0.0.1:3001
+      AUTH_TRUST_HOST: "true"
+    ports:
+      - "127.0.0.1:3001:3000"
+    restart: unless-stopped
+    # No privileged mode, host network, Docker socket, or broad added capabilities.

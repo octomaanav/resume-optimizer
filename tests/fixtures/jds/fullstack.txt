@@ -1,0 +1,20 @@
+SYNTHETIC TEST JOB DESCRIPTION — Full Stack TypeScript Engineer
+Company: Example Fullstack Labs (fictional)
+Location: Boston / Remote, United States
+
+Responsibilities and selection priorities
+Build customer-facing React and Next.js interfaces together with Node.js REST API endpoints and PostgreSQL storage. Implement accessible form workflows, query optimization and integration tests. Ship through GitHub Actions CI/CD and Docker. Select work showing both UI and backend delivery rather than unrelated algorithms exercises.
+
+Required qualifications
+- TypeScript
+- React
+- Next.js
+- Node.js
+- PostgreSQL
+- REST API
+- GitHub Actions
+
+Preferred, not mandatory
+- GraphQL
+
+Applications are assessed on demonstrated work. Candidates may apply without preferred tools. Do not claim skills you have not used.

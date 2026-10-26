@@ -20,7 +20,9 @@ const BodySchema = z.object({
   password: z
     .string()
     .min(8, "Password must be at least 8 characters.")
-    .max(200),
+    .max(200)
+    .refine(value => Buffer.byteLength(value, "utf8") <= 72,
+      "Password must be at most 72 UTF-8 bytes."),
 });
 
 export async function POST(req: Request) {
@@ -60,7 +62,15 @@ export async function POST(req: Request) {
       name: parsed.data.name ?? null,
       passwordHash,
     })
+    .onConflictDoNothing({ target: users.email })
     .returning({ id: users.id, email: users.email });
+
+  if (!created) {
+    return NextResponse.json(
+      { error: "An account with that email already exists." },
+      { status: 409 },
+    );
+  }
 
   return NextResponse.json({ ok: true, user: created }, { status: 201 });
 }

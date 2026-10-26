@@ -1,0 +1,33 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><title>Northstar Developer Tools — Test Application</title>
+<style>body{font:16px system-ui;max-width:780px;margin:32px auto;padding:16px}label{display:block;margin:16px 0 5px}input,select,textarea{display:block;width:90%;padding:9px}input[type=checkbox]{width:auto;display:inline}section{border:1px solid #ddd;padding:20px;margin:20px 0}button{padding:12px}</style>
+<h1>Software Engineer Application (Local Test)</h1><section class="job-description" data-jd><h2>Job description</h2><div style="white-space:pre-wrap">__JD__</div></section>
+<form id="application_form" onsubmit="event.preventDefault();window.submissions=(window.submissions||0)+1">
+<h2>Contact details</h2>
+<label for="first">First name</label><input id="first" required autocomplete="given-name">
+<label for="last">Last name</label><input id="last" required autocomplete="family-name">
+<label for="email">Email</label><input id="email" type="email" required>
+<label for="phone">Phone</label><input id="phone" type="tel" required>
+<label for="city">City</label><input id="city" required>
+<label for="state">State</label><input id="state" required>
+<label for="country">Country</label><select id="country" required><option value="">Choose...</option><option value="US">United States</option><option value="CA">Canada</option></select>
+<label for="linkedin">LinkedIn</label><input id="linkedin" type="url" required>
+<label for="github">GitHub</label><input id="github" type="url" required>
+<label for="portfolio">Portfolio</label><input id="portfolio" type="url" required>
+<h2>Education and work experience</h2>
+<label for="school">School</label><input id="school" required>
+<label for="degree">Degree</label><select id="degree" required><option value="">Choose...</option><option>Bachelor of Science in Computer Science</option><option>Master of Science</option></select>
+<label for="major">Major</label><input id="major" required>
+<label for="grad">Graduation year</label><input id="grad" required>
+<label for="gpa">GPA</label><input id="gpa" type="number" step="0.01" required>
+<label for="company">Most recent employer</label><input id="company" required>
+<label for="jobtitle">Most recent job title</label><input id="jobtitle" required>
+<h2>Application questions</h2>
+<label for="authorized">Are you legally authorized to work in the United States?</label><select id="authorized" required><option value="">Choose...</option><option value="yes">Yes</option><option value="no">No</option></select>
+<label for="sponsorship">Will you require sponsorship now or in the future?</label><select id="sponsorship" required><option value="">Choose...</option><option value="yes">Yes</option><option value="no">No</option></select>
+<label for="relocate">Are you willing to relocate?</label><select id="relocate" required><option value="">Choose...</option><option value="yes">Yes</option><option value="no">No</option></select>
+<label for="why">Why do you want to join Northstar Developer Tools?</label><textarea id="why" required maxlength="500"></textarea>
+<label for="challenge">Describe a technical challenge you solved.</label><textarea id="challenge" required maxlength="800"></textarea>
+<label for="resume">Resume / CV (PDF)</label><input type="file" id="resume" accept=".pdf,application/pdf" required>
+<label for="privacy"><input type="checkbox" id="privacy" required>I agree to the privacy policy</label>
+<button type="submit" id="submit">Submit application</button>
+</form><script>window.submissions=0;</script></html>

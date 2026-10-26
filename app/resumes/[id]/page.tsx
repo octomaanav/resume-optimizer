@@ -11,7 +11,7 @@ import {
   resumeFilteredProjects,
 } from "../../lib/resume-filter";
 import { renderJakeResumeTex } from "../../lib/jake-latex";
-import { fitResumeToPageLimit } from "../../lib/resume-pdf-fit";
+import { compileGeneratedResume } from "../../lib/resume-pdf-client";
 import {
   useHydratedProfile,
   useHydratedResumes,
@@ -181,14 +181,12 @@ export default function ResumeDetailPage() {
       const bytes = await compileLatexViaApi(customLatexDraft);
       return { bytes, bulletsDropped: 0 };
     }
-    const fitted = await fitResumeToPageLimit({
+    const fitted = await compileGeneratedResume({
       profile: displayProfile,
       experienceIds: selExp,
       projectIds: selProj,
       subsetEnabled,
       title: title.trim() || doc?.title,
-      compile: compileLatexViaApi,
-      maxPages: 1,
     });
     return { bytes: fitted.pdfBytes, bulletsDropped: fitted.bulletsDropped };
   }
@@ -257,13 +255,13 @@ export default function ResumeDetailPage() {
 
   if (!storageReady) {
     return (
-      <p className="text-sm text-zinc-500 dark:text-zinc-400">Loading…</p>
+      <p className="text-sm text-muted">Loading…</p>
     );
   }
 
   if (!doc) {
     return (
-      <div className="text-sm text-zinc-600 dark:text-zinc-300">
+      <div className="text-sm text-muted">
         Resume not found.
       </div>
     );
@@ -279,7 +277,7 @@ export default function ResumeDetailPage() {
           <h1 className="truncate text-2xl font-semibold tracking-tight">
             {doc.title}
           </h1>
-          <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">
+          <p className="mt-1 text-sm text-muted">
             Pick profile rows, customize text for this resume only, edit LaTeX,
             or use Optimize for a JD-specific pass.
           </p>
@@ -287,7 +285,7 @@ export default function ResumeDetailPage() {
         <div className="flex flex-wrap items-center gap-2">
           <Link
             href={`/optimize/resume?baseId=${encodeURIComponent(doc.id)}`}
-            className="inline-flex items-center gap-1.5 rounded-xl border border-border px-3 py-2 text-sm hover:bg-zinc-50 dark:hover:bg-zinc-800"
+            className="inline-flex items-center gap-1.5 rounded-md border border-border px-3 py-2 text-sm hover:bg-surface-sunken "
           >
             <AiMagicIcon size="sm" />
             Optimize for JD
@@ -300,7 +298,7 @@ export default function ResumeDetailPage() {
                 effectiveLatex,
               )
             }
-            className="rounded-xl border border-border px-3 py-2 text-sm hover:bg-zinc-50 dark:hover:bg-zinc-800"
+            className="rounded-md border border-border px-3 py-2 text-sm hover:bg-surface-sunken "
           >
             Download .tex
           </button>
@@ -308,7 +306,7 @@ export default function ResumeDetailPage() {
             type="button"
             disabled={pdfBusy || !effectiveLatex.trim()}
             onClick={() => void downloadPdf()}
-            className="rounded-xl border border-border px-3 py-2 text-sm hover:bg-zinc-50 disabled:opacity-50 dark:hover:bg-zinc-800"
+            className="rounded-md border border-border px-3 py-2 text-sm hover:bg-surface-sunken disabled:opacity-50 "
           >
             {pdfBusy ? "…" : "Download PDF"}
           </button>
@@ -316,7 +314,7 @@ export default function ResumeDetailPage() {
       </div>
 
       {pdfError ? (
-        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-900 dark:border-red-900/50 dark:bg-red-900/20 dark:text-red-100">
+        <div className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-900 dark:border-red-900/50 dark:bg-red-900/20 dark:text-red-100">
           {pdfError}
         </div>
       ) : null}
@@ -326,10 +324,10 @@ export default function ResumeDetailPage() {
           type="button"
           onClick={() => setView("preview")}
           className={cx(
-            "rounded-full px-3 py-1.5 text-sm transition",
+            "rounded-md px-3 py-1.5 text-sm transition",
             view === "preview"
-              ? "bg-accent text-white"
-              : "text-muted hover:bg-zinc-100 dark:hover:bg-zinc-800",
+              ? "bg-accent text-on-accent"
+              : "text-muted hover:bg-surface-sunken ",
           )}
         >
           Preview
@@ -338,10 +336,10 @@ export default function ResumeDetailPage() {
           type="button"
           onClick={() => setView("customize")}
           className={cx(
-            "rounded-full px-3 py-1.5 text-sm transition",
+            "rounded-md px-3 py-1.5 text-sm transition",
             view === "customize"
-              ? "bg-accent text-white"
-              : "text-muted hover:bg-zinc-100 dark:hover:bg-zinc-800",
+              ? "bg-accent text-on-accent"
+              : "text-muted hover:bg-surface-sunken ",
           )}
         >
           Customize
@@ -350,10 +348,10 @@ export default function ResumeDetailPage() {
           type="button"
           onClick={() => setView("latex")}
           className={cx(
-            "rounded-full px-3 py-1.5 text-sm transition",
+            "rounded-md px-3 py-1.5 text-sm transition",
             view === "latex"
-              ? "bg-accent text-white"
-              : "text-muted hover:bg-zinc-100 dark:hover:bg-zinc-800",
+              ? "bg-accent text-on-accent"
+              : "text-muted hover:bg-surface-sunken ",
           )}
         >
           LaTeX
@@ -362,27 +360,27 @@ export default function ResumeDetailPage() {
           type="button"
           onClick={() => setView("markdown")}
           className={cx(
-            "rounded-full px-3 py-1.5 text-sm transition",
+            "rounded-md px-3 py-1.5 text-sm transition",
             view === "markdown"
-              ? "bg-accent text-white"
-              : "text-muted hover:bg-zinc-100 dark:hover:bg-zinc-800",
+              ? "bg-accent text-on-accent"
+              : "text-muted hover:bg-surface-sunken ",
           )}
         >
           (Legacy) Markdown
         </button>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid gap-6 xl:grid-cols-2">
         <div className="flex flex-col gap-4">
           <div className="text-sm font-semibold">Document</div>
           <label className="flex flex-col gap-1">
-            <span className="text-sm text-zinc-600 dark:text-zinc-300">
+            <span className="text-sm text-muted">
               Title
             </span>
             <input
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="rounded-xl border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-accent"
+              className="rounded-md border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-accent"
             />
           </label>
           <button
@@ -395,14 +393,14 @@ export default function ResumeDetailPage() {
                 updatedAt: Date.now(),
               });
             }}
-            className="self-start rounded-xl bg-accent px-3 py-2 text-sm font-medium text-white shadow-sm hover:bg-accent-dark"
+            className="self-start rounded-md bg-accent px-3 py-2 text-sm font-medium text-on-accent hover:bg-accent-hover"
           >
             Save title
           </button>
 
-          <div className="rounded-2xl border border-border p-4 text-sm">
+          <div className="rounded-lg border border-border p-4 text-sm">
             <div className="font-semibold">Profile entries on this resume</div>
-            <p className="mt-1 text-xs text-zinc-600 dark:text-zinc-400">
+            <p className="mt-1 text-xs text-muted">
               Turn on “Pick from profile” to show only checked roles and
               projects (e.g. two cybersecurity jobs). Off = use all profile
               entries unless you list specific IDs (legacy).
@@ -447,7 +445,7 @@ export default function ResumeDetailPage() {
               </div>
 
               <div>
-                <div className="text-xs font-medium text-zinc-500">
+                <div className="text-xs font-medium text-muted">
                   Experience
                 </div>
                 <ul className="mt-1 max-h-48 space-y-1 overflow-y-auto rounded-lg border border-border p-2">
@@ -468,7 +466,7 @@ export default function ResumeDetailPage() {
                           <span className="font-medium">
                             {(exp.title || "").trim() || "(Role)"}
                           </span>
-                          <span className="text-zinc-500">
+                          <span className="text-muted">
                             {" "}
                             · {(exp.company || "").trim() || "Company"}
                           </span>
@@ -477,13 +475,13 @@ export default function ResumeDetailPage() {
                     </li>
                   ))}
                   {profile.experience.length === 0 ? (
-                    <li className="text-xs text-zinc-500">No experience in profile.</li>
+                    <li className="text-xs text-muted">No experience in profile.</li>
                   ) : null}
                 </ul>
               </div>
 
               <div>
-                <div className="text-xs font-medium text-zinc-500">
+                <div className="text-xs font-medium text-muted">
                   Projects
                 </div>
                 <ul className="mt-1 max-h-48 space-y-1 overflow-y-auto rounded-lg border border-border p-2">
@@ -505,7 +503,7 @@ export default function ResumeDetailPage() {
                             {(proj.name || "").trim() || "(Project)"}
                           </span>
                           {(proj.role || "").trim() ? (
-                            <span className="text-zinc-500">
+                            <span className="text-muted">
                               {" "}
                               · {(proj.role || "").trim()}
                             </span>
@@ -515,7 +513,7 @@ export default function ResumeDetailPage() {
                     </li>
                   ))}
                   {profile.projects.length === 0 ? (
-                    <li className="text-xs text-zinc-500">No projects in profile.</li>
+                    <li className="text-xs text-muted">No projects in profile.</li>
                   ) : null}
                 </ul>
               </div>
@@ -535,15 +533,15 @@ export default function ResumeDetailPage() {
                   updatedAt: Date.now(),
                 });
               }}
-              className="mt-4 rounded-xl bg-accent px-3 py-2 text-sm font-medium text-white shadow-sm hover:bg-accent-dark"
+              className="mt-4 rounded-md bg-accent px-3 py-2 text-sm font-medium text-on-accent hover:bg-accent-hover"
             >
               Save profile selection
             </button>
           </div>
 
-          <div className="rounded-2xl border border-border p-4 text-sm">
+          <div className="rounded-lg border border-border p-4 text-sm">
             <div className="font-semibold">JD (legacy)</div>
-            <div className="mt-2 whitespace-pre-wrap text-xs text-zinc-600 dark:text-zinc-300">
+            <div className="mt-2 whitespace-pre-wrap text-xs text-muted">
               {doc.jd || "(empty — use Optimize for new flow)"}
             </div>
           </div>
@@ -589,15 +587,15 @@ export default function ResumeDetailPage() {
           {view === "latex" ? (
             <div className="flex flex-col gap-3">
               <div className="text-sm font-semibold">LaTeX</div>
-              <div className="flex flex-wrap gap-2 rounded-xl border border-border p-2">
+              <div className="flex flex-wrap gap-2 rounded-md border border-border p-2">
                 <button
                   type="button"
                   onClick={() => setLatexMode("generated")}
                   className={cx(
                     "rounded-lg px-3 py-1.5 text-xs font-medium",
                     latexMode === "generated"
-                      ? "bg-accent text-white"
-                      : "text-zinc-600 dark:text-zinc-400",
+                      ? "bg-accent text-on-accent"
+                      : "text-muted",
                   )}
                 >
                   Generated (Jake + profile)
@@ -613,8 +611,8 @@ export default function ResumeDetailPage() {
                   className={cx(
                     "rounded-lg px-3 py-1.5 text-xs font-medium",
                     latexMode === "custom"
-                      ? "bg-accent text-white"
-                      : "text-zinc-600 dark:text-zinc-400",
+                      ? "bg-accent text-on-accent"
+                      : "text-muted",
                   )}
                 >
                   Custom (full document)
@@ -622,7 +620,7 @@ export default function ResumeDetailPage() {
               </div>
 
               {latexMode === "generated" ? (
-                <p className="text-xs text-zinc-600 dark:text-zinc-400">
+                <p className="text-xs text-muted">
                   Read-only output from your profile and the selection on the
                   left. Switch to Custom to edit the full .tex yourself
                   (Tectonic / node-latex-compiler).
@@ -647,7 +645,7 @@ export default function ResumeDetailPage() {
                         updatedAt: Date.now(),
                       });
                     }}
-                    className="rounded-lg bg-accent px-2 py-1 text-xs font-medium text-white"
+                    className="rounded-lg bg-accent px-2 py-1 text-xs font-medium text-on-accent"
                   >
                     Save custom LaTeX
                   </button>
@@ -679,7 +677,7 @@ export default function ResumeDetailPage() {
                 readOnly={latexMode === "generated"}
                 spellCheck={false}
                 rows={22}
-                className="min-h-[280px] w-full rounded-2xl border border-border bg-surface px-3 py-2 font-mono text-xs outline-none focus:border-accent"
+                className="min-h-[280px] w-full rounded-lg border border-border bg-surface px-3 py-2 font-mono text-xs outline-none focus:border-accent"
               />
 
               <div className="flex flex-wrap items-center gap-2">
@@ -687,7 +685,7 @@ export default function ResumeDetailPage() {
                   type="button"
                   disabled={pdfBusy || !effectiveLatex.trim()}
                   onClick={() => void compilePdfPreview()}
-                  className="rounded-xl border border-border px-3 py-2 text-sm hover:bg-zinc-50 disabled:opacity-50 dark:hover:bg-zinc-800"
+                  className="rounded-md border border-border px-3 py-2 text-sm hover:bg-surface-sunken disabled:opacity-50 "
                 >
                   {pdfBusy ? "Compiling…" : "Compile preview (PDF)"}
                 </button>
@@ -695,13 +693,13 @@ export default function ResumeDetailPage() {
 
               {pdfObjectUrl ? (
                 <div className="flex flex-col gap-2">
-                  <div className="text-xs font-medium text-zinc-500">
+                  <div className="text-xs font-medium text-muted">
                     PDF preview (local)
                   </div>
                   <iframe
                     title="LaTeX PDF preview"
                     src={pdfObjectUrl}
-                    className="h-[520px] w-full rounded-xl border border-border"
+                    className="h-[520px] w-full rounded-md border border-border"
                   />
                 </div>
               ) : null}
@@ -715,7 +713,7 @@ export default function ResumeDetailPage() {
                 value={doc.outputMarkdown ?? ""}
                 readOnly
                 rows={26}
-                className="rounded-2xl border border-border bg-surface px-3 py-2 font-mono text-xs outline-none focus:border-accent"
+                className="rounded-lg border border-border bg-surface px-3 py-2 font-mono text-xs outline-none focus:border-accent"
               />
             </>
           ) : null}

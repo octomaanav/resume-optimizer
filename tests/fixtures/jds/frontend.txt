@@ -1,0 +1,19 @@
+SYNTHETIC TEST JOB DESCRIPTION — Frontend React and Accessibility Engineer
+Company: Example Frontend Labs (fictional)
+Location: Boston / Remote, United States
+
+Responsibilities and selection priorities
+Build accessible React and Next.js workflows in TypeScript. Prioritize keyboard navigation, screen-reader labels, reusable form components, validation and responsive UI. Write Playwright end-to-end tests. Strong evidence of accessible component and dashboard work matters more than backend tracing or data pipelines.
+
+Required qualifications
+- React
+- Next.js
+- TypeScript
+- accessible
+- keyboard
+- Playwright
+
+Preferred, not mandatory
+- Vue
+
+Applications are assessed on demonstrated work. Candidates may apply without preferred tools. Do not claim skills you have not used.

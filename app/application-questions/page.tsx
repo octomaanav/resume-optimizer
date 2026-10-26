@@ -101,20 +101,18 @@ export default function ApplicationQuestionsPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex items-start justify-between gap-4">
+      <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">
             Application Q&A
           </h1>
           <p className="mt-1 text-sm text-muted">
-            One template per common question (exact prompt + reusable base answer).
-            Questions are segregated by Job Board (Ashby, Greenhouse, Workday, etc.)
-            so auto-fill fetches board-specific templates during application filing.
+            Save reusable answers to common questions. Organize them by job board for autofill, then tailor each answer to the role.
           </p>
         </div>
         <Link
           href="/application-questions/new"
-          className="inline-flex items-center gap-1.5 rounded-xl bg-accent px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-accent-dark"
+          className="inline-flex items-center gap-1.5 rounded-md bg-accent px-4 py-2 text-sm font-medium text-on-accent hover:bg-accent-hover"
         >
           <Plus size={14} />
           New template
@@ -131,17 +129,17 @@ export default function ApplicationQuestionsPage() {
               key={board.id}
               type="button"
               onClick={() => setActiveTab(board.id)}
-              className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-medium transition-all ${
+              className={`inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-all ${
                 isActive
-                  ? "bg-accent text-white shadow-sm"
-                  : "bg-surface text-muted hover:bg-zinc-100 hover:text-foreground dark:hover:bg-zinc-800"
+                  ? "bg-accent text-on-accent shadow-sm"
+                  : "bg-surface text-muted hover:bg-zinc-100 hover:text-foreground "
               }`}
             >
               <span>{board.label}</span>
               <span
                 className={`rounded-full px-1.5 py-0.2 text-[10px] ${
                   isActive
-                    ? "bg-white/20 text-white"
+                    ? "bg-surface/20 text-on-accent"
                     : "bg-zinc-200/60 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300"
                 }`}
               >
@@ -153,7 +151,7 @@ export default function ApplicationQuestionsPage() {
       </div>
 
       {groups.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-border p-8 text-center text-sm text-muted">
+        <div className="rounded-lg border border-dashed border-border p-8 text-center text-sm text-muted">
           <p>
             {activeTab === "all"
               ? "No Q&A templates yet. Create one, paste the employer's question text, write a base answer, then run Optimize with each job's JD."
@@ -182,7 +180,7 @@ export default function ApplicationQuestionsPage() {
                 {list.map((doc) => (
                   <div
                     key={doc.id}
-                    className="rounded-2xl border border-border bg-surface p-4 transition-all hover:border-border-hover hover:shadow-sm"
+                    className="min-w-0 rounded-md border border-border bg-surface p-4 transition-all hover:border-border-hover hover:shadow-sm"
                   >
                     <div className="flex flex-wrap items-center justify-between gap-3">
                       <div className="min-w-0 flex-1">
@@ -203,16 +201,16 @@ export default function ApplicationQuestionsPage() {
                           Updated {formatListTimestamp(doc.updatedAt)}
                         </div>
                       </div>
-                      <div className="flex items-center gap-2">
+                      <div className="flex flex-wrap items-center gap-2">
                         <Link
                           href={`/application-questions/${doc.id}`}
-                          className="rounded-xl border border-border px-3 py-2 text-sm hover:bg-zinc-50 dark:hover:bg-zinc-800"
+                          className="rounded-md border border-border px-3 py-2 text-sm hover:bg-surface-sunken "
                         >
                           Edit template
                         </Link>
                         <Link
                           href={`/optimize/application-question?baseId=${encodeURIComponent(doc.id)}`}
-                          className="inline-flex items-center gap-1.5 rounded-xl border border-accent/30 bg-accent-light px-3 py-2 text-sm font-medium text-accent hover:bg-accent/15"
+                          className="inline-flex items-center gap-1.5 rounded-md border border-accent/30 bg-accent-light px-3 py-2 text-sm font-medium text-accent hover:bg-accent/15"
                         >
                           <AiMagicIcon size="sm" />
                           Optimize for JD
@@ -224,7 +222,7 @@ export default function ApplicationQuestionsPage() {
                             setDocs(next);
                             void persistApplicationAnswerDocs(next);
                           }}
-                          className="inline-flex items-center gap-1 rounded-xl px-3 py-2 text-sm text-muted hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/30 dark:hover:text-red-400"
+                          className="inline-flex items-center gap-1 rounded-md px-3 py-2 text-sm text-muted hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/30 dark:hover:text-red-400"
                         >
                           <Trash2 size={13} />
                           Delete

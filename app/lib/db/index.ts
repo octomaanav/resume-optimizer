@@ -23,7 +23,7 @@ const globalForDb = globalThis as unknown as {
 
 const sql =
   globalForDb.__resumeOptimizerSql ??
-  postgres(connectionString, { max: 10, prepare: false });
+  postgres(connectionString, { max: 3, prepare: false, idle_timeout: 20, connect_timeout: 15, ...(process.env.DATABASE_REQUIRE_TLS === "true" ? { ssl: { rejectUnauthorized: true } } : {}) });
 
 if (process.env.NODE_ENV !== "production") {
   globalForDb.__resumeOptimizerSql = sql;
